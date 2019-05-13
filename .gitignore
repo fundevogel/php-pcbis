@@ -1,0 +1,11 @@
+# Composer + sensitive files
+/composer.lock
+/*login*.json
+/*.cache
+/vendor
+
+# Auto-generated
+/dist
+
+# Tests
+/tests/Resources/*_actual.jpg
