@@ -26,7 +26,15 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.1.0';
+    const VERSION = '0.2.0';
+
+
+    /**
+     * Path to cached book information received from KNV's API
+     *
+     * @var string
+     */
+    private $cachePath = './.cache';
 
 
     /**
@@ -43,14 +51,6 @@ class PHPCBIS
      * @var string
      */
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
-
-
-    /**
-     * CSV input file headers in order of use when exporting with pcbis.de
-     *
-     * @var string
-     */
-    private $cachePath = './.cache';
 
 
     public function __construct(array $login = null, string $lang = 'de')
@@ -72,6 +72,16 @@ class PHPCBIS
      * Setters & getters
      */
 
+    public function setCachePath(string $cachePath)
+    {
+        $this->cachePath = $cachePath;
+    }
+
+    public function getCachePath()
+    {
+        return $this->cachePath;
+    }
+
     public function setImagePath(string $imagePath)
     {
         $this->imagePath = $imagePath;
@@ -90,16 +100,6 @@ class PHPCBIS
     public function getUserAgent()
     {
         return $this->userAgent;
-    }
-
-    public function setCachePath(string $cachePath)
-    {
-        $this->cachePath = $cachePath;
-    }
-
-    public function getCachePath()
-    {
-        return $this->cachePath;
     }
 
 
@@ -127,7 +127,7 @@ class PHPCBIS
     /**
      * Loads credentials saved in a local JSON file as array
      *
-     * @param string $fileName - Provider name
+     * @param string $fileName - Name of file to be included
      * @return array|boolean
      */
     public function getLogin(string $fileName = 'login')
@@ -140,7 +140,6 @@ class PHPCBIS
         }
 
         throw new \Exception('Please provide valid login credentials.');
-
     }
 
 
@@ -152,7 +151,7 @@ class PHPCBIS
      * @param string $isbn
      * @return array|Exception
      */
-    private function callAPI(string $isbn)
+    public function callAPI(string $isbn)
     {
         $client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
             'soap_version' => SOAP_1_2,
@@ -224,35 +223,17 @@ class PHPCBIS
      */
     public function loadBook($isbn)
     {
-        try {
-            $this->validateISBN($isbn);
-        } catch (\InvalidArgumentException $e) {
-            echo 'Error: ', $e->getMessage(), "\n";
-            return false;
-        }
+        $this->validateISBN($isbn);
 
         $driver = new FilesystemCache($this->cachePath);
-        $id = implode('-', ['knv', md5($isbn)]);
 
-        if ($driver->contains($id)) {
-            echo 'Loading "' . $isbn . '" from cache .. done!', "\n";
-        } else {
-            // .. however, if something goes wrong with the API call,
-            // we don't want to save an empty response:
-            try {
-                $result = $this->callAPI($isbn);
-            } catch (\Exception $e) {
-                echo 'Error: ' . $e->getMessage(), "\n";
-                return false;
-            }
-
-            $driver->save($id, $result);
-            echo 'Downloading & saving "' . $isbn . '" to cache .. done!', "\n";
+        if ($driver->contains($isbn) === false) {
+            $result = $this->callAPI($isbn);
+            $driver->save($isbn, $result);
         }
 
-        return $driver->fetch($id);
+        return $driver->fetch($isbn);
     }
-
 
     /**
      * Downloads book cover from DNB
@@ -265,12 +246,7 @@ class PHPCBIS
      */
     public function downloadCover(string $isbn, string $fileName = null)
     {
-        try {
-            $this->validateISBN($isbn);
-        } catch (\InvalidArgumentException $e) {
-            echo 'Error: ', $e->getMessage(), "\n";
-            return false;
-        }
+        $this->validateISBN($isbn);
 
         if ($fileName == null) {
             $fileName = $isbn;
