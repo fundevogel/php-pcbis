@@ -202,6 +202,10 @@ class PHPCBIS
             'Logout' => true
         ]);
 
+        if ($query->Suchergebnis->TrefferGesamt === 0) {
+            return false;
+        }
+
         // Getting raw XML response & preparing it to be loaded by SimpleXML
         $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
         $result = Butler::replace($result, '&', '&amp;');
@@ -244,7 +248,7 @@ class PHPCBIS
      * @param string $fileName - Filename for the image to be downloaded
      * @return boolean
      */
-    public function downloadCover(string $isbn, string $fileName = null)
+    public function downloadCover(string $isbn, string $fileName = null, bool $overwrite = false)
     {
         $this->validateISBN($isbn);
 
@@ -254,8 +258,7 @@ class PHPCBIS
 
         $file = $this->imagePath . '/' . $fileName . '.jpg';
 
-        if (file_exists($file)) {
-            echo 'Book cover for ' . $isbn . ' already exists, skipping ..', "\n";
+        if (file_exists($file) && !$overwrite) {
             return true;
         }
 
@@ -280,9 +283,9 @@ class PHPCBIS
             fwrite($handle, $raw);
             fclose($handle);
 
-            echo 'Downloading & saving "' . $isbn . '" as "' . $file . '" .. done!', "\n";
             return true;
         }
+
         return false;
     }
 
