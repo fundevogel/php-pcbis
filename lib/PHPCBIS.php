@@ -42,7 +42,7 @@ class PHPCBIS
      *
      * @var string
      */
-    private $imagePath = './dist/images';
+    private $imagePath = './images';
 
 
     /**
