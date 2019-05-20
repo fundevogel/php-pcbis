@@ -366,16 +366,10 @@ class PHPCBIS
         $publisher = $array['IndexVerlag'];
 
         if (is_array($publisher)) {
-            return Butler::first($publisher);
+            return trim(Butler::first($publisher));
         }
 
-        $publisher = trim($publisher);
-
-        if (Butler::substr($publisher, -6) !== 'Verlag') {
-            $publisher = $publisher . ' Verlag';
-        }
-
-        return $publisher;
+        return trim($publisher);
     }
 
 
