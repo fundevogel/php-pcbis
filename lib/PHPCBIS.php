@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.4.1';
+    const VERSION = '0.4.2';
 
 
     /**
@@ -562,7 +562,7 @@ class PHPCBIS
         foreach ($array['IndexSchlagw'] as $entry) {
             $array = Butler::split(trim($entry), ';');
 
-            if (count($array) === 1) {
+            if (count($array) === 1 && Butler::contains($array[0], 'Antolin')) {
                 continue;
             }
 
