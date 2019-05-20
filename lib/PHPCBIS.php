@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.4.2';
+    const VERSION = '0.4.3';
 
 
     /**
@@ -554,6 +554,15 @@ class PHPCBIS
     {
         if (Butler::missing($array, ['IndexSchlagw'])) {
             return '';
+        }
+
+        if (is_string($array['IndexSchlagw'])) {
+            $array = Butler::split(trim($array['IndexSchlagw']), ';');
+
+            return [
+                Butler::contains($array[0], 'Antolin') ? '' : $array[0],
+                count($array) === 2 ? $array[1] : '',
+            ];
         }
 
         $tags = [];
