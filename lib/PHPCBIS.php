@@ -311,10 +311,6 @@ class PHPCBIS
             $authors[] = implode(' ', $authorReverse);
         }
 
-        if (count($authors) === 1) {
-            return $authors[0];
-        }
-
         return implode('; ', $authors);
     }
 
@@ -395,7 +391,21 @@ class PHPCBIS
             return '';
         }
 
-        return $array['Mitarb'];
+        $array = Butler::split($array['Mitarb'], '; ');
+
+        foreach ($array as $x => $entry) {
+            $subarray = Butler::split($entry, ': ');
+
+            foreach ($subarray as $y => $subentry) {
+                $substring = Butler::split($subentry, ', ');
+                $substringReverse = array_reverse($substring);
+                $subarray[$y] = implode(' ', $substringReverse);
+            }
+
+            $array[$x] = implode(': ', $subarray);
+        }
+
+        return implode('; ', $array);
     }
 
 
@@ -541,6 +551,67 @@ class PHPCBIS
 
 
     /**
+     * Splits 'IndexSchlagw' array into categories & tags
+     *
+     * @param string $array - Source PHP array to read data from
+     * @return string
+     */
+    private function separateTags(array $array)
+    {
+        if (Butler::missing($array, ['IndexSchlagw'])) {
+            return '';
+        }
+
+        $tags = [];
+        $categories = [];
+
+        foreach ($array['IndexSchlagw'] as $entry) {
+            $array = Butler::split(trim($entry), ';');
+
+            if (count($array) === 1) {
+                continue;
+            }
+
+            $tags[] = $array[0];
+            $categories[] = $array[1];
+        }
+
+        // $categories might hold duplicates
+        $categories = array_unique($categories);
+
+        return [$tags, $categories];
+    }
+
+
+    /**
+     * Processes array (fetched from KNV's API) & builds 'Kategorien' attribute
+     *
+     * @param string $array - Source PHP array to read data from
+     * @return string
+     */
+    private function getCategories(array $array)
+    {
+        $array = $this->separateTags($array)[1];
+
+        return implode(', ', $array);
+    }
+
+
+    /**
+     * Processes array (fetched from KNV's API) & builds 'Schlagworte' attribute
+     *
+     * @param string $array - Source PHP array to read data from
+     * @return string
+     */
+    private function getTags(array $array)
+    {
+        $array = $this->separateTags($array)[0];
+
+        return implode(', ', $array);
+    }
+
+
+    /**
      * Builds an array with KNV information
      *
      * @param array $dataInput - Input that should be processed
@@ -565,6 +636,8 @@ class PHPCBIS
                 'Inhaltsbeschreibung' => $this->getText($dataInput),
                 'Abmessungen' => $this->getDimensions($dataInput),
                 'Einband' => $this->getBinding($dataInput),
+                'Kategorien' => $this->getCategories($dataInput),
+                'Schlagworte' => $this->getTags($dataInput),
             ];
         } catch (\Exception $e) {
             echo 'Error: ' . $e->getMessage(), "\n";
