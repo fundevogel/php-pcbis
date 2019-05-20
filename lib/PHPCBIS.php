@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.4.0';
+    const VERSION = '0.4.1';
 
 
     /**
@@ -308,10 +308,10 @@ class PHPCBIS
         foreach ($data as $value) {
             $author = Butler::split($value, ',');
             $authorReverse = array_reverse($author);
-            $authors[] = implode(' ', $authorReverse);
+            $authors[] = Butler::join($authorReverse, ' ');
         }
 
-        return implode('; ', $authors);
+        return Butler::join($authors, '; ');
     }
 
 
@@ -393,13 +393,13 @@ class PHPCBIS
             foreach ($subarray as $y => $subentry) {
                 $substring = Butler::split($subentry, ', ');
                 $substringReverse = array_reverse($substring);
-                $subarray[$y] = implode(' ', $substringReverse);
+                $subarray[$y] = Butler::join($substringReverse, ' ');
             }
 
-            $array[$x] = implode(': ', $subarray);
+            $array[$x] = Butler::join($subarray, ': ');
         }
 
-        return implode('; ', $array);
+        return Butler::join($array, '; ');
     }
 
 
@@ -587,7 +587,7 @@ class PHPCBIS
     {
         $array = $this->separateTags($array)[1];
 
-        return implode(', ', $array);
+        return Butler::join($array, ', ');
     }
 
 
@@ -601,7 +601,7 @@ class PHPCBIS
     {
         $array = $this->separateTags($array)[0];
 
-        return implode(', ', $array);
+        return Butler::join($array, ', ');
     }
 
 

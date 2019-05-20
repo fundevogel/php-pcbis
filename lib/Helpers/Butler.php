@@ -209,6 +209,24 @@ class Butler
 
 
     /**
+     * Better alternative for implode()
+     *
+     * @param  string  $value The value to join
+     * @param  string  $separator The string to join by
+     * @param  int     $length The min length of values.
+     * @return array   An array of found values
+     */
+    public static function join($value, $separator = ', ')
+    {
+        if (is_string($value) === true) {
+            return $value;
+        }
+
+        return implode($separator, $value);
+    }
+
+
+    /**
      * Better alternative for explode()
      * It takes care of removing empty values
      * and it has a built-in way to skip values
