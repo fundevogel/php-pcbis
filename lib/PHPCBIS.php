@@ -483,6 +483,7 @@ class PHPCBIS
                 unset($textArray[array_search($entry, $textArray)]);
             }
         }
+
         return Butler::first($textArray);
     }
 
@@ -528,7 +529,7 @@ class PHPCBIS
     /**
      * Processes array (fetched from KNV's API) & builds 'Einband' attribute
      *
-     * @param string $string - Einband string
+     * @param array $array - Source PHP array to read data from
      * @return string
      */
     private function getBinding(array $array)
@@ -545,9 +546,33 @@ class PHPCBIS
 
 
     /**
+     * Processes array (fetched from KNV's API) & builds 'Seitenzahl' attribute
+     *
+     * @param array $array - Source PHP array to read data from
+     * @return string
+     */
+    private function getPageCount(array $array): string
+    {
+        if (Butler::missing($array, ['Abb'])) {
+            return '';
+        }
+
+        $lines = Butler::split($array['Abb'], '.');
+
+        foreach ($lines as $line) {
+            if (Butler::substr($line, -1) === 'S') {
+                return Butler::split($line, ' ')[0];
+            }
+        }
+
+        return $array['Abb'];
+    }
+
+
+    /**
      * Splits 'IndexSchlagw' array into categories & tags
      *
-     * @param string $array - Source PHP array to read data from
+     * @param array $array - Source PHP array to read data from
      * @return string
      */
     private function separateTags(array $array)
@@ -589,7 +614,7 @@ class PHPCBIS
     /**
      * Processes array (fetched from KNV's API) & builds 'Kategorien' attribute
      *
-     * @param string $array - Source PHP array to read data from
+     * @param array $array - Source PHP array to read data from
      * @return string
      */
     private function getCategories(array $array)
@@ -603,7 +628,7 @@ class PHPCBIS
     /**
      * Processes array (fetched from KNV's API) & builds 'Schlagworte' attribute
      *
-     * @param string $array - Source PHP array to read data from
+     * @param array $array - Source PHP array to read data from
      * @return string
      */
     private function getTags(array $array)
@@ -639,6 +664,7 @@ class PHPCBIS
                 'Inhaltsbeschreibung' => $this->getText($dataInput),
                 'Abmessungen' => $this->getDimensions($dataInput),
                 'Einband' => $this->getBinding($dataInput),
+                'Seitenzahl' => $this->getPageCount($dataInput),
                 'Kategorien' => $this->getCategories($dataInput),
                 'Schlagworte' => $this->getTags($dataInput),
             ];
