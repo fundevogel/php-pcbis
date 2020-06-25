@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.4.3';
+    const VERSION = '0.5.1';
 
 
     /**
@@ -590,24 +590,31 @@ class PHPCBIS
             ];
         }
 
-        $tags = [];
         $categories = [];
+        $tags = [];
 
         foreach ($array['IndexSchlagw'] as $entry) {
             $array = Butler::split(trim($entry), ';');
 
-            if (count($array) === 1 && Butler::contains($array[0], 'Antolin')) {
-                continue;
+            // We don't need no .. Antolin
+            if (count($array) === 1) {
+                if (Butler::contains($array[0], 'Antolin')) {
+                    continue;
+                }
+
+                $tags[] = $array[0];
             }
 
-            $tags[] = $array[0];
-            $categories[] = $array[1];
+            if (count($array) > 1) {
+                $tags[] = $array[0];
+                $categories[] = $array[1];
+            }
         }
 
         // $categories might hold duplicates
         $categories = array_unique($categories);
 
-        return [$tags, $categories];
+        return [$categories, $tags];
     }
 
 
@@ -619,7 +626,7 @@ class PHPCBIS
      */
     private function getCategories(array $array)
     {
-        $array = $this->separateTags($array)[1];
+        $array = $this->separateTags($array)[0];
 
         return Butler::join($array, ', ');
     }
@@ -633,7 +640,7 @@ class PHPCBIS
      */
     private function getTags(array $array)
     {
-        $array = $this->separateTags($array)[0];
+        $array = $this->separateTags($array)[1];
 
         return Butler::join($array, ', ');
     }
