@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.5.1';
+    const VERSION = '0.5.2';
 
 
     /**
@@ -203,7 +203,7 @@ class PHPCBIS
         ]);
 
         if ($query->Suchergebnis->TrefferGesamt === 0) {
-            return false;
+            throw new \Exception('No database entry found.');
         }
 
         // Getting raw XML response & preparing it to be loaded by SimpleXML
