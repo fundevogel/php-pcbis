@@ -577,16 +577,16 @@ class PHPCBIS
      */
     private function separateTags(array $array)
     {
-        if (Butler::missing($array, ['IndexSchlagw'])) {
-            return '';
+        if (Butler::missing($array, ['IndexSchlagw']) || $array['IndexSchlagw'] === null) {
+            return false;
         }
 
         if (is_string($array['IndexSchlagw'])) {
             $array = Butler::split(trim($array['IndexSchlagw']), ';');
 
             return [
-                Butler::contains($array[0], 'Antolin') ? '' : $array[0],
-                count($array) === 2 ? $array[1] : '',
+                'categories' => count($array) === 2 ? $array[1] : '',
+                'tags' => Butler::contains($array[0], 'Antolin') ? '' : $array[0],
             ];
         }
 
@@ -611,10 +611,10 @@ class PHPCBIS
             }
         }
 
-        // $categories might hold duplicates
-        $categories = array_unique($categories);
-
-        return [$categories, $tags];
+        return [
+            'categories' => $categories,
+            'tags' => $tags
+        ];
     }
 
 
@@ -626,9 +626,17 @@ class PHPCBIS
      */
     private function getCategories(array $array)
     {
-        $array = $this->separateTags($array)[0];
+        if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['categories'])) {
+            return '';
+        }
 
-        return Butler::join($array, ', ');
+        $categories = $this->separateTags($array)['categories'];
+
+        if (is_string($categories)) {
+            return $categories;
+        }
+
+        return Butler::join(array_unique($categories), ', ');
     }
 
 
@@ -640,9 +648,18 @@ class PHPCBIS
      */
     private function getTags(array $array)
     {
-        $array = $this->separateTags($array)[1];
+        if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['tags'])) {
+            return '';
 
-        return Butler::join($array, ', ');
+        }
+
+        $tags = $this->separateTags($array)['tags'];
+
+        if (is_string($tags)) {
+            return $tags;
+        }
+
+        return Butler::join(array_unique($tags), ', ');
     }
 
 
