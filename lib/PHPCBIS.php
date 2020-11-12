@@ -307,7 +307,11 @@ class PHPCBIS
             $fileName = $isbn;
         }
 
-        $file = $this->imagePath . '/' . $fileName . '.jpg';
+        $file = realpath($this->imagePath . '/' . $fileName . '.jpg');
+
+        if (!file_exists(dirname($file))) {
+            mkdir(dirname($file), 0755, true);
+        }
 
         if (file_exists($file) && !$overwrite) {
             return true;
