@@ -134,7 +134,7 @@ class PHPCBIS
      * Loads credentials saved in a local JSON file as array
      *
      * @param string $fileName - Name of file to be included
-     * @return array|bool
+     * @return array|bool|Exception
      */
     public function getLogin(string $fileName = 'login')
     {
@@ -248,8 +248,6 @@ class PHPCBIS
 
     /**
      * Downloads book cover from DNB
-     *
-     * .. if book cover for given ISBN doesn't exist already
      *
      * @param string $isbn - International Standard Book Number
      * @param string $fileName - Filename for the image to be downloaded
@@ -663,7 +661,7 @@ class PHPCBIS
      * Builds an array with KNV information
      *
      * @param array $dataInput - Input that should be processed
-     * @return array
+     * @return array|InvalidArgumentException|Exception
      */
     public function processData(array $dataInput = null)
     {
@@ -689,7 +687,7 @@ class PHPCBIS
                 'Schlagworte' => $this->getTags($dataInput),
             ];
         } catch (\Exception $e) {
-            echo 'Error: ' . $e->getMessage(), "\n";
+            throw $e;
         }
 
         return $dataOutput;
