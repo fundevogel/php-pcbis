@@ -50,6 +50,22 @@ class PHPCBIS
 
 
     /**
+     * Path to translation files
+     *
+     * @var string
+     */
+    private $languagePath = __DIR__ . '/../languages';
+
+
+    /**
+     * Language code used for translations
+     *
+     * @var array
+     */
+    private $languageCode = '';
+
+
+    /**
      * User-Agent used when downloading book cover images
      *
      * @var string
@@ -57,7 +73,7 @@ class PHPCBIS
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
 
 
-    public function __construct(array $login = null, string $lang = 'de')
+    public function __construct(array $login = null, string $languageCode = 'de')
     {
         // Credentials for restricted APIs
         $this->login = $login;
@@ -66,9 +82,7 @@ class PHPCBIS
             $this->login = $this->getLogin();
         }
 
-        // Feel free to open a pull request to include additional language variables
-        // TODO: Extending language variables by local files or other means (eg passing an array)
-        $this->translations = json_decode(file_get_contents(__DIR__ . '/../languages/' . $lang . '.json'), true);
+        $this->languageCode = $languageCode;
     }
 
 
@@ -96,6 +110,16 @@ class PHPCBIS
         return $this->imagePath;
     }
 
+    public function setLanguagePath(string $languagePath)
+    {
+        $this->languagePath = $languagePath;
+    }
+
+    public function getLanguagePath()
+    {
+        return $this->languagePath;
+    }
+
     public function setUserAgent(string $userAgent)
     {
         $this->userAgent = $userAgent;
@@ -104,6 +128,25 @@ class PHPCBIS
     public function getUserAgent()
     {
         return $this->userAgent;
+    }
+
+
+    /**
+     * Retrieves translations for current language
+     *
+     * @param string $languageCode - Language code
+     * @return array|Exception
+     */
+    private function getTranslations(string $languageCode)
+    {
+        if (file_exists($file = $this->languagePath . '/' . $languageCode . '.json')) {
+            $json = file_get_contents($this->languagePath . '/' . $languageCode . '.json');
+            $array = json_decode($json, true);
+
+            return $array;
+        }
+
+        throw new \Exception('Please provide a valid translation file.');
     }
 
 
@@ -534,10 +577,10 @@ class PHPCBIS
             return '';
         }
 
-        $translations = $this->translations['binding'];
+        $translations = $this->getTranslations($this->languageCode);
         $string = $array['Einband'];
 
-        return $translations[$string];
+        return $translations['binding'][$string];
     }
 
 
