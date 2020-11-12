@@ -108,7 +108,7 @@ class PHPCBIS
 
 
     /**
-     * Validates and formats given ISBN
+     * Validates and formats given EAN/ISBN
      * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
@@ -116,8 +116,7 @@ class PHPCBIS
      */
     public function validateISBN(string $isbn)
     {
-        $ean = Butler::replace($isbn, '-', '');
-        $isbn = new Isbn($ean);
+        $isbn = new Isbn($isbn);
 
         try {
             $isbn->validate();
