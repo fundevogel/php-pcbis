@@ -10,7 +10,10 @@
 namespace PHPCBIS;
 
 use PHPCBIS\Helpers\Butler;
-use Doctrine\Common\Cache\FilesystemCache;
+
+use Doctrine\Common\Cache\FilesystemCache as FileCache;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ClientException as GuzzleException;
 
 /**
  * Class PHPCBIS
@@ -229,7 +232,7 @@ class PHPCBIS
     {
         $this->validateISBN($isbn);
 
-        $driver = new FilesystemCache($this->cachePath);
+        $driver = new FileCache($this->cachePath);
 
         if ($driver->contains($isbn) === false) {
             $result = $this->callAPI($isbn);
@@ -239,6 +242,7 @@ class PHPCBIS
         return $driver->fetch($isbn);
     }
 
+
     /**
      * Downloads book cover from DNB
      *
@@ -246,6 +250,7 @@ class PHPCBIS
      *
      * @param string $isbn - International Standard Book Number
      * @param string $fileName - Filename for the image to be downloaded
+     * @param boolean $overwrite - Whether existing file should be overwritten
      * @return boolean
      */
     public function downloadCover(string $isbn, string $fileName = null, bool $overwrite = false)
@@ -262,31 +267,19 @@ class PHPCBIS
             return true;
         }
 
-        $url = 'https://portal.dnb.de/opac/mvb/cover.htm?isbn=' . $isbn;
+        $success = false;
 
         if ($handle = fopen($file, 'w')) {
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
-            $result = parse_url($url);
-            curl_setopt($ch, CURLOPT_REFERER, $result['scheme'] . '://' . $result['host']);
-            curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-            $raw = curl_exec($ch);
-            curl_close($ch);
+            $client = new GuzzleClient();
+            $url = 'https://portal.dnb.de/opac/mvb/cover.htm?isbn=' . $isbn;
 
-            if (!$raw) {
-                @unlink($file);
-                return false;
-            }
-
-            fwrite($handle, $raw);
-            fclose($handle);
-
-            return true;
+            try {
+                $response = $client->get($url, ['sink' => $handle]);
+                $success = true;
+            } catch (GuzzleException $e) {}
         }
 
-        return false;
+        return $success;
     }
 
 
