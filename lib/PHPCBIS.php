@@ -254,8 +254,11 @@ class PHPCBIS
      * @param bool $overwrite - Whether existing file should be overwritten
      * @return bool
      */
-    public function downloadCover(string $isbn, string $fileName = null, bool $overwrite = false)
-    {
+    public function downloadCover(
+        string $isbn,
+        string $fileName = null,
+        bool $overwrite = false
+    ): bool {
         $isbn = $this->validateISBN($isbn);
 
         if ($fileName == null) {
@@ -290,7 +293,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getAuthor(array $array)
+    private function getAuthor(array $array): string
     {
         if (Butler::missing($array, ['AutorSachtitel'])) {
             return '';
@@ -315,7 +318,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getTitle(array $array)
+    private function getTitle(array $array): string
     {
         if (Butler::missing($array, ['Titel'])) {
             return '';
@@ -331,7 +334,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getSubtitle(array $array)
+    private function getSubtitle(array $array): string
     {
         if (Butler::missing($array, ['Utitel'])) {
             return '';
@@ -351,7 +354,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getPublisher(array $array)
+    private function getPublisher(array $array): string
     {
         if (Butler::missing($array, ['IndexVerlag'])) {
             return '';
@@ -373,7 +376,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getParticipants(array $array)
+    private function getParticipants(array $array): string
     {
         if (Butler::missing($array, ['Mitarb'])) {
             return '';
@@ -403,7 +406,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getPrice(array $array)
+    private function getPrice(array $array): string
     {
         // Input: XX(.YY)
         // Output: XX,YY
@@ -421,7 +424,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getYear(array $array)
+    private function getYear(array $array): string
     {
         if (Butler::missing($array, ['Erschjahr'])) {
             return '';
@@ -437,7 +440,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getAge(array $array)
+    private function getAge(array $array): string
     {
         if (Butler::missing($array, ['Alter'])) {
             return '';
@@ -459,7 +462,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getText(array $array)
+    private function getText(array $array): string
     {
         if (Butler::missing($array, ['Text1'])) {
             return 'Keine Beschreibung vorhanden!';
@@ -488,7 +491,7 @@ class PHPCBIS
      * @param string $string - Abmessungen string
      * @return string
      */
-    private function convertMM(string $string)
+    private function convertMM(string $string): string
     {
         $string = $string / 10;
         $string = Butler::replace($string, '.', ',');
@@ -503,7 +506,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getDimensions(array $array)
+    private function getDimensions(array $array): string
     {
         if (Butler::missing($array, ['Breite'])) {
             return '';
@@ -526,7 +529,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getBinding(array $array)
+    private function getBinding(array $array): string
     {
         if (Butler::missing($array, ['Einband'])) {
             return '';
@@ -567,9 +570,9 @@ class PHPCBIS
      * Splits 'IndexSchlagw' array into categories & tags
      *
      * @param array $array - Source PHP array to read data from
-     * @return string
+     * @return array
      */
-    private function separateTags(array $array)
+    private function separateTags(array $array): array
     {
         if (Butler::missing($array, ['IndexSchlagw']) || $array['IndexSchlagw'] === null) {
             return false;
@@ -618,7 +621,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getCategories(array $array)
+    private function getCategories(array $array): string
     {
         if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['categories'])) {
             return '';
@@ -640,7 +643,7 @@ class PHPCBIS
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getTags(array $array)
+    private function getTags(array $array): string
     {
         if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['tags'])) {
             return '';
