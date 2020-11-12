@@ -11,6 +11,7 @@ namespace PHPCBIS;
 
 use PHPCBIS\Helpers\Butler;
 
+use Biblys\Isbn\Isbn;
 use Doctrine\Common\Cache\FilesystemCache as FileCache;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException as GuzzleException;
@@ -29,7 +30,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.5.2';
+    const VERSION = '0.6.0';
 
 
     /**
@@ -107,23 +108,25 @@ class PHPCBIS
 
 
     /**
-     * Checks whether given ISBN consists of 10 or 13 digits
-     * For more advanced ways to detect valid ISBNs,
-     * see https://github.com/biblys/isbn
+     * Validates and formats given ISBN
+     * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
-     * @return boolean|InvalidArgumentException
+     * @return bool|InvalidArgumentException
      */
     public function validateISBN(string $isbn)
     {
-        $cleanISBN = Butler::replace($isbn, '-', '');
-        $length = Butler::length($cleanISBN);
+        $ean = Butler::replace($isbn, '-', '');
+        $isbn = new Isbn($ean);
 
-        if ($length === 10 || $length === 13) {
-            return true;
+        try {
+            $isbn->validate();
+            $isbn = $isbn->format('ISBN-13');
+        } catch(Exception $e) {
+            throw new \InvalidArgumentException($e->getMessage());
         }
 
-        throw new \InvalidArgumentException('ISBN must consist of 10 or 13 digits, ' . $length . ' given (' . $isbn . ').');
+        return $isbn;
     }
 
 
@@ -131,7 +134,7 @@ class PHPCBIS
      * Loads credentials saved in a local JSON file as array
      *
      * @param string $fileName - Name of file to be included
-     * @return array|boolean
+     * @return array|bool
      */
     public function getLogin(string $fileName = 'login')
     {
@@ -226,11 +229,11 @@ class PHPCBIS
      * Fetches book information from cache if they exist, otherwise loads them & saves to cache
      *
      * @param string $isbn - A given book's ISBN
-     * @return array|boolean
+     * @return array|bool
      */
     public function loadBook($isbn)
     {
-        $this->validateISBN($isbn);
+        $isbn = $this->validateISBN($isbn);
 
         $driver = new FileCache($this->cachePath);
 
@@ -250,12 +253,12 @@ class PHPCBIS
      *
      * @param string $isbn - International Standard Book Number
      * @param string $fileName - Filename for the image to be downloaded
-     * @param boolean $overwrite - Whether existing file should be overwritten
-     * @return boolean
+     * @param bool $overwrite - Whether existing file should be overwritten
+     * @return bool
      */
     public function downloadCover(string $isbn, string $fileName = null, bool $overwrite = false)
     {
-        $this->validateISBN($isbn);
+        $isbn = $this->validateISBN($isbn);
 
         if ($fileName == null) {
             $fileName = $isbn;
