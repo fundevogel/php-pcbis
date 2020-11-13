@@ -421,6 +421,27 @@ class PHPCBIS
             return '';
         }
 
+        if ($this->isAudiobook($array)) {
+            $string = 'Gesprochen von';
+            if (Butler::contains($array['Mitarb'], $string) && $groupTask === $string) {
+                $speakersArray = Butler::split($array['Mitarb'], $string);
+                $speakers = Butler::last($speakersArray);
+
+                $result = [];
+
+                foreach (Butler::split($speakers, ';') as $speaker) {
+                    $speakerArray = Butler::split($speaker, ',');
+                    $speakerArrayReverse = array_reverse($speakerArray);
+
+                    $result[] = Butler::join($speakerArrayReverse, ' ');
+                }
+
+                return Butler::join($result, ', ');
+            }
+
+            return $array['Mitarb'];
+        }
+
         $result = [];
 
         foreach (Butler::split($array['Mitarb'], '. ') as $group) {
@@ -592,7 +613,6 @@ class PHPCBIS
         $translations = $this->getTranslations($this->languageCode);
         $string = $array['Einband'];
 
-        var_dump($string);
         return $translations['binding'][$string];
     }
 
@@ -715,6 +735,37 @@ class PHPCBIS
 
 
     /**
+     * Determines if this is an audiobook
+     *
+     * @param array $array - Source PHP array to read data from
+     * @return string
+     */
+    private function isAudiobook(array $array): bool
+    {
+        return $this->getBinding($array) === 'CD';
+    }
+
+
+    /**
+     * Processes array (fetched from KNV's API) & builds 'Dauer' attribute
+     *
+     * @param array $array - Source PHP array to read data from
+     * @return string
+     */
+    private function getDuration(array $array): string
+    {
+        if (!isset($array['Utitel']) || !$this->isAudiobook($array)) {
+            return '';
+        }
+
+        $array = Butler::split($array['Utitel'], '.');
+        $duration = Butler::last($array);
+
+        return Butler::replace($duration, ' Min', '');
+    }
+
+
+    /**
      * Builds an array with KNV information
      *
      * @param array $dataInput - Input that should be processed
@@ -739,12 +790,25 @@ class PHPCBIS
                 'Erscheinungsjahr' => $this->getYear($dataInput),
                 'Altersempfehlung' => $this->getAge($dataInput),
                 'Inhaltsbeschreibung' => $this->getText($dataInput),
-                'Abmessungen' => $this->getDimensions($dataInput),
                 'Einband' => $this->getBinding($dataInput),
                 'Seitenzahl' => $this->getPageCount($dataInput),
-                'Kategorien' => $this->getCategories($dataInput),
-                'Schlagworte' => $this->getTags($dataInput),
+                'Abmessungen' => $this->getDimensions($dataInput),
+                // 'Kategorien' => $this->getCategories($dataInput),
+                // 'Schlagworte' => $this->getTags($dataInput),
             ];
+
+            if ($this->isAudiobook($dataInput)) {
+                // Remove non-audiobook entries
+                unset($dataOutput['IllustratorIn']);
+                unset($dataOutput['ÜbersetzerIn']);
+                unset($dataOutput['Einband']);
+                unset($dataOutput['Seitenzahl']);
+
+                $dataOutput = Butler::update($dataOutput, [
+                    'Dauer' => $this->getDuration($dataInput),
+                    'SprecherIn' => $this->getParticipants($dataInput, 'Gesprochen von'),
+                ]);
+            }
         } catch (\Exception $e) {
             throw $e;
         }
