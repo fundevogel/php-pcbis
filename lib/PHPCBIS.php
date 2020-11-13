@@ -194,7 +194,7 @@ class PHPCBIS
      * @param string $isbn
      * @return array|Exception
      */
-    public function callAPI(string $isbn)
+    public function fetchData(string $isbn)
     {
         $client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
             'soap_version' => SOAP_1_2,
@@ -225,7 +225,7 @@ class PHPCBIS
                         'Suchfeld' => 'ISBN',
                         'Suchwert' => $isbn,
                         'Schwert2' => '',
-                        'Suchart' => 'Genau'
+                        'Suchart' => 'Genau',
                     ],
                 ],
             ],
@@ -237,7 +237,7 @@ class PHPCBIS
                 'Format' => 'KNVXMLLangText',
             ],
             // .. and logging out, that's it!
-            'Logout' => true
+            'Logout' => true,
         ]);
 
         if ($query->Suchergebnis->TrefferGesamt === 0) {
@@ -258,7 +258,8 @@ class PHPCBIS
 
 
     /**
-     * Fetches book information from cache if they exist, otherwise loads them & saves to cache
+     * Fetches book information from cache if they exist,
+     * otherwise loads them & saves to cache
      *
      * @param string $isbn - A given book's ISBN
      * @return array|bool
@@ -270,7 +271,7 @@ class PHPCBIS
         $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
 
         if ($driver->contains($isbn) === false) {
-            $result = $this->callAPI($isbn);
+            $result = $this->fetchData($isbn);
             $driver->save($isbn, $result);
         }
 
@@ -331,7 +332,7 @@ class PHPCBIS
      */
     private function getAuthor(array $array): string
     {
-        if (Butler::missing($array, ['AutorSachtitel'])) {
+        if (!isset($array['AutorSachtitel'])) {
             return '';
         }
 
@@ -356,7 +357,7 @@ class PHPCBIS
      */
     private function getTitle(array $array): string
     {
-        if (Butler::missing($array, ['Titel'])) {
+        if (!isset($array['Titel'])) {
             return '';
         }
 
@@ -372,7 +373,7 @@ class PHPCBIS
      */
     private function getSubtitle(array $array): string
     {
-        if (Butler::missing($array, ['Utitel'])) {
+        if (!isset($array['Utitel'])) {
             return '';
         }
 
@@ -392,7 +393,7 @@ class PHPCBIS
      */
     private function getPublisher(array $array): string
     {
-        if (Butler::missing($array, ['IndexVerlag'])) {
+        if (!isset($array['IndexVerlag'])) {
             return '';
         }
 
@@ -409,12 +410,14 @@ class PHPCBIS
     /**
      * Processes array (fetched from KNV's API) & builds 'Mitwirkende' attribute
      *
+     * This may also be used to retrieve illustrator(s) & translator(s)
+     *
      * @param array $array - Source PHP array to read data from
      * @return string
      */
-    private function getParticipants(array $array): string
+    private function getParticipants(array $array, string $groupTask = ''): string
     {
-        if (Butler::missing($array, ['Mitarb'])) {
+        if (!isset($array['Mitarb'])) {
             return '';
         }
 
@@ -435,6 +438,15 @@ class PHPCBIS
             }
 
             $people = Butler::join($peopleArray, ' & ');
+
+            if ($groupTask !== '') {
+                if ($groupTask === $task) {
+                    return $people;
+                }
+
+                return '';
+            }
+
             $result[] = Butler::join([$task, $people], ': ');
         }
 
@@ -452,7 +464,7 @@ class PHPCBIS
     {
         // Input: XX(.YY)
         // Output: XX,YY
-        if (Butler::missing($array, ['PreisEurD'])) {
+        if (!isset($array['PreisEurD'])) {
             return '';
         }
 
@@ -468,7 +480,7 @@ class PHPCBIS
      */
     private function getYear(array $array): string
     {
-        if (Butler::missing($array, ['Erschjahr'])) {
+        if (!isset($array['Erschjahr'])) {
             return '';
         }
 
@@ -484,7 +496,7 @@ class PHPCBIS
      */
     private function getAge(array $array): string
     {
-        if (Butler::missing($array, ['Alter'])) {
+        if (!isset($array['Alter'])) {
             return '';
         }
 
@@ -506,7 +518,7 @@ class PHPCBIS
      */
     private function getText(array $array): string
     {
-        if (Butler::missing($array, ['Text1'])) {
+        if (!isset($array['Text1'])) {
             return 'Keine Beschreibung vorhanden!';
         }
 
@@ -550,11 +562,11 @@ class PHPCBIS
      */
     private function getDimensions(array $array): string
     {
-        if (Butler::missing($array, ['Breite'])) {
+        if (!isset($array['Breite'])) {
             return '';
         }
 
-        if (Butler::missing($array, ['Hoehe'])) {
+        if (!isset($array['Hoehe'])) {
             return '';
         }
 
@@ -573,13 +585,14 @@ class PHPCBIS
      */
     private function getBinding(array $array): string
     {
-        if (Butler::missing($array, ['Einband'])) {
+        if (!isset($array['Einband'])) {
             return '';
         }
 
         $translations = $this->getTranslations($this->languageCode);
         $string = $array['Einband'];
 
+        var_dump($string);
         return $translations['binding'][$string];
     }
 
@@ -592,7 +605,7 @@ class PHPCBIS
      */
     private function getPageCount(array $array): string
     {
-        if (Butler::missing($array, ['Abb'])) {
+        if (!isset($array['Abb'])) {
             return '';
         }
 
@@ -616,7 +629,7 @@ class PHPCBIS
      */
     private function separateTags(array $array): array
     {
-        if (Butler::missing($array, ['IndexSchlagw']) || $array['IndexSchlagw'] === null) {
+        if (!isset($array['IndexSchlagw'])) {
             return false;
         }
 
@@ -665,7 +678,7 @@ class PHPCBIS
      */
     private function getCategories(array $array): string
     {
-        if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['categories'])) {
+        if (!isset($this->separateTags($array)['categories']) || $this->separateTags($array) === false) {
             return '';
         }
 
@@ -687,9 +700,8 @@ class PHPCBIS
      */
     private function getTags(array $array): string
     {
-        if ($this->separateTags($array) === false || Butler::missing($this->separateTags($array), ['tags'])) {
+        if (!isset($this->separateTags($array)['tags']) || $this->separateTags($array) === false) {
             return '';
-
         }
 
         $tags = $this->separateTags($array)['tags'];
@@ -720,6 +732,8 @@ class PHPCBIS
                 'Titel' => $this->getTitle($dataInput),
                 'Untertitel' => $this->getSubtitle($dataInput),
                 'Verlag' => $this->getPublisher($dataInput),
+                'IllustratorIn' => $this->getParticipants($dataInput, 'Illustration'),
+                'ÜbersetzerIn' => $this->getParticipants($dataInput, 'Übersetzung'),
                 'Mitwirkende' => $this->getParticipants($dataInput),
                 'Preis' => $this->getPrice($dataInput),
                 'Erscheinungsjahr' => $this->getYear($dataInput),
