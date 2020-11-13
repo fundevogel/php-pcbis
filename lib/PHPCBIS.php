@@ -11,11 +11,6 @@ namespace PHPCBIS;
 
 use PHPCBIS\Helpers\Butler;
 
-use Biblys\Isbn\Isbn;
-use Doctrine\Common\Cache\FilesystemCache as FileCache;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException as GuzzleException;
-
 /**
  * Class PHPCBIS
  *
@@ -30,7 +25,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.6.0';
+    const VERSION = '0.8.0';
 
 
     /**
@@ -159,7 +154,7 @@ class PHPCBIS
      */
     public function validateISBN(string $isbn)
     {
-        $isbn = new Isbn($isbn);
+        $isbn = new \Biblys\Isbn\Isbn($isbn);
 
         try {
             $isbn->validate();
@@ -210,14 +205,14 @@ class PHPCBIS
         ]);
 
         // For getting started with KNV's (surprisingly well documented) german API,
-        // see http://www.knv.de/fileadmin/user_upload/IT/KNV_Webservice_2018.pdf
+        // see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
         $query = $client->WSCall([
             // Login using credentials provided by `knv.login.json`
             'LoginInfo' => $this->login,
             // Starting a new database query
             'Suchen' => [
-                'Datenbank' => [
                 // Basically searching all databases they got
+                'Datenbank' => [
                     'KNV',
                     'KNVBG',
                     'BakerTaylor',
@@ -240,11 +235,6 @@ class PHPCBIS
                 'SatzVon' => 1,
                 'SatzBis' => 1,
                 'Format' => 'KNVXMLLangText',
-                'AuswahlMultimediaDaten' => [
-                    // We only want the best cover they got - ZOOM mode ON!
-                    'mmDatenLiefern' => true,
-                    'mmVarianteFilter' => 'zoom',
-                ],
             ],
             // .. and logging out, that's it!
             'Logout' => true
@@ -277,7 +267,7 @@ class PHPCBIS
     {
         $isbn = $this->validateISBN($isbn);
 
-        $driver = new FileCache($this->cachePath);
+        $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
 
         if ($driver->contains($isbn) === false) {
             $result = $this->callAPI($isbn);
@@ -320,13 +310,13 @@ class PHPCBIS
         $success = false;
 
         if ($handle = fopen($file, 'w')) {
-            $client = new GuzzleClient();
+            $client = new \GuzzleHttp\Client();
             $url = 'https://portal.dnb.de/opac/mvb/cover.htm?isbn=' . $isbn;
 
             try {
                 $response = $client->get($url, ['sink' => $handle]);
                 $success = true;
-            } catch (GuzzleException $e) {}
+            } catch (\GuzzleHttp\Exception\ClientException $e) {}
         }
 
         return $success;
@@ -428,21 +418,27 @@ class PHPCBIS
             return '';
         }
 
-        $array = Butler::split($array['Mitarb'], '; ');
+        $result = [];
 
-        foreach ($array as $x => $entry) {
-            $subarray = Butler::split($entry, ': ');
+        foreach (Butler::split($array['Mitarb'], '. ') as $group) {
+            $groupArray = Butler::split($group, ': ');
+            $task = $groupArray[0];
 
-            foreach ($subarray as $y => $subentry) {
-                $substring = Butler::split($subentry, ', ');
-                $substringReverse = array_reverse($substring);
-                $subarray[$y] = Butler::join($substringReverse, ' ');
+            $people = Butler::split($groupArray[1], '; ');
+            $peopleArray = [];
+
+            foreach ($people as $person) {
+                $personString = Butler::split($person, ', ');
+                $personStringReverse = array_reverse($personString);
+
+                $peopleArray[] = Butler::join($personStringReverse, ' ');
             }
 
-            $array[$x] = Butler::join($subarray, ': ');
+            $people = Butler::join($peopleArray, ' & ');
+            $result[] = Butler::join([$task, $people], ': ');
         }
 
-        return Butler::join($array, '; ');
+        return Butler::join($result, '; ');
     }
 
 
