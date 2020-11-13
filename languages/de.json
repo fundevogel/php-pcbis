@@ -1,14 +1,15 @@
 {
     "binding": {
-        "PP": "Pappband",
+        "BUCH": "gebunden",
+        "CD": "CD",
+        "HL": "Halbleinen",
         "KT": "kartoniert",
         "LN": "Leinen",
-        "HL": "Halbleinen",
-        "CD": "CD",
+        "PP": "Pappband",
+        "CRD": "Nonbook",
         "GEB": "gebunden",
         "GEH": "geheftet",
-        "SPL": "Spiel",
         "NON": "Nonbook",
-        "CRD": "Nonbook"
+        "SPL": "Spiel"
     }
 }
