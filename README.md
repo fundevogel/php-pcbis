@@ -16,6 +16,38 @@ It's [available for Composer](https://packagist.org/packages/fundevogel/php-pcbi
 ## Basic workflow
 .. to be continued.
 
+### Loading translations
+This library provides minimal translations for german strings out-of-the-box. However, you may want to bring your own - for example, you could load a JSON file, looking like this:
+
+```json
+{
+    "binding": {
+        "BUCH": "gebunden",
+        "CD": "CD",
+        "HL": "Halbleinen",
+        "KT": "kartoniert",
+        "LN": "Leinen",
+        "PP": "Pappband",
+        "CRD": "Nonbook",
+        "GEB": "gebunden",
+        "GEH": "geheftet",
+        "NON": "Nonbook",
+        "SPL": "Spiel"
+    }
+}
+```
+
+.. and load its contents, passing them onto `new PHPCBIS()` as second parameter:
+
+```php
+<?php
+
+$file = file_get_contents('/path/to/translations.json');
+$translations = json_decode($file, true);
+
+// For providing login credentials, see above
+new PHPCBIS($login, $translations)
+```
 
 ## Credits
 Most of the helper functions were taken from [Kirby](https://getkirby.com)'s excellent [`toolkit`](https://github.com/getkirby-v2/toolkit) package by [Bastian Allgeier](https://github.com/bastianallgeier) (who's just awesome, btw).

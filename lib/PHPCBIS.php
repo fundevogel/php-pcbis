@@ -45,19 +45,11 @@ class PHPCBIS
 
 
     /**
-     * Path to translation files
-     *
-     * @var string
-     */
-    private $languagePath = __DIR__ . '/../languages';
-
-
-    /**
-     * Language code used for translations
+     * Translatable strings
      *
      * @var array
      */
-    private $languageCode = '';
+    private $translations;
 
 
     /**
@@ -68,7 +60,7 @@ class PHPCBIS
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
 
 
-    public function __construct(array $login = null, string $languageCode = 'de')
+    public function __construct(array $login = null, array $translations = [])
     {
         // Credentials for KNV's restricted API
         $this->login = $login;
@@ -77,7 +69,9 @@ class PHPCBIS
             $this->login = $this->getLogin();
         }
 
-        $this->languageCode = $languageCode;
+        if (!empty($translations)) {
+            $this->translations = $translations;
+        }
     }
 
 
@@ -105,14 +99,14 @@ class PHPCBIS
         return $this->imagePath;
     }
 
-    public function setLanguagePath(string $languagePath)
+    public function setTranslations(array $translations)
     {
-        $this->languagePath = $languagePath;
+        $this->translations = $translations;
     }
 
-    public function getLanguagePath()
+    public function getTranslations()
     {
-        return $this->languagePath;
+        return $this->translations;
     }
 
     public function setUserAgent(string $userAgent)
@@ -123,25 +117,6 @@ class PHPCBIS
     public function getUserAgent()
     {
         return $this->userAgent;
-    }
-
-
-    /**
-     * Retrieves translations for current language
-     *
-     * @param string $languageCode - Language code
-     * @return array|Exception
-     */
-    private function getTranslations(string $languageCode)
-    {
-        if (file_exists($file = $this->languagePath . '/' . $languageCode . '.json')) {
-            $json = file_get_contents($this->languagePath . '/' . $languageCode . '.json');
-            $array = json_decode($json, true);
-
-            return $array;
-        }
-
-        throw new \Exception('Please provide a valid translation file.');
     }
 
 
@@ -280,7 +255,7 @@ class PHPCBIS
         // return new Book(
         //     $driver->fetch($isbn),
         //     $this->imagePath,
-        //     $this->languageCode,
+        //     $this->translations,
         // );
     }
 
@@ -595,10 +570,31 @@ class PHPCBIS
             return '';
         }
 
-        $translations = $this->getTranslations($this->languageCode);
-        $string = $array['Einband'];
+        $binding = $array['Einband'];
 
-        return $translations['binding'][$string];
+        $translations = [
+            'BUCH' => 'gebunden',
+            'CD'   => 'CD',
+            'CRD'  => 'Nonbook',
+            'GEB'  => 'gebunden',
+            'GEH'  => 'geheftet',
+            'HL'   => 'Halbleinen',
+            'KT'   => 'kartoniert',
+            'LN'   => 'Leinen',
+            'NON'  => 'Nonbook',
+            'PP'   => 'Pappband',
+            'SPL'  => 'Spiel',
+        ];
+
+        if (isset($this->translations['binding'])) {
+            $translations = $this->translations['binding'];
+        }
+
+        if (!isset($translations[$binding])) {
+            return $binding;
+        }
+
+        return $translations[$binding];
     }
 
 
@@ -786,7 +782,6 @@ class PHPCBIS
                 // Remove non-audiobook entries
                 unset($dataOutput['IllustratorIn']);
                 unset($dataOutput['ÜbersetzerIn']);
-                unset($dataOutput['Einband']);
                 unset($dataOutput['Seitenzahl']);
 
                 $dataOutput = Butler::update($dataOutput, [
