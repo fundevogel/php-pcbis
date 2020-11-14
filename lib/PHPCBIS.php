@@ -60,13 +60,13 @@ class PHPCBIS
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
 
 
-    public function __construct(array $login = null, array $translations = [])
+    public function __construct(array $credentials = null, array $translations = [])
     {
         // Credentials for KNV's restricted API
-        $this->login = $login;
+        $this->credentials = $credentials;
 
-        if ($login === null) {
-            $this->login = $this->getLogin();
+        if ($credentials === null) {
+            $this->credentials = $this->authenticate();
         }
 
         if (!empty($translations)) {
@@ -125,7 +125,7 @@ class PHPCBIS
      * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
-     * @return bool|InvalidArgumentException
+     * @return string|InvalidArgumentException
      */
     public function validateISBN(string $isbn)
     {
@@ -134,7 +134,7 @@ class PHPCBIS
         try {
             $isbn->validate();
             $isbn = $isbn->format('ISBN-13');
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
 
@@ -148,9 +148,9 @@ class PHPCBIS
      * @param string $fileName - Name of file to be included
      * @return array|Exception
      */
-    public function getLogin(string $fileName = 'login')
+    private function authenticate()
     {
-        if (file_exists($file = realpath('./' . $fileName . '.json'))) {
+        if (file_exists($file = realpath('./login.json'))) {
             $json = file_get_contents($file);
             $array = json_decode($json, true);
 
@@ -182,8 +182,8 @@ class PHPCBIS
         // For getting started with KNV's (surprisingly well documented) german API,
         // see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
         $query = $client->WSCall([
-            // Login using credentials provided by `knv.login.json`
-            'LoginInfo' => $this->login,
+            // Login using credentials provided by `login.json`
+            'LoginInfo' => $this->credentials,
             // Starting a new database query
             'Suchen' => [
                 // Basically searching all databases they got
