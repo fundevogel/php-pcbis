@@ -15,6 +15,36 @@ if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 class Butler
 {
     /**
+     * Reverses name, going from 'Doe, John' to 'John Doe'
+     *
+     * @param string $string - Name to be reversed
+     * @return string
+     */
+    public static function reverseName(string $string, string $delimiter = ',')
+    {
+        $array = Butler::split($string, $delimiter);
+        $arrayReverse = array_reverse($array);
+
+        return Butler::join($arrayReverse, ' ');
+    }
+
+
+    /**
+     * Converts millimeters to centimeters
+     *
+     * @param string $string - Millimeter information
+     * @return string
+     */
+    public static function convertMM(string $string): string
+    {
+        $number = $string / 10;
+        $number = static::replace($string, '.', ',');
+
+        return $number . 'cm';
+    }
+
+
+    /**
      * An UTF-8 safe version of substr()
      *
      * @param  string  $str

@@ -331,21 +331,6 @@ class PHPCBIS
 
 
     /**
-     * Reverses name  from millimeters to centimeters
-     *
-     * @param string $string - Abmessungen string
-     * @return string
-     */
-    private function reverseName(string $string, string $delimiter = ',')
-    {
-        $array = Butler::split($string, $delimiter);
-        $arrayReverse = array_reverse($array);
-
-        return Butler::join($arrayReverse, ' ');
-    }
-
-
-    /**
      * Processes array (fetched from KNV's API) & builds 'AutorIn' attribute
      *
      * @param array $array - Source PHP array to read data from
@@ -361,7 +346,7 @@ class PHPCBIS
         $result = [];
 
         foreach ($authors as $author) {
-            $result[] = $this->reverseName($author);
+            $result[] = Butler::reverseName($author);
         }
 
         return Butler::join($result, '; ');
@@ -451,7 +436,7 @@ class PHPCBIS
                     $result = [];
 
                     foreach (Butler::split($speakers, ';') as $speaker) {
-                        $result[] = $this->reverseName($speaker);
+                        $result[] = Butler::reverseName($speaker);
                     }
 
                     return Butler::join($result, ', ');
@@ -470,7 +455,7 @@ class PHPCBIS
             $peopleArray = [];
 
             foreach ($people as $person) {
-                $peopleArray[] = $this->reverseName($person);
+                $peopleArray[] = Butler::reverseName($person);
             }
 
             $peopleString = Butler::join($peopleArray, ' & ');
@@ -576,21 +561,6 @@ class PHPCBIS
 
 
     /**
-     * Converts 'Abmessungen' attribute from millimeters to centimeters
-     *
-     * @param string $string - Abmessungen string
-     * @return string
-     */
-    private function convertMM(string $string): string
-    {
-        $number = $string / 10;
-        $number = Butler::replace($string, '.', ',');
-
-        return $number . 'cm';
-    }
-
-
-    /**
      * Processes array & builds 'Abmessungen' attribute as fetched from KNV's API
      *
      * @param array $array - Source PHP array to read data from
@@ -606,8 +576,8 @@ class PHPCBIS
             return '';
         }
 
-        $width = $this->convertMM($array['Breite']);
-        $height = $this->convertMM($array['Hoehe']);
+        $width = Butler::convertMM($array['Breite']);
+        $height = Butler::convertMM($array['Hoehe']);
 
         return $width . ' x ' . $height;
     }
