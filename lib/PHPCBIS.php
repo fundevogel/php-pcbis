@@ -70,7 +70,7 @@ class PHPCBIS
 
     public function __construct(array $login = null, string $languageCode = 'de')
     {
-        // Credentials for restricted APIs
+        // Credentials for KNV's restricted API
         $this->login = $login;
 
         if ($login === null) {
@@ -171,7 +171,7 @@ class PHPCBIS
      * Loads credentials saved in a local JSON file as array
      *
      * @param string $fileName - Name of file to be included
-     * @return array|bool|Exception
+     * @return array|Exception
      */
     public function getLogin(string $fileName = 'login')
     {
@@ -276,6 +276,12 @@ class PHPCBIS
         }
 
         return $driver->fetch($isbn);
+
+        // return new Book(
+        //     $driver->fetch($isbn),
+        //     $this->imagePath,
+        //     $this->languageCode,
+        // );
     }
 
 
@@ -325,6 +331,21 @@ class PHPCBIS
 
 
     /**
+     * Reverses name  from millimeters to centimeters
+     *
+     * @param string $string - Abmessungen string
+     * @return string
+     */
+    private function reverseName(string $string, string $delimiter = ',')
+    {
+        $array = Butler::split($string, $delimiter);
+        $arrayReverse = array_reverse($array);
+
+        return Butler::join($arrayReverse, ' ');
+    }
+
+
+    /**
      * Processes array (fetched from KNV's API) & builds 'AutorIn' attribute
      *
      * @param array $array - Source PHP array to read data from
@@ -336,16 +357,14 @@ class PHPCBIS
             return '';
         }
 
-        $data = Butler::split($array['AutorSachtitel'], ';');
-        $authors = [];
+        $authors = Butler::split($array['AutorSachtitel'], ';');
+        $result = [];
 
-        foreach ($data as $value) {
-            $author = Butler::split($value, ',');
-            $authorReverse = array_reverse($author);
-            $authors[] = Butler::join($authorReverse, ' ');
+        foreach ($authors as $author) {
+            $result[] = $this->reverseName($author);
         }
 
-        return Butler::join($authors, '; ');
+        return Butler::join($result, '; ');
     }
 
 
@@ -373,11 +392,7 @@ class PHPCBIS
      */
     private function getSubtitle(array $array): string
     {
-        if (!isset($array['Utitel'])) {
-            return '';
-        }
-
-        if ($array['Utitel'] == null) {
+        if (!isset($array['Utitel']) || $array['Utitel'] == null) {
             return '';
         }
 
@@ -421,54 +436,54 @@ class PHPCBIS
             return '';
         }
 
+        $participants = $array['Mitarb'];
+
         if ($this->isAudiobook($array)) {
-            $string = 'Gesprochen von';
-            if (Butler::contains($array['Mitarb'], $string) && $groupTask === $string) {
-                $speakersArray = Butler::split($array['Mitarb'], $string);
-                $speakers = Butler::last($speakersArray);
+            $spoken = 'Gesprochen von';
 
-                $result = [];
+            if (Butler::contains($participants, $spoken)) {
+                $participantArray = Butler::split($participants, $spoken);
+                $participants = $participantArray[0];
 
-                foreach (Butler::split($speakers, ';') as $speaker) {
-                    $speakerArray = Butler::split($speaker, ',');
-                    $speakerArrayReverse = array_reverse($speakerArray);
+                if ($groupTask === $spoken) {
+                    $speakers = Butler::last($participantArray);
 
-                    $result[] = Butler::join($speakerArrayReverse, ' ');
+                    $result = [];
+
+                    foreach (Butler::split($speakers, ';') as $speaker) {
+                        $result[] = $this->reverseName($speaker);
+                    }
+
+                    return Butler::join($result, ', ');
                 }
-
-                return Butler::join($result, ', ');
             }
-
-            return $array['Mitarb'];
         }
 
         $result = [];
 
-        foreach (Butler::split($array['Mitarb'], '. ') as $group) {
-            $groupArray = Butler::split($group, ': ');
+        foreach (Butler::split($participants, '.') as $group) {
+            $groupArray = Butler::split($group, ':');
             $task = $groupArray[0];
 
-            $people = Butler::split($groupArray[1], '; ');
+            $delimiter = $this->isAudiobook($array) ? '.' : ';';
+            $people = Butler::split($groupArray[1], $delimiter);
             $peopleArray = [];
 
             foreach ($people as $person) {
-                $personString = Butler::split($person, ', ');
-                $personStringReverse = array_reverse($personString);
-
-                $peopleArray[] = Butler::join($personStringReverse, ' ');
+                $peopleArray[] = $this->reverseName($person);
             }
 
-            $people = Butler::join($peopleArray, ' & ');
+            $peopleString = Butler::join($peopleArray, ' & ');
 
             if ($groupTask !== '') {
                 if ($groupTask === $task) {
-                    return $people;
+                    return $peopleString;
                 }
 
-                return '';
+                continue;
             }
 
-            $result[] = Butler::join([$task, $people], ': ');
+            $result[] = Butler::join([$task, $peopleString], ': ');
         }
 
         return Butler::join($result, '; ');
@@ -521,13 +536,13 @@ class PHPCBIS
             return '';
         }
 
-        $string = Butler::substr($array['Alter'], 0, 2);
+        $age = Butler::substr($array['Alter'], 0, 2);
 
-        if (Butler::substr($string, 0, 1) === '0') {
-            $string = Butler::substr($string, 1, 1);
+        if (Butler::substr($age, 0, 1) === '0') {
+            $age = Butler::substr($age, 1, 1);
         }
 
-      	return 'ab ' . $string . ' Jahren';
+      	return 'ab ' . $age . ' Jahren';
     }
 
 
@@ -568,10 +583,10 @@ class PHPCBIS
      */
     private function convertMM(string $string): string
     {
-        $string = $string / 10;
-        $string = Butler::replace($string, '.', ',');
+        $number = $string / 10;
+        $number = Butler::replace($string, '.', ',');
 
-        return $string . 'cm';
+        return $number . 'cm';
     }
 
 
@@ -806,6 +821,7 @@ class PHPCBIS
 
                 $dataOutput = Butler::update($dataOutput, [
                     'Dauer' => $this->getDuration($dataInput),
+                    'RegisseurIn' => $this->getParticipants($dataInput, 'Regie'),
                     'SprecherIn' => $this->getParticipants($dataInput, 'Gesprochen von'),
                 ]);
             }
