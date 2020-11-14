@@ -25,7 +25,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.8.0';
+    const VERSION = '0.9.0';
 
 
     /**
@@ -398,24 +398,49 @@ class PHPCBIS
 
         $participants = $array['Mitarb'];
 
-        if ($this->isAudiobook($array)) {
-            $spoken = 'Gesprochen von';
+        $spoken1 = 'Gesprochen von';
+        $spoken2 = 'Gesprochen:';
 
-            if (Butler::contains($participants, $spoken)) {
-                $participantArray = Butler::split($participants, $spoken);
-                $participants = $participantArray[0];
+        // 'Mitarbeit: ... Regie: ... Gesprochen von XY'
+        if (Butler::contains($array['Mitarb'], $spoken1) && $groupTask !== '') {
+            $participantArray = Butler::split($array['Mitarb'], $spoken1);
+            $participants = $participantArray[0];
 
-                if ($groupTask === $spoken) {
-                    $speakers = Butler::last($participantArray);
+            if ($groupTask === $spoken1) {
+                $speakers = Butler::last($participantArray);
 
-                    $result = [];
+                $result = [];
 
-                    foreach (Butler::split($speakers, ';') as $speaker) {
-                        $result[] = Butler::reverseName($speaker);
-                    }
-
-                    return Butler::join($result, ', ');
+                foreach (Butler::split($speakers, ';') as $speaker) {
+                    $result[] = Butler::reverseName($speaker);
                 }
+
+                return Butler::join($result, ', ');
+            }
+        }
+
+        // 'Mitarbeit: ... Regie: ... Gesprochen: XY'
+        if (Butler::contains($participants, $spoken2) && $groupTask !== '') {
+            $participantArray = Butler::split($participants, $spoken2);
+            $speaker = Butler::last($participantArray);
+
+            if ($groupTask === $spoken2 = $spoken1) {
+                return Butler::reverseName($speaker);
+            }
+
+            return '';
+        }
+
+        // 'Gesprochen von XY' & 'Gesprochen: XY'
+        foreach ([$spoken1, $spoken2] as $spoken) {
+            if (Butler::startsWith($array['Mitarb'], $spoken)) {
+                if ($groupTask === $spoken2 = $spoken1) {
+                    $string = Butler::replace($array['Mitarb'], $spoken, '');
+
+                    return Butler::reverseName($string);
+                }
+
+                return '';
             }
         }
 
@@ -426,6 +451,7 @@ class PHPCBIS
             $task = $groupArray[0];
 
             $delimiter = $this->isAudiobook($array) ? '.' : ';';
+
             $people = Butler::split($groupArray[1], $delimiter);
             $peopleArray = [];
 
@@ -434,6 +460,7 @@ class PHPCBIS
             }
 
             $peopleString = Butler::join($peopleArray, ' & ');
+
 
             if ($groupTask !== '') {
                 if ($groupTask === $task) {
@@ -774,16 +801,13 @@ class PHPCBIS
                 'Einband' => $this->getBinding($dataInput),
                 'Seitenzahl' => $this->getPageCount($dataInput),
                 'Abmessungen' => $this->getDimensions($dataInput),
-                // 'Kategorien' => $this->getCategories($dataInput),
-                // 'Schlagworte' => $this->getTags($dataInput),
+                'Kategorien' => $this->getCategories($dataInput),
+                'Schlagworte' => $this->getTags($dataInput),
             ];
 
+            // If it's an audiobook ..
             if ($this->isAudiobook($dataInput)) {
-                // Remove non-audiobook entries
-                unset($dataOutput['IllustratorIn']);
-                unset($dataOutput['ÜbersetzerIn']);
-                unset($dataOutput['Seitenzahl']);
-
+                // .. add entries exclusive to audiobooks
                 $dataOutput = Butler::update($dataOutput, [
                     'Dauer' => $this->getDuration($dataInput),
                     'RegisseurIn' => $this->getParticipants($dataInput, 'Regie'),
