@@ -25,7 +25,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.8.0';
+    const VERSION = '0.9.0';
 
 
     /**
@@ -45,19 +45,11 @@ class PHPCBIS
 
 
     /**
-     * Path to translation files
-     *
-     * @var string
-     */
-    private $languagePath = __DIR__ . '/../languages';
-
-
-    /**
-     * Language code used for translations
+     * Translatable strings
      *
      * @var array
      */
-    private $languageCode = '';
+    private $translations;
 
 
     /**
@@ -68,16 +60,18 @@ class PHPCBIS
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
 
 
-    public function __construct(array $login = null, string $languageCode = 'de')
+    public function __construct(array $credentials = null, array $translations = [])
     {
-        // Credentials for restricted APIs
-        $this->login = $login;
+        // Credentials for KNV's restricted API
+        $this->credentials = $credentials;
 
-        if ($login === null) {
-            $this->login = $this->getLogin();
+        if ($credentials === null) {
+            $this->credentials = $this->authenticate();
         }
 
-        $this->languageCode = $languageCode;
+        if (!empty($translations)) {
+            $this->translations = $translations;
+        }
     }
 
 
@@ -105,14 +99,14 @@ class PHPCBIS
         return $this->imagePath;
     }
 
-    public function setLanguagePath(string $languagePath)
+    public function setTranslations(array $translations)
     {
-        $this->languagePath = $languagePath;
+        $this->translations = $translations;
     }
 
-    public function getLanguagePath()
+    public function getTranslations()
     {
-        return $this->languagePath;
+        return $this->translations;
     }
 
     public function setUserAgent(string $userAgent)
@@ -127,30 +121,11 @@ class PHPCBIS
 
 
     /**
-     * Retrieves translations for current language
-     *
-     * @param string $languageCode - Language code
-     * @return array|Exception
-     */
-    private function getTranslations(string $languageCode)
-    {
-        if (file_exists($file = $this->languagePath . '/' . $languageCode . '.json')) {
-            $json = file_get_contents($this->languagePath . '/' . $languageCode . '.json');
-            $array = json_decode($json, true);
-
-            return $array;
-        }
-
-        throw new \Exception('Please provide a valid translation file.');
-    }
-
-
-    /**
      * Validates and formats given EAN/ISBN
      * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
-     * @return bool|InvalidArgumentException
+     * @return string|InvalidArgumentException
      */
     public function validateISBN(string $isbn)
     {
@@ -159,7 +134,7 @@ class PHPCBIS
         try {
             $isbn->validate();
             $isbn = $isbn->format('ISBN-13');
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
 
@@ -171,11 +146,11 @@ class PHPCBIS
      * Loads credentials saved in a local JSON file as array
      *
      * @param string $fileName - Name of file to be included
-     * @return array|bool|Exception
+     * @return array|Exception
      */
-    public function getLogin(string $fileName = 'login')
+    private function authenticate()
     {
-        if (file_exists($file = realpath('./' . $fileName . '.json'))) {
+        if (file_exists($file = realpath('./login.json'))) {
             $json = file_get_contents($file);
             $array = json_decode($json, true);
 
@@ -207,8 +182,8 @@ class PHPCBIS
         // For getting started with KNV's (surprisingly well documented) german API,
         // see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
         $query = $client->WSCall([
-            // Login using credentials provided by `knv.login.json`
-            'LoginInfo' => $this->login,
+            // Login using credentials provided by `login.json`
+            'LoginInfo' => $this->credentials,
             // Starting a new database query
             'Suchen' => [
                 // Basically searching all databases they got
@@ -276,6 +251,12 @@ class PHPCBIS
         }
 
         return $driver->fetch($isbn);
+
+        // return new Book(
+        //     $driver->fetch($isbn),
+        //     $this->imagePath,
+        //     $this->translations,
+        // );
     }
 
 
@@ -336,16 +317,14 @@ class PHPCBIS
             return '';
         }
 
-        $data = Butler::split($array['AutorSachtitel'], ';');
-        $authors = [];
+        $authors = Butler::split($array['AutorSachtitel'], ';');
+        $result = [];
 
-        foreach ($data as $value) {
-            $author = Butler::split($value, ',');
-            $authorReverse = array_reverse($author);
-            $authors[] = Butler::join($authorReverse, ' ');
+        foreach ($authors as $author) {
+            $result[] = Butler::reverseName($author);
         }
 
-        return Butler::join($authors, '; ');
+        return Butler::join($result, '; ');
     }
 
 
@@ -373,11 +352,7 @@ class PHPCBIS
      */
     private function getSubtitle(array $array): string
     {
-        if (!isset($array['Utitel'])) {
-            return '';
-        }
-
-        if ($array['Utitel'] == null) {
+        if (!isset($array['Utitel']) || $array['Utitel'] == null) {
             return '';
         }
 
@@ -421,33 +396,81 @@ class PHPCBIS
             return '';
         }
 
-        $result = [];
+        $participants = $array['Mitarb'];
 
-        foreach (Butler::split($array['Mitarb'], '. ') as $group) {
-            $groupArray = Butler::split($group, ': ');
-            $task = $groupArray[0];
+        $spoken1 = 'Gesprochen von';
+        $spoken2 = 'Gesprochen:';
 
-            $people = Butler::split($groupArray[1], '; ');
-            $peopleArray = [];
+        // 'Mitarbeit: ... Regie: ... Gesprochen von XY'
+        if (Butler::contains($array['Mitarb'], $spoken1) && $groupTask !== '') {
+            $participantArray = Butler::split($array['Mitarb'], $spoken1);
+            $participants = $participantArray[0];
 
-            foreach ($people as $person) {
-                $personString = Butler::split($person, ', ');
-                $personStringReverse = array_reverse($personString);
+            if ($groupTask === $spoken1) {
+                $speakers = Butler::last($participantArray);
 
-                $peopleArray[] = Butler::join($personStringReverse, ' ');
+                $result = [];
+
+                foreach (Butler::split($speakers, ';') as $speaker) {
+                    $result[] = Butler::reverseName($speaker);
+                }
+
+                return Butler::join($result, ', ');
+            }
+        }
+
+        // 'Mitarbeit: ... Regie: ... Gesprochen: XY'
+        if (Butler::contains($participants, $spoken2) && $groupTask !== '') {
+            $participantArray = Butler::split($participants, $spoken2);
+            $speaker = Butler::last($participantArray);
+
+            if ($groupTask === $spoken2 = $spoken1) {
+                return Butler::reverseName($speaker);
             }
 
-            $people = Butler::join($peopleArray, ' & ');
+            return '';
+        }
 
-            if ($groupTask !== '') {
-                if ($groupTask === $task) {
-                    return $people;
+        // 'Gesprochen von XY' & 'Gesprochen: XY'
+        foreach ([$spoken1, $spoken2] as $spoken) {
+            if (Butler::startsWith($array['Mitarb'], $spoken)) {
+                if ($groupTask === $spoken2 = $spoken1) {
+                    $string = Butler::replace($array['Mitarb'], $spoken, '');
+
+                    return Butler::reverseName($string);
                 }
 
                 return '';
             }
+        }
 
-            $result[] = Butler::join([$task, $people], ': ');
+        $result = [];
+
+        foreach (Butler::split($participants, '.') as $group) {
+            $groupArray = Butler::split($group, ':');
+            $task = $groupArray[0];
+
+            $delimiter = $this->isAudiobook($array) ? '.' : ';';
+
+            $people = Butler::split($groupArray[1], $delimiter);
+            $peopleArray = [];
+
+            foreach ($people as $person) {
+                $peopleArray[] = Butler::reverseName($person);
+            }
+
+            $peopleString = Butler::join($peopleArray, ' & ');
+
+
+            if ($groupTask !== '') {
+                if ($groupTask === $task) {
+                    return $peopleString;
+                }
+
+                continue;
+            }
+
+            $result[] = Butler::join([$task, $peopleString], ': ');
         }
 
         return Butler::join($result, '; ');
@@ -500,13 +523,13 @@ class PHPCBIS
             return '';
         }
 
-        $string = Butler::substr($array['Alter'], 0, 2);
+        $age = Butler::substr($array['Alter'], 0, 2);
 
-        if (Butler::substr($string, 0, 1) === '0') {
-            $string = Butler::substr($string, 1, 1);
+        if (Butler::substr($age, 0, 1) === '0') {
+            $age = Butler::substr($age, 1, 1);
         }
 
-      	return 'ab ' . $string . ' Jahren';
+      	return 'ab ' . $age . ' Jahren';
     }
 
 
@@ -540,21 +563,6 @@ class PHPCBIS
 
 
     /**
-     * Converts 'Abmessungen' attribute from millimeters to centimeters
-     *
-     * @param string $string - Abmessungen string
-     * @return string
-     */
-    private function convertMM(string $string): string
-    {
-        $string = $string / 10;
-        $string = Butler::replace($string, '.', ',');
-
-        return $string . 'cm';
-    }
-
-
-    /**
      * Processes array & builds 'Abmessungen' attribute as fetched from KNV's API
      *
      * @param array $array - Source PHP array to read data from
@@ -570,8 +578,8 @@ class PHPCBIS
             return '';
         }
 
-        $width = $this->convertMM($array['Breite']);
-        $height = $this->convertMM($array['Hoehe']);
+        $width = Butler::convertMM($array['Breite']);
+        $height = Butler::convertMM($array['Hoehe']);
 
         return $width . ' x ' . $height;
     }
@@ -589,11 +597,31 @@ class PHPCBIS
             return '';
         }
 
-        $translations = $this->getTranslations($this->languageCode);
-        $string = $array['Einband'];
+        $binding = $array['Einband'];
 
-        var_dump($string);
-        return $translations['binding'][$string];
+        $translations = [
+            'BUCH' => 'gebunden',
+            'CD'   => 'CD',
+            'CRD'  => 'Nonbook',
+            'GEB'  => 'gebunden',
+            'GEH'  => 'geheftet',
+            'HL'   => 'Halbleinen',
+            'KT'   => 'kartoniert',
+            'LN'   => 'Leinen',
+            'NON'  => 'Nonbook',
+            'PP'   => 'Pappband',
+            'SPL'  => 'Spiel',
+        ];
+
+        if (isset($this->translations['binding'])) {
+            $translations = $this->translations['binding'];
+        }
+
+        if (!isset($translations[$binding])) {
+            return $binding;
+        }
+
+        return $translations[$binding];
     }
 
 
@@ -715,6 +743,37 @@ class PHPCBIS
 
 
     /**
+     * Determines if this is an audiobook
+     *
+     * @param array $array - Source PHP array to read data from
+     * @return string
+     */
+    private function isAudiobook(array $array): bool
+    {
+        return $this->getBinding($array) === 'CD';
+    }
+
+
+    /**
+     * Processes array (fetched from KNV's API) & builds 'Dauer' attribute
+     *
+     * @param array $array - Source PHP array to read data from
+     * @return string
+     */
+    private function getDuration(array $array): string
+    {
+        if (!isset($array['Utitel']) || !$this->isAudiobook($array)) {
+            return '';
+        }
+
+        $array = Butler::split($array['Utitel'], '.');
+        $duration = Butler::last($array);
+
+        return Butler::replace($duration, ' Min', '');
+    }
+
+
+    /**
      * Builds an array with KNV information
      *
      * @param array $dataInput - Input that should be processed
@@ -739,12 +798,22 @@ class PHPCBIS
                 'Erscheinungsjahr' => $this->getYear($dataInput),
                 'Altersempfehlung' => $this->getAge($dataInput),
                 'Inhaltsbeschreibung' => $this->getText($dataInput),
-                'Abmessungen' => $this->getDimensions($dataInput),
                 'Einband' => $this->getBinding($dataInput),
                 'Seitenzahl' => $this->getPageCount($dataInput),
+                'Abmessungen' => $this->getDimensions($dataInput),
                 'Kategorien' => $this->getCategories($dataInput),
                 'Schlagworte' => $this->getTags($dataInput),
             ];
+
+            // If it's an audiobook ..
+            if ($this->isAudiobook($dataInput)) {
+                // .. add entries exclusive to audiobooks
+                $dataOutput = Butler::update($dataOutput, [
+                    'Dauer' => $this->getDuration($dataInput),
+                    'RegisseurIn' => $this->getParticipants($dataInput, 'Regie'),
+                    'SprecherIn' => $this->getParticipants($dataInput, 'Gesprochen von'),
+                ]);
+            }
         } catch (\Exception $e) {
             throw $e;
         }

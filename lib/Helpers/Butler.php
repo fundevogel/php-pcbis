@@ -15,6 +15,36 @@ if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 class Butler
 {
     /**
+     * Reverses name, going from 'Doe, John' to 'John Doe'
+     *
+     * @param string $string - Name to be reversed
+     * @return string
+     */
+    public static function reverseName(string $string, string $delimiter = ',')
+    {
+        $array = Butler::split($string, $delimiter);
+        $arrayReverse = array_reverse($array);
+
+        return Butler::join($arrayReverse, ' ');
+    }
+
+
+    /**
+     * Converts millimeters to centimeters
+     *
+     * @param string $string - Millimeter information
+     * @return string
+     */
+    public static function convertMM(string $string): string
+    {
+        $number = $string / 10;
+        $number = static::replace($string, '.', ',');
+
+        return $number . 'cm';
+    }
+
+
+    /**
      * An UTF-8 safe version of substr()
      *
      * @param  string  $str
@@ -342,6 +372,26 @@ class Butler
     }
 
 
+   /**
+     * Returns the position of a needle in a string
+     * if it can be found
+     *
+     * @param string $string
+     * @param string $needle
+     * @param bool $caseInsensitive
+     * @return int|bool
+     */
+    public static function position(string $string = null, string $needle, bool $caseInsensitive = false)
+    {
+        if ($caseInsensitive === true) {
+            $string = static::lower($string);
+            $needle = static::lower($needle);
+        }
+
+        return mb_strpos($string, $needle, 0, 'UTF-8');
+    }
+
+
     /**
      * Convert a string to a safe version to be used in a URL
      *
@@ -373,6 +423,24 @@ class Butler
         $string = str_replace('/', $separator, $string);
 
         return $string;
+    }
+
+
+    /**
+     * Checks if a string starts with the passed needle
+     *
+     * @param string $string
+     * @param string $needle
+     * @param bool $caseInsensitive
+     * @return bool
+     */
+    public static function startsWith(string $string = null, string $needle, bool $caseInsensitive = false): bool
+    {
+        if ($needle === '') {
+            return true;
+        }
+
+        return static::position($string, $needle, $caseInsensitive) === 0;
     }
 
 

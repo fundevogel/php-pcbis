@@ -1,6 +1,6 @@
 # Composer + sensitive files
 /composer.lock
-/*login*.json
+/login.json
 /*.cache
 /vendor
 
