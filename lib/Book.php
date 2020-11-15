@@ -24,6 +24,14 @@ class Book
 
 
     /**
+     * Source data fetched from KNV's API
+     *
+     * @var array
+     */
+    private $source;
+
+
+    /**
      * Whether it's an audiobook
      *
      * @var bool
@@ -198,9 +206,6 @@ class Book
         $this->title       = $this->buildTitle();
         $this->subtitle    = $this->buildSubtitle();
         $this->publisher   = $this->buildPublisher();
-        // $this->participants = $this->buildParticipants();
-        // $this->illustrator = $this->buildIllustrator();
-        // $this->translator = $this->buildTranslator();
         $this->description = $this->buildDescription();
         $this->retailPrice = $this->buildretailPrice();
         $this->releaseYear = $this->buildreleaseYear();
@@ -209,11 +214,17 @@ class Book
         $this->pageCount   = $this->buildPageCount();
         $this->dimensions  = $this->buildDimensions();
 
+        # Extract participants
+        $this->participants = $this->buildParticipants();
+        // $this->illustrator = $this->buildIllustrator();
+        // $this->translator = $this->buildTranslator();
+
+        # Extract category & topics
         $tags = $this->separateTags();
         $this->category    = $this->buildCategory($tags);
         $this->topics      = $this->buildTopics($tags);
 
-        // # Build audiobook specifics
+        // # Build audiobook attributes
         $this->duration = $this->buildDuration();
         // $this->director = $this->buildDirector();
         // $this->narrator = $this->buildNarrator();
@@ -289,6 +300,17 @@ class Book
         }
 
         return $success;
+    }
+
+
+    /**
+     * Shows source data fetched from KNV's API
+     *
+     * @return array
+     */
+    public function showSource(): array
+    {
+        return $this->source;
     }
 
 
@@ -441,7 +463,128 @@ class Book
     }
 
 
+    /**
+     * Extracts participants from source array
+     *
+     * This includes `illustrator`, `translator`, `director`, `narrator` & `participant`
+     *
+     * @return array
+     */
+    protected function buildParticipants(): array
+    {
+        if (!isset($this->source['Mitarb'])) {
+            return [];
+        }
 
+        $string = $this->source['Mitarb'];
+        var_dump($string);
+        $participants = [
+            'illustrator' => [],
+            'translator' => [],
+            'director' => [],
+            'narrator' => [],
+            'participant' => [],
+        ];
+
+        $spoken1 = 'Gesprochen von';
+        $spoken2 = 'Gesprochen:';
+
+        foreach ([$spoken1, $spoken2] as $spoken) {
+            if (Butler::startsWith($string, $spoken)) {
+                $string = Butler::replace($string, $spoken, '');
+
+                $participants['narrator'][] = Butler::reverseName($string);
+            }
+        }
+
+
+        // // 'Mitarbeit: ... Regie: ... Gesprochen von XY'
+        // if (Butler::contains($array['Mitarb'], $spoken1) && $groupTask !== '') {
+        //     $participantArray = Butler::split($array['Mitarb'], $spoken1);
+        //     $participants = $participantArray[0];
+
+        //     if ($groupTask === $spoken1) {
+        //         $speakers = Butler::last($participantArray);
+
+        //         $result = [];
+
+        //         foreach (Butler::split($speakers, ';') as $speaker) {
+        //             $result[] = Butler::reverseName($speaker);
+        //         }
+
+        //         return Butler::join($result, ', ');
+        //     }
+        // }
+
+        // // 'Mitarbeit: ... Regie: ... Gesprochen: XY'
+        // if (Butler::contains($participants, $spoken2) && $groupTask !== '') {
+        //     $participantArray = Butler::split($participants, $spoken2);
+        //     $speaker = Butler::last($participantArray);
+
+        //     if ($groupTask === $spoken2 = $spoken1) {
+        //         return Butler::reverseName($speaker);
+        //     }
+
+        //     return '';
+        // }
+
+        // // 'Gesprochen von XY' & 'Gesprochen: XY'
+        // foreach ([$spoken1, $spoken2] as $spoken) {
+        //     if (Butler::startsWith($array['Mitarb'], $spoken)) {
+        //         if ($groupTask === $spoken2 = $spoken1) {
+        //             $string = Butler::replace($array['Mitarb'], $spoken, '');
+
+        //             return Butler::reverseName($string);
+        //         }
+
+        //         return '';
+        //     }
+        // }
+
+        // $result = [];
+
+        // foreach (Butler::split($participants, '.') as $group) {
+        //     $groupArray = Butler::split($group, ':');
+        //     $task = $groupArray[0];
+
+        //     $delimiter = $this->isAudiobook($array) ? '.' : ';';
+
+        //     $people = Butler::split($groupArray[1], $delimiter);
+        //     $peopleArray = [];
+
+        //     foreach ($people as $person) {
+        //         $peopleArray[] = Butler::reverseName($person);
+        //     }
+
+        //     $peopleString = Butler::join($peopleArray, ' & ');
+
+
+        //     if ($groupTask !== '') {
+        //         if ($groupTask === $task) {
+        //             return $peopleString;
+        //         }
+
+        //         continue;
+        //     }
+
+        //     $result[] = Butler::join([$task, $peopleString], ': ');
+        // }
+
+        // return Butler::join($result, '; ');
+        return $participants;
+    }
+
+
+    public function setParticipants($participants)
+    {
+        $this->participants = $participants;
+    }
+
+
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
 
 
     /**
@@ -791,11 +934,11 @@ class Book
         $topics = $array['topics'];
 
         if (is_string($topics)) {
-            return $topics;
+            $topics = (array) $topics;
         }
 
         $topics = array_filter($topics, function ($topic) {
-            if (!in_array($topic, $this->blockedTopics)) {
+            if (!in_array($topic, $this->blockedTopics, true)) {
                 return $topic;
             }
         });
@@ -894,99 +1037,7 @@ class Book
 
 
     /**
-     * TODO
+     * TODO: Illustrator, translator, director, narrator + partaking people
      */
 
-    /**
-     * Builds participants
-     *
-     * This may also be used to retrieve illustrator(s) & translator(s)
-     *
-     * @return string
-     */
-    protected function buildParticipants(array $array, string $groupTask = ''): string
-    {
-        if (!isset($array['Mitarb'])) {
-            return '';
-        }
-
-        $participants = $array['Mitarb'];
-
-        $spoken1 = 'Gesprochen von';
-        $spoken2 = 'Gesprochen:';
-
-        // 'Mitarbeit: ... Regie: ... Gesprochen von XY'
-        if (Butler::contains($array['Mitarb'], $spoken1) && $groupTask !== '') {
-            $participantArray = Butler::split($array['Mitarb'], $spoken1);
-            $participants = $participantArray[0];
-
-            if ($groupTask === $spoken1) {
-                $speakers = Butler::last($participantArray);
-
-                $result = [];
-
-                foreach (Butler::split($speakers, ';') as $speaker) {
-                    $result[] = Butler::reverseName($speaker);
-                }
-
-                return Butler::join($result, ', ');
-            }
-        }
-
-        // 'Mitarbeit: ... Regie: ... Gesprochen: XY'
-        if (Butler::contains($participants, $spoken2) && $groupTask !== '') {
-            $participantArray = Butler::split($participants, $spoken2);
-            $speaker = Butler::last($participantArray);
-
-            if ($groupTask === $spoken2 = $spoken1) {
-                return Butler::reverseName($speaker);
-            }
-
-            return '';
-        }
-
-        // 'Gesprochen von XY' & 'Gesprochen: XY'
-        foreach ([$spoken1, $spoken2] as $spoken) {
-            if (Butler::startsWith($array['Mitarb'], $spoken)) {
-                if ($groupTask === $spoken2 = $spoken1) {
-                    $string = Butler::replace($array['Mitarb'], $spoken, '');
-
-                    return Butler::reverseName($string);
-                }
-
-                return '';
-            }
-        }
-
-        $result = [];
-
-        foreach (Butler::split($participants, '.') as $group) {
-            $groupArray = Butler::split($group, ':');
-            $task = $groupArray[0];
-
-            $delimiter = $this->isAudiobook($array) ? '.' : ';';
-
-            $people = Butler::split($groupArray[1], $delimiter);
-            $peopleArray = [];
-
-            foreach ($people as $person) {
-                $peopleArray[] = Butler::reverseName($person);
-            }
-
-            $peopleString = Butler::join($peopleArray, ' & ');
-
-
-            if ($groupTask !== '') {
-                if ($groupTask === $task) {
-                    return $peopleString;
-                }
-
-                continue;
-            }
-
-            $result[] = Butler::join([$task, $peopleString], ': ');
-        }
-
-        return Butler::join($result, '; ');
-    }
 }
