@@ -25,7 +25,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '0.9.0';
+    const VERSION = '1.0.0-beta.1';
 
 
     /**
@@ -228,7 +228,7 @@ class PHPCBIS
         // XML to JSON to PHP array - we want its last entry
         $xml = simplexml_load_string($result);
         $json = json_encode($xml);
-        $array = (json_decode($json, true));
+        $array = json_decode($json, true);
 
         return Butler::last($array);
     }
@@ -239,7 +239,7 @@ class PHPCBIS
      * otherwise loads them & saves to cache
      *
      * @param string $isbn - A given book's ISBN
-     * @return array|bool
+     * @return PHPCBIS\Book
      */
     public function loadBook($isbn)
     {
@@ -252,10 +252,6 @@ class PHPCBIS
             $driver->save($isbn, $result);
         }
 
-        return new Book(
-            $driver->fetch($isbn),
-            $this->imagePath,
-            $this->translations,
-        );
+        return new Book($isbn, $driver->fetch($isbn), $this->imagePath, $this->translations);
     }
 }

@@ -16,6 +16,14 @@ use PHPCBIS\Helpers\Butler;
 class Book
 {
     /**
+     * International Standard Book Number
+     *
+     * @var string
+     */
+    private $isbn;
+
+
+    /**
      * Whether it's an audiobook
      *
      * @var bool
@@ -174,7 +182,10 @@ class Book
      * Constructor
      */
 
-    public function __construct(array $source, string $imagePath, array $translations) {
+    public function __construct(string $isbn, array $source, string $imagePath, array $translations) {
+        # Store valid ISBN
+        $this->isbn = $isbn;
+
         # Store data fetched from KNV's API
         $this->source = $source;
 
@@ -222,18 +233,15 @@ class Book
         $this->blockedTopics = $blockedTopics;
     }
 
-
     public function getBlockedTopics()
     {
         return $this->blockedTopics;
     }
 
-
     public function setUserAgent(string $userAgent)
     {
         $this->userAgent = $userAgent;
     }
-
 
     public function getUserAgent()
     {
@@ -248,12 +256,11 @@ class Book
     /**
      * Downloads book cover from DNB
      *
-     * @param string $isbn - International Standard Book Number
      * @param string $fileName - Filename for the image to be downloaded
      * @param bool $overwrite - Whether existing file should be overwritten
      * @return bool
      */
-    public function downloadCover(string $fileName = null,bool $overwrite = false): bool
+    public function downloadCover(string $fileName = null, bool $overwrite = false): bool
     {
         if ($fileName == null) {
             $fileName = $this->isbn;
@@ -432,6 +439,7 @@ class Book
     {
         return $this->publisher;
     }
+
 
 
 
