@@ -128,6 +128,14 @@ class Book
 
 
     /**
+     * Duration (audiobook only)
+     *
+     * @var string
+     */
+    protected $duration;
+
+
+    /**
      * Category
      *
      * @var string
@@ -144,11 +152,43 @@ class Book
 
 
     /**
-     * Duration (audiobook only)
+     * Illustrator
      *
-     * @var string
+     * @var array
      */
-    protected $duration;
+    protected $illustrator;
+
+
+    /**
+     * Translator
+     *
+     * @var array
+     */
+    protected $translator;
+
+
+    /**
+     * Director
+     *
+     * @var array
+     */
+    protected $director;
+
+
+    /**
+     * Narrator
+     *
+     * @var array
+     */
+    protected $narrator;
+
+
+    /**
+     * Participant
+     *
+     * @var array
+     */
+    protected $participant;
 
 
     /**
@@ -175,7 +215,7 @@ class Book
      *
      * @var array
      */
-    protected $translations;
+    protected $translations = [];
 
 
     /**
@@ -190,7 +230,7 @@ class Book
      * Constructor
      */
 
-    public function __construct(string $isbn, array $source, string $imagePath, array $translations) {
+    public function __construct(string $isbn, array $source, string $imagePath) {
         # Store valid ISBN
         $this->isbn = $isbn;
 
@@ -213,25 +253,23 @@ class Book
         $this->binding     = $this->buildBinding();
         $this->pageCount   = $this->buildPageCount();
         $this->dimensions  = $this->buildDimensions();
-
-        # Extract participants
-        $this->participants = $this->buildParticipants();
-        // $this->illustrator = $this->buildIllustrator();
-        // $this->translator = $this->buildTranslator();
+        $this->duration    = $this->buildDuration();
 
         # Extract category & topics
         $tags = $this->separateTags();
         $this->category    = $this->buildCategory($tags);
         $this->topics      = $this->buildTopics($tags);
 
-        // # Build audiobook attributes
-        $this->duration = $this->buildDuration();
-        // $this->director = $this->buildDirector();
-        // $this->narrator = $this->buildNarrator();
+        # Extract involved people
+        $people = $this->separatePeople();
+        $this->illustrator = $this->buildIllustrator($people);
+        $this->translator  = $this->buildTranslator($people);
+        $this->director    = $this->buildDirector($people);
+        $this->narrator    = $this->buildNarrator($people);
+        $this->participant = $this->buildParticipant($people);
 
         # Import image path & translations
         $this->imagePath = $imagePath;
-        $this->translations = $translations;
     }
 
 
@@ -247,6 +285,16 @@ class Book
     public function getBlockedTopics()
     {
         return $this->blockedTopics;
+    }
+
+    public function setTranslations(array $translations)
+    {
+        $this->translations = $translations;
+    }
+
+    public function getTranslations()
+    {
+        return $this->translations;
     }
 
     public function setUserAgent(string $userAgent)
@@ -346,7 +394,7 @@ class Book
 
             $authors[] = [
                 'firstName' => $authorArray[1],
-                'lastName' => $authorArray[0],
+                'lastName'  => $authorArray[0],
             ];
         }
 
@@ -464,21 +512,15 @@ class Book
 
 
     /**
-     * Extracts participants from source array
+     * Extracts involved people from source array
      *
      * This includes `illustrator`, `translator`, `director`, `narrator` & `participant`
      *
      * @return array
      */
-    protected function buildParticipants(): array
+    private function separatePeople(): array
     {
-        if (!isset($this->source['Mitarb'])) {
-            return [];
-        }
-
-        $string = $this->source['Mitarb'];
-        var_dump($string);
-        $participants = [
+        $people = [
             'illustrator' => [],
             'translator' => [],
             'director' => [],
@@ -486,104 +528,300 @@ class Book
             'participant' => [],
         ];
 
-        $spoken1 = 'Gesprochen von';
-        $spoken2 = 'Gesprochen:';
+        if (!isset($this->source['Mitarb'])) {
+            return $people;
+        }
 
-        foreach ([$spoken1, $spoken2] as $spoken) {
-            if (Butler::startsWith($string, $spoken)) {
-                $string = Butler::replace($string, $spoken, '');
+        $string = $this->source['Mitarb'];
 
-                $participants['narrator'][] = Butler::reverseName($string);
+        # Narrator role
+        $delimiter1 = 'Gesprochen von';
+        $delimiter2 = 'Gesprochen:';
+
+        foreach ([$delimiter1, $delimiter2] as $delimiter) {
+            # Case 1: 'Gesprochen von / Gesprochen: XY'
+            if (Butler::startsWith($string, $delimiter)) {
+                $case1 = Butler::replace($string, $delimiter, '');
+                $array = Butler::split($case1, ',');
+
+                # Edge case: single entry, such as 'Diverse'
+                $lastName = '';
+
+                if (count($array) > 1) {
+                    $firstName = $array[1];
+                }
+
+                $people['narrator'][] = [
+                    'firstName' => $firstName,
+                    'lastName'  => $array[0],
+                ];
+
+                # Case 1 yields only a single narrator
+                // break;
+                return $people;
+            }
+
+            # Case 2: '... Gesprochen von / Gesprochen: XY'
+            if (Butler::contains($string, $delimiter)) {
+                $array = Butler::split($string, '.');
+                $case2 = Butler::replace(Butler::last($array), $delimiter, '');
+
+                foreach (Butler::split($case2, ';') as $narrator) {
+                    $narratorArray = Butler::split($narrator, ',');
+
+                    # Edge case: single entry, such as 'Diverse'
+                    $firstName = '';
+
+                    if (count($narratorArray) > 1) {
+                        $firstName = $narratorArray[1];
+                    }
+
+                    $people['narrator'][] = [
+                        'firstName' => $firstName,
+                        'lastName'  => $narratorArray[0],
+                    ];
+                }
+
+                # Case 2 yields more participants
+                $string = Butler::split($string, $delimiter)[0];
+                break;
             }
         }
 
+        # Remaining roles
+        $tasks = [
+            'Illustration' => 'illustrator',
+            'Übersetzung'  => 'translator',
+            'Regie'        => 'director',
+            'Mitarbeit'    => 'participant',
+        ];
 
-        // // 'Mitarbeit: ... Regie: ... Gesprochen von XY'
-        // if (Butler::contains($array['Mitarb'], $spoken1) && $groupTask !== '') {
-        //     $participantArray = Butler::split($array['Mitarb'], $spoken1);
-        //     $participants = $participantArray[0];
-
-        //     if ($groupTask === $spoken1) {
-        //         $speakers = Butler::last($participantArray);
-
-        //         $result = [];
-
-        //         foreach (Butler::split($speakers, ';') as $speaker) {
-        //             $result[] = Butler::reverseName($speaker);
-        //         }
-
-        //         return Butler::join($result, ', ');
-        //     }
+        // if (empty($array)) {
+        //     continue;
         // }
+        foreach (Butler::split($string, '.') as $array) {
+            $array = Butler::split($array, ':');
 
-        // // 'Mitarbeit: ... Regie: ... Gesprochen: XY'
-        // if (Butler::contains($participants, $spoken2) && $groupTask !== '') {
-        //     $participantArray = Butler::split($participants, $spoken2);
-        //     $speaker = Butler::last($participantArray);
+            # Determine role
+            $task = 'participant';
 
-        //     if ($groupTask === $spoken2 = $spoken1) {
-        //         return Butler::reverseName($speaker);
-        //     }
+            if (isset($tasks[$array[0]])) {
+                $task = $tasks[$array[0]];
+            }
 
-        //     return '';
-        // }
+            $array = Butler::split($array[1], ';');
 
-        // // 'Gesprochen von XY' & 'Gesprochen: XY'
-        // foreach ([$spoken1, $spoken2] as $spoken) {
-        //     if (Butler::startsWith($array['Mitarb'], $spoken)) {
-        //         if ($groupTask === $spoken2 = $spoken1) {
-        //             $string = Butler::replace($array['Mitarb'], $spoken, '');
+            foreach ($array as $case3) {
+                $person = Butler::split($case3, ',');
 
-        //             return Butler::reverseName($string);
-        //         }
+                $people[$task][] = [
+                    'firstName' => $person[1],
+                    'lastName'  => $person[0],
+                ];
+            }
+        }
 
-        //         return '';
-        //     }
-        // }
-
-        // $result = [];
-
-        // foreach (Butler::split($participants, '.') as $group) {
-        //     $groupArray = Butler::split($group, ':');
-        //     $task = $groupArray[0];
-
-        //     $delimiter = $this->isAudiobook($array) ? '.' : ';';
-
-        //     $people = Butler::split($groupArray[1], $delimiter);
-        //     $peopleArray = [];
-
-        //     foreach ($people as $person) {
-        //         $peopleArray[] = Butler::reverseName($person);
-        //     }
-
-        //     $peopleString = Butler::join($peopleArray, ' & ');
+        return $people;
+    }
 
 
-        //     if ($groupTask !== '') {
-        //         if ($groupTask === $task) {
-        //             return $peopleString;
-        //         }
+    private function exportRole(array $array, string $role): string
+    {
+        if (!$array) {
+            return '';
+        }
 
+        $people = [];
+
+        foreach ($array as $person) {
+            $people[] = $person['firstName'] . ' ' . $person['lastName'];
+        }
+
+        return Butler::join($people, '; ');
+    }
+
+
+    private function exportPeople(array $people)
+    {
+        // $participants = [];
+
+        // foreach ($this->participants as $task => $group) {
+        //     if (empty($group)) {
         //         continue;
         //     }
 
-        //     $result[] = Butler::join([$task, $peopleString], ': ');
+        //     $data = [];
+
+        //     foreach ($group as $participant) {
+        //         $data[] = $participant['firstName'] . ' ' . $participant['lastName'];
+        //     }
+
+        //     $translations = [
+        //         'illustrator' => 'IllustratorIn',
+        //         'translator' => 'ÜbersetzerIn',
+        //         'director' => 'RegisseurIn',
+        //         'narrator' => 'SprecherIn',
+        //         'participant' => 'Mitwirkende',
+        //     ];
+
+        //     if (!empty($this->translations)) {
+        //         $translations = $this->translations;
+        //     }
+
+        //     if (!isset($translations[$task])) {
+        //         throw new \Exception('No translation found: ' . $task);
+        //     }
+
+        //     $participants[] = $translations[$task] . ': ' . Butler::join($data, '; ');
         // }
 
-        // return Butler::join($result, '; ');
-        return $participants;
+        // return Butler::join($participants, '; ');
     }
 
 
-    public function setParticipants($participants)
+    private function extractRole(array $people, string $role): array
     {
-        $this->participants = $participants;
+        return $people[$role];
     }
 
 
-    public function getParticipants()
+    /**
+     * Builds illustrator
+     *
+     * @param array $people - People involved
+     * @return string
+     */
+    protected function buildIllustrator(array $people): array
     {
-        return $this->participants;
+        return $this->extractRole($people, 'illustrator');
+    }
+
+
+    public function setIllustrator($illustrator)
+    {
+        $this->illustrator = $illustrator;
+    }
+
+
+    public function getIllustrator(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->illustrator;
+        }
+
+        $this->exportRole($this->illustrator, 'illustrator');
+    }
+
+
+    /**
+     * Builds translator
+     *
+     * @param array $people - People involved
+     * @return string
+     */
+    protected function buildTranslator(array $people): array
+    {
+        return $this->extractRole($people, 'translator');
+    }
+
+
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
+    }
+
+
+    public function getTranslator(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->translator;
+        }
+
+        $this->exportRole($this->translator, 'translator');
+    }
+
+
+    /**
+     * Builds director
+     *
+     * @param array $people - People involved
+     * @return string
+     */
+    protected function buildDirector(array $people): array
+    {
+        return $this->extractRole($people, 'director');
+    }
+
+
+    public function setDirector($director)
+    {
+        $this->director = $director;
+    }
+
+
+    public function getDirector(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->director;
+        }
+
+        $this->exportRole($this->director, 'director');
+    }
+
+
+    /**
+     * Builds narrator
+     *
+     * @param array $people - People involved
+     * @return string
+     */
+    protected function buildNarrator(array $people): array
+    {
+        return $this->extractRole($people, 'narrator');
+    }
+
+
+    public function setNarrator($narrator)
+    {
+        $this->narrator = $narrator;
+    }
+
+
+    public function getNarrator(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->narrator;
+        }
+
+        $this->exportRole($this->narrator, 'narrator');
+    }
+
+
+    /**
+     * Builds participant
+     *
+     * @param array $people - People involved
+     * @return string
+     */
+    protected function buildParticipant(array $people): array
+    {
+        return $this->extractRole($people, 'participant');
+    }
+
+
+    public function setParticipant($participant)
+    {
+        $this->participant = $participant;
+    }
+
+
+    public function getParticipant(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->participant;
+        }
+
+        $this->exportRole($this->participant, 'participant');
     }
 
 
@@ -733,11 +971,29 @@ class Book
 
         $binding = $this->source['Einband'];
 
-        if (!isset($this->translations[$binding])) {
+        $translations = [
+            'BUCH' => 'gebunden',
+            'CD'   => 'CD',
+            'CRD'  => 'Nonbook',
+            'GEB'  => 'gebunden',
+            'GEH'  => 'geheftet',
+            'HL'   => 'Halbleinen',
+            'KT'   => 'kartoniert',
+            'LN'   => 'Leinen',
+            'NON'  => 'Nonbook',
+            'PP'   => 'Pappband',
+            'SPL'  => 'Spiel',
+        ];
+
+        if (!empty($this->translations)) {
+            $translations = $this->translations;
+        }
+
+        if (!isset($translations[$binding])) {
             return $binding;
         }
 
-        return $this->translations[$binding];
+        return $translations[$binding];
     }
 
 
@@ -995,40 +1251,33 @@ class Book
 
 
     /**
-     * Exports all information, optionally as preformatted strings
+     * Exports all information, optionally as pre-formatted strings
      *
      * @return array
      */
-    public function export(bool $formatted = false)
+    public function export(bool $formatted = false): array
     {
         $data = [
-            'AutorIn' => $this->getAuthor($formatted),
-            'Titel' => $this->title,
-            'Untertitel' => $this->subtitle,
-            'Verlag' => $this->publisher,
-            // 'Mitwirkende' => $this->participants,
-            // 'IllustratorIn' => $this->illustrator,
-            // 'ÜbersetzerIn' => $this->translator,
-            'Preis' => $this->retailPrice,
-            'Erscheinungsjahr' => $this->releaseYear,
-            'Altersempfehlung' => $this->age,
-            'Inhaltsbeschreibung' => $this->description,
-            'Einband' => $this->binding,
-            'Seitenzahl' => $this->pageCount,
-            'Abmessungen' => $this->dimensions,
-            'Kategorie' => $this->category,
-            'Themen' => $this->getTopics($formatted),
+            'AutorIn'          => $this->getAuthor($formatted),
+            'Titel'            => $this->getTitle(),
+            'Untertitel'       => $this->getSubtitle(),
+            'Verlag'           => $this->getPublisher(),
+            'Preis'            => $this->getRetailPrice(),
+            'Erscheinungsjahr' => $this->getReleaseYear(),
+            'Altersempfehlung' => $this->getAge(),
+            'Inhaltsangabe'    => $this->getDescription(),
+            'Einband'          => $this->getBinding(),
+            'Seitenzahl'       => $this->getPageCount(),
+            'Abmessungen'      => $this->getDimensions(),
+            'Dauer'            => $this->getDuration(),
+            'IllustratorIn'    => $this->getIllustrator($formatted),
+            'ÜbersetzerIn'     => $this->getTranslator($formatted),
+            'RegisseurIn'      => $this->getDirector($formatted),
+            'SprecherIn'       => $this->getNarrator($formatted),
+            'Mitwirkende'      => $this->getParticipant($formatted),
+            'Kategorie'        => $this->getCategory(),
+            'Themen'           => $this->getTopics($formatted),
         ];
-
-        // // If it's an audiobook ..
-        // if ($this->isAudiobook) {
-        //     // .. add entries exclusive to audiobooks
-        //     $dataOutput = Butler::update($dataOutput, [
-        //         'Dauer' => $this->Duration,
-        //         'RegisseurIn' => $this->Participants($dataInput, 'Regie'),
-        //         'SprecherIn' => $this->Participants($dataInput, 'Gesprochen von'),
-        //     ]);
-        // }
 
         return $data;
     }

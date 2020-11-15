@@ -25,7 +25,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '1.0.0-beta.1';
+    const VERSION = '1.0.0-beta.2';
 
 
     /**
@@ -45,40 +45,16 @@ class PHPCBIS
 
 
     /**
-     * Translatable strings
-     *
-     * @var array
-     */
-    private $translations = [
-        'BUCH' => 'gebunden',
-        'CD'   => 'CD',
-        'CRD'  => 'Nonbook',
-        'GEB'  => 'gebunden',
-        'GEH'  => 'geheftet',
-        'HL'   => 'Halbleinen',
-        'KT'   => 'kartoniert',
-        'LN'   => 'Leinen',
-        'NON'  => 'Nonbook',
-        'PP'   => 'Pappband',
-        'SPL'  => 'Spiel',
-    ];
-
-
-    /**
      * Constructor
      */
 
-    public function __construct(array $credentials = null, array $translations = [])
+    public function __construct(array $credentials = null)
     {
         // Credentials for KNV's restricted API
         $this->credentials = $credentials;
 
         if ($credentials === null) {
             $this->credentials = $this->authenticate();
-        }
-
-        if (!empty($translations)) {
-            $this->translations = $translations;
         }
     }
 
@@ -105,16 +81,6 @@ class PHPCBIS
     public function getImagePath()
     {
         return $this->imagePath;
-    }
-
-    public function setTranslations(array $translations)
-    {
-        $this->translations = $translations;
-    }
-
-    public function getTranslations()
-    {
-        return $this->translations;
     }
 
 
@@ -252,6 +218,6 @@ class PHPCBIS
             $driver->save($isbn, $result);
         }
 
-        return new Book($isbn, $driver->fetch($isbn), $this->imagePath, $this->translations);
+        return new Book($isbn, $driver->fetch($isbn), $this->imagePath);
     }
 }
