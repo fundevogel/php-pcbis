@@ -276,6 +276,10 @@ class Book
             $this->isAudiobook = true;
         }
 
+        # Extract category, topics & involved people
+        $this->tags        = $this->separateTags();
+        $this->people      = $this->separatePeople();
+
         # Build bibliographic dataset
         $this->author      = $this->buildAuthor();
         $this->title       = $this->buildTitle();
@@ -289,14 +293,8 @@ class Book
         $this->pageCount   = $this->buildPageCount();
         $this->dimensions  = $this->buildDimensions();
         $this->duration    = $this->buildDuration();
-
-        # Extract category & topics
-        $this->tags        = $this->separateTags();
         $this->category    = $this->buildCategory();
         $this->topics      = $this->buildTopics();
-
-        # Extract involved people
-        $this->people      = $this->separatePeople();
         $this->illustrator = $this->buildIllustrator();
         $this->translator  = $this->buildTranslator();
         $this->director    = $this->buildDirector();
@@ -467,10 +465,13 @@ class Book
 
         $delimiter = ';';
 
-        # When `AutorSachtitel` contains the title, try `IndexAutor`
-        # TODO: Check `IndexAutor`: string, always array, whaddup?
-        if (!Butler::contains($string, $delimiter) || is_array($string)) {
-            $string = Butler::join($this->source['IndexAutor'], $delimiter);
+        # When `AutorSachtitel` contains something other than a person
+        if (!Butler::contains($string, $delimiter)) {
+            if (!empty($this->people['original'])) {
+                return $this->people['original'];
+            }
+
+            return [];
         }
 
         $array = Butler::split($string, $delimiter);
@@ -496,6 +497,10 @@ class Book
     {
         if (!$formatted) {
             return $this->author;
+        }
+
+        if (empty($this->author)) {
+            return '';
         }
 
         $authors = [];
@@ -681,13 +686,13 @@ class Book
             'Übersetzung'  => 'translator',
             'Regie'        => 'director',
             'Mitarbeit'    => 'participant',
+            'Vorlage'      => 'original',
         ];
 
         foreach (Butler::split($string, '.') as $array) {
             $array = Butler::split($array, ':');
 
             # Determine role
-            # TODO: Not covered stuff, like 'Vorlage' (see 978-88-6312-438-5)
             $task = 'participant';
 
             if (isset($tasks[$array[0]])) {
