@@ -97,6 +97,11 @@ class PHPCBIS
      */
     public function validateISBN(string $isbn)
     {
+        if (Butler::length($isbn) === 13 && Butler::startsWith($isbn, '4')) {
+            # Most likely non-convertable EAN
+            return $isbn;
+        }
+
         $isbn = new \Biblys\Isbn\Isbn($isbn);
 
         try {
