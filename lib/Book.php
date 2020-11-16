@@ -1118,7 +1118,6 @@ class Book
         }
 
         if (!isset($translations[$binding])) {
-            # TODO: See if this needs `trim()`
             return $binding;
         }
 
@@ -1259,7 +1258,6 @@ class Book
 
     /**
      * Builds category
-     * TODO: Check if `$array === false` is really necessary
      *
      * @return string
      */
@@ -1269,7 +1267,7 @@ class Book
             return 'Hörbuch';
         }
 
-        if (!isset($this->tags['category']) || $this->tags === false) {
+        if (!isset($this->tags['category'])) {
             return '';
         }
 
