@@ -390,6 +390,28 @@ class Book
 
 
     /**
+     * Extracts people from exploded strings (= arrays) & organizes them by first & last name
+     *
+     * @param array $people - Involved people
+     * @return array
+     */
+    private function organizePeople(array $people): array
+    {
+        # Edge case: single person entry, such as 'Diverse'
+        $array = [$people[0]];
+
+        if (count($people) > 1) {
+            $array = [
+                'firstName' => $people[1],
+                'lastName'  => $people[0],
+            ];
+        }
+
+        return $array;
+    }
+
+
+    /**
      * Builds author(s)
      *
      * @return array
@@ -408,6 +430,11 @@ class Book
         # TODO: Maybe check AutorSachtitel === Kurztitel ??
         # TODO: Check `IndexAutor`: string, always array, whaddup?
         if (!Butler::contains($string, $delimiter)) {
+            // var_dump($this->source['AutorSachtitel']);
+            // var_dump($this->source['Kurztitel']);
+            // var_dump($this->source['IndexAutor']);
+        }
+        if (!Butler::contains($string, $delimiter) || is_array($string)) {
             $string = Butler::join($this->source['IndexAutor'], $delimiter);
         }
 
@@ -415,12 +442,9 @@ class Book
         $authors = [];
 
         foreach ($array as $author) {
-            $authorArray = Butler::split($author, ',');
+            $group = Butler::split($author, ',');
 
-            $authors[] = [
-                'firstName' => $authorArray[1],
-                'lastName'  => $authorArray[0],
-            ];
+            $authors[] = $this->organizePeople($group);
         }
 
         return $authors;
@@ -442,7 +466,7 @@ class Book
         $authors = [];
 
         foreach ($this->author as $author) {
-            $authors[] = $author['firstName'] . ' ' . $author['lastName'];
+            $authors[] = Butler::join($author, ' ');
         }
 
         return Butler::join($authors, '; ');
@@ -567,19 +591,9 @@ class Book
             # Case 1: 'Gesprochen von / Gesprochen: XY'
             if (Butler::startsWith($string, $delimiter)) {
                 $case1 = Butler::replace($string, $delimiter, '');
-                $array = Butler::split($case1, ',');
+                $group = Butler::split($case1, ',');
 
-                # Edge case: single entry, such as 'Diverse'
-                $lastName = '';
-
-                if (count($array) > 1) {
-                    $firstName = $array[1];
-                }
-
-                $people['narrator'][] = [
-                    'firstName' => $firstName,
-                    'lastName'  => $array[0],
-                ];
+                $people['narrator'][] = $this->organizePeople($group);
 
                 # Case 1 yields only a single narrator
                 return $people;
@@ -631,6 +645,7 @@ class Book
                 $task = $tasks[$array[0]];
             }
 
+            var_dump($array);
             $array = Butler::split($array[1], ';');
 
             foreach ($array as $case3) {
@@ -673,8 +688,8 @@ class Book
 
         $array = [];
 
-        foreach (array_values($this->people) as $person) {
-            $array[] = $person['firstName'] . ' ' . $person['lastName'];
+        foreach (array_values($this->people[$role]) as $person) {
+            $array[] = Butler::join($person, ' ');
         }
 
         return Butler::join($array, '; ');
