@@ -312,6 +312,16 @@ class Book
         return $this->blockedTopics;
     }
 
+    public function setISBN($isbn)
+    {
+        $this->isbn = $isbn;
+    }
+
+    public function getISBN()
+    {
+        return $this->isbn;
+    }
+
     public function setTranslations(array $translations)
     {
         $this->translations = $translations;
@@ -1348,6 +1358,7 @@ class Book
     public function export(bool $formatted = false): array
     {
         $data = [
+            'ISBN'             => $this->getISBN(),
             'AutorIn'          => $this->getAuthor($formatted),
             'Titel'            => $this->getTitle(),
             'Untertitel'       => $this->getSubtitle(),
