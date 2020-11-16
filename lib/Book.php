@@ -200,6 +200,14 @@ class Book
 
 
     /**
+     * Editor
+     *
+     * @var array
+     */
+    protected $editor;
+
+
+    /**
      * Participant
      *
      * @var array
@@ -282,6 +290,7 @@ class Book
         $this->translator  = $this->buildTranslator($this->people);
         $this->director    = $this->buildDirector($this->people);
         $this->narrator    = $this->buildNarrator($this->people);
+        $this->narrator    = $this->buildEditor($this->people);
         $this->participant = $this->buildParticipant($this->people);
 
         # Import image path & translations
@@ -574,6 +583,7 @@ class Book
             'translator' => [],
             'director' => [],
             'narrator' => [],
+            'editor' => [],
             'participant' => [],
         ];
 
@@ -582,6 +592,19 @@ class Book
         }
 
         $string = $this->source['Mitarb'];
+
+        # Editor role
+        $publishedBy = 'Herausgegeben von';
+
+        if (Butler::startsWith($string, $publishedBy)) {
+            $case1 = Butler::replace($string, $publishedBy, '');
+            $group = Butler::split($case1, ',');
+
+            $people['editor'][] = $this->organizePeople($group);
+
+            # Case 1 yields only a single editor
+            return $people;
+        }
 
         # Narrator role
         $delimiter1 = 'Gesprochen von';
@@ -844,6 +867,33 @@ class Book
         }
 
         return $this->exportRole('narrator');
+    }
+
+
+    /**
+     * Builds editor
+     *
+     * @return array
+     */
+    protected function buildEditor(): array
+    {
+        return $this->extractRole('editor');
+    }
+
+
+    public function setEditor($editor)
+    {
+        $this->editor = $editor;
+    }
+
+
+    public function getEditor(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->editor;
+        }
+
+        return $this->exportRole('editor');
     }
 
 
