@@ -32,6 +32,14 @@ class Book
 
 
     /**
+     * Whether source data was fetched from cache
+     *
+     * @var bool
+     */
+    protected $fromCache;
+
+
+    /**
      * Whether it's an audiobook
      *
      * @var bool
@@ -254,12 +262,15 @@ class Book
      * Constructor
      */
 
-    public function __construct(string $isbn, array $source, string $imagePath) {
+    public function __construct(string $isbn, array $source, string $imagePath, bool $fromCache) {
         # Store valid ISBN
         $this->isbn = $isbn;
 
-        # Store data fetched from KNV's API
+        # Store source data, fetched from KNV's API ..
         $this->source = $source;
+
+        # .. or from cache?
+        $this->fromCache = $fromCache;
 
         if (isset($source['Einband']) && $source['Einband'] === 'CD') {
             $this->isAudiobook = true;
@@ -394,6 +405,17 @@ class Book
     public function showSource(): array
     {
         return $this->source;
+    }
+
+
+    /**
+     * Checks whether source data was fetched from cache
+     *
+     * @return bool
+     */
+    public function fromCache(): bool
+    {
+        return $this->fromCache;
     }
 
 

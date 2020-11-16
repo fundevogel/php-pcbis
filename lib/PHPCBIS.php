@@ -212,12 +212,13 @@ class PHPCBIS
         $isbn = $this->validateISBN($isbn);
 
         $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
+        $cached = $driver->contains($isbn);
 
-        if ($driver->contains($isbn) === false) {
+        if (!$cached) {
             $result = $this->fetchData($isbn);
             $driver->save($isbn, $result);
         }
 
-        return new Book($isbn, $driver->fetch($isbn), $this->imagePath);
+        return new Book($isbn, $driver->fetch($isbn), $this->imagePath, $cached);
     }
 }
