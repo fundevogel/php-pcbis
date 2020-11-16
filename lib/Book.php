@@ -136,6 +136,14 @@ class Book
 
 
     /**
+     * Tags (category & topics)
+     *
+     * @var array
+     */
+    private $tags;
+
+
+    /**
      * Category
      *
      * @var string
@@ -149,6 +157,14 @@ class Book
      * @var array
      */
     protected $topics;
+
+
+    /**
+     * Involved people (all roles)
+     *
+     * @var array
+     */
+    private $people;
 
 
     /**
@@ -256,17 +272,17 @@ class Book
         $this->duration    = $this->buildDuration();
 
         # Extract category & topics
-        $tags = $this->separateTags();
-        $this->category    = $this->buildCategory($tags);
-        $this->topics      = $this->buildTopics($tags);
+        $this->tags        = $this->separateTags();
+        $this->category    = $this->buildCategory($this->tags);
+        $this->topics      = $this->buildTopics($this->tags);
 
         # Extract involved people
-        $people = $this->separatePeople();
-        $this->illustrator = $this->buildIllustrator($people);
-        $this->translator  = $this->buildTranslator($people);
-        $this->director    = $this->buildDirector($people);
-        $this->narrator    = $this->buildNarrator($people);
-        $this->participant = $this->buildParticipant($people);
+        $this->people      = $this->separatePeople();
+        $this->illustrator = $this->buildIllustrator($this->people);
+        $this->translator  = $this->buildTranslator($this->people);
+        $this->director    = $this->buildDirector($this->people);
+        $this->narrator    = $this->buildNarrator($this->people);
+        $this->participant = $this->buildParticipant($this->people);
 
         # Import image path & translations
         $this->imagePath = $imagePath;
@@ -557,7 +573,6 @@ class Book
                 ];
 
                 # Case 1 yields only a single narrator
-                // break;
                 return $people;
             }
 
@@ -596,9 +611,6 @@ class Book
             'Mitarbeit'    => 'participant',
         ];
 
-        // if (empty($array)) {
-        //     continue;
-        // }
         foreach (Butler::split($string, '.') as $array) {
             $array = Butler::split($array, ':');
 
@@ -625,15 +637,33 @@ class Book
     }
 
 
-    private function exportRole(array $people, string $role): string
+    /**
+     * Extracts involved people from array created by `separatePeople()`
+     *
+     * @param string $role - Individual role
+     * @return array
+     */
+    private function extractRole(string $role): array
     {
-        if (empty($people)) {
+        return $this->people[$role];
+    }
+
+
+    /**
+     * Exports involved people as string
+     *
+     * @param string $role - Individual role
+     * @return string
+     */
+    private function exportRole(string $role): string
+    {
+        if (empty($this->people[$role])) {
             return '';
         }
 
         $array = [];
 
-        foreach (array_values($people) as $person) {
+        foreach (array_values($this->people) as $person) {
             $array[] = $person['firstName'] . ' ' . $person['lastName'];
         }
 
@@ -641,7 +671,12 @@ class Book
     }
 
 
-    private function exportPeople(array $people)
+    /**
+     * Exports all involved people as (large) string
+     *
+     * @return string
+     */
+    public function exportPeople(): string
     {
         // $participants = [];
 
@@ -679,21 +714,14 @@ class Book
     }
 
 
-    private function extractRole(array $people, string $role): array
-    {
-        return $people[$role];
-    }
-
-
     /**
      * Builds illustrator
      *
-     * @param array $people - People involved
-     * @return string
+     * @return array
      */
-    protected function buildIllustrator(array $people): array
+    protected function buildIllustrator(): array
     {
-        return $this->extractRole($people, 'illustrator');
+        return $this->extractRole('illustrator');
     }
 
 
@@ -709,19 +737,18 @@ class Book
             return $this->illustrator;
         }
 
-        return $this->exportRole($this->illustrator, 'illustrator');
+        return $this->exportRole('illustrator');
     }
 
 
     /**
      * Builds translator
      *
-     * @param array $people - People involved
-     * @return string
+     * @return array
      */
-    protected function buildTranslator(array $people): array
+    protected function buildTranslator(): array
     {
-        return $this->extractRole($people, 'translator');
+        return $this->extractRole('translator');
     }
 
 
@@ -737,19 +764,18 @@ class Book
             return $this->translator;
         }
 
-        return $this->exportRole($this->translator, 'translator');
+        return $this->exportRole('translator');
     }
 
 
     /**
      * Builds director
      *
-     * @param array $people - People involved
-     * @return string
+     * @return array
      */
-    protected function buildDirector(array $people): array
+    protected function buildDirector(): array
     {
-        return $this->extractRole($people, 'director');
+        return $this->extractRole('director');
     }
 
 
@@ -765,19 +791,18 @@ class Book
             return $this->director;
         }
 
-        return $this->exportRole($this->director, 'director');
+        return $this->exportRole('director');
     }
 
 
     /**
      * Builds narrator
      *
-     * @param array $people - People involved
-     * @return string
+     * @return array
      */
-    protected function buildNarrator(array $people): array
+    protected function buildNarrator(): array
     {
-        return $this->extractRole($people, 'narrator');
+        return $this->extractRole('narrator');
     }
 
 
@@ -793,19 +818,18 @@ class Book
             return $this->narrator;
         }
 
-        return $this->exportRole($this->narrator, 'narrator');
+        return $this->exportRole('narrator');
     }
 
 
     /**
      * Builds participant
      *
-     * @param array $people - People involved
-     * @return string
+     * @return array
      */
-    protected function buildParticipant(array $people): array
+    protected function buildParticipant(): array
     {
-        return $this->extractRole($people, 'participant');
+        return $this->extractRole('participant');
     }
 
 
@@ -821,7 +845,7 @@ class Book
             return $this->participant;
         }
 
-        return $this->exportRole($this->participant, 'participant');
+        return $this->exportRole('participant');
     }
 
 
@@ -1132,20 +1156,19 @@ class Book
      * Builds category
      * TODO: Check if `$array === false` is really necessary
      *
-     * @param array $array - Separated tags (category + topcs)
      * @return string
      */
-    protected function buildCategory(array $array): string
+    protected function buildCategory(): string
     {
         if ($this->isAudiobook) {
             return 'Hörbuch';
         }
 
-        if (!isset($array['category']) || $array === false) {
+        if (!isset($this->tags['category']) || $this->tags === false) {
             return '';
         }
 
-        $category = $array['category'];
+        $category = $this->tags['category'];
 
         if (is_string($category)) {
             if (Butler::contains(Butler::lower($category), 'sachbuch')) {
@@ -1178,16 +1201,15 @@ class Book
     /**
      * Builds topic(s)
      *
-     * @param array $array - Separated tags (category + topcs)
-     * @return string
+     * @return array
      */
-    protected function buildTopics(array $array): array
+    protected function buildTopics(): array
     {
-        if (!isset($array['topics']) || $array === false) {
+        if (!isset($this->tags['topics']) || $this->tags === false) {
             return [];
         }
 
-        $topics = $array['topics'];
+        $topics = $this->tags['topics'];
 
         if (is_string($topics)) {
             $topics = (array) $topics;
