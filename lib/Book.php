@@ -281,17 +281,17 @@ class Book
 
         # Extract category & topics
         $this->tags        = $this->separateTags();
-        $this->category    = $this->buildCategory($this->tags);
-        $this->topics      = $this->buildTopics($this->tags);
+        $this->category    = $this->buildCategory();
+        $this->topics      = $this->buildTopics();
 
         # Extract involved people
         $this->people      = $this->separatePeople();
-        $this->illustrator = $this->buildIllustrator($this->people);
-        $this->translator  = $this->buildTranslator($this->people);
-        $this->director    = $this->buildDirector($this->people);
-        $this->narrator    = $this->buildNarrator($this->people);
-        $this->narrator    = $this->buildEditor($this->people);
-        $this->participant = $this->buildParticipant($this->people);
+        $this->illustrator = $this->buildIllustrator();
+        $this->translator  = $this->buildTranslator();
+        $this->director    = $this->buildDirector();
+        $this->narrator    = $this->buildNarrator();
+        $this->narrator    = $this->buildEditor();
+        $this->participant = $this->buildParticipant();
 
         # Import image path & translations
         $this->imagePath = $imagePath;
@@ -436,13 +436,7 @@ class Book
         $delimiter = ';';
 
         # When `AutorSachtitel` contains the title, try `IndexAutor`
-        # TODO: Maybe check AutorSachtitel === Kurztitel ??
         # TODO: Check `IndexAutor`: string, always array, whaddup?
-        if (!Butler::contains($string, $delimiter)) {
-            // var_dump($this->source['AutorSachtitel']);
-            // var_dump($this->source['Kurztitel']);
-            // var_dump($this->source['IndexAutor']);
-        }
         if (!Butler::contains($string, $delimiter) || is_array($string)) {
             $string = Butler::join($this->source['IndexAutor'], $delimiter);
         }
@@ -668,7 +662,6 @@ class Book
                 $task = $tasks[$array[0]];
             }
 
-            var_dump($array);
             $array = Butler::split($array[1], ';');
 
             foreach ($array as $case3) {
@@ -1072,7 +1065,6 @@ class Book
 
         $translations = [
             'BUCH' => 'gebunden',
-            'CD'   => 'CD',
             'CRD'  => 'Nonbook',
             'GEB'  => 'gebunden',
             'GEH'  => 'geheftet',
@@ -1089,6 +1081,7 @@ class Book
         }
 
         if (!isset($translations[$binding])) {
+            # TODO: See if this needs `trim()`
             return $binding;
         }
 
@@ -1378,12 +1371,4 @@ class Book
 
         return $data;
     }
-
-
-
-
-    /**
-     * TODO: Illustrator, translator, director, narrator + partaking people
-     */
-
 }
