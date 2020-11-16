@@ -10,7 +10,11 @@ It powers [our book recommendations](https://fundevogel.de/en/recommendations) &
 
 
 ## How
-It's [available for Composer](https://packagist.org/packages/fundevogel/php-pcbis), to be installed with `composer require fundevogel/php-pcbis`.
+It's available for [Composer](https://getcomposer.org):
+
+```text
+composer require fundevogel/php-pcbis
+```
 
 
 ## Basic workflow
@@ -21,23 +25,21 @@ This library provides minimal translations for german strings out-of-the-box. Ho
 
 ```json
 {
-    "binding": {
-        "BUCH": "gebunden",
-        "CD": "CD",
-        "HL": "Halbleinen",
-        "KT": "kartoniert",
-        "LN": "Leinen",
-        "PP": "Pappband",
-        "CRD": "Nonbook",
-        "GEB": "gebunden",
-        "GEH": "geheftet",
-        "NON": "Nonbook",
-        "SPL": "Spiel"
-    }
+    "BUCH": "gebunden",
+    "CD": "CD",
+    "HL": "Halbleinen",
+    "KT": "kartoniert",
+    "LN": "Leinen",
+    "PP": "Pappband",
+    "CRD": "Nonbook",
+    "GEB": "gebunden",
+    "GEH": "geheftet",
+    "NON": "Nonbook",
+    "SPL": "Spiel"
 }
 ```
 
-.. and load its contents, passing them onto `new PHPCBIS()` as second parameter:
+.. and load its contents with `setTranslations()`:
 
 ```php
 <?php
@@ -46,8 +48,10 @@ $file = file_get_contents('/path/to/translations.json');
 $translations = json_decode($file, true);
 
 // For providing login credentials, see above
-new PHPCBIS($login, $translations)
+$book = new PHPCBIS()->loadBook('some-isbn');
+$book->setTranslations($translations);
 ```
+
 
 ## Credits
 Most of the helper functions were taken from [Kirby](https://getkirby.com)'s excellent [`toolkit`](https://github.com/getkirby-v2/toolkit) package by [Bastian Allgeier](https://github.com/bastianallgeier) (who's just awesome, btw).

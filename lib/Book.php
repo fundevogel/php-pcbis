@@ -402,7 +402,16 @@ class Book
 
         $string = $this->source['AutorSachtitel'];
 
-        $array = Butler::split($string, ';');
+        $delimiter = ';';
+
+        # When `AutorSachtitel` contains the title, try `IndexAutor`
+        # TODO: Maybe check AutorSachtitel === Kurztitel ??
+        # TODO: Check `IndexAutor`: string, always array, whaddup?
+        if (!Butler::contains($string, $delimiter)) {
+            $string = Butler::join($this->source['IndexAutor'], $delimiter);
+        }
+
+        $array = Butler::split($string, $delimiter);
         $authors = [];
 
         foreach ($array as $author) {
@@ -615,6 +624,7 @@ class Book
             $array = Butler::split($array, ':');
 
             # Determine role
+            # TODO: Not covered stuff, like 'Vorlage' (see 978-88-6312-438-5)
             $task = 'participant';
 
             if (isset($tasks[$array[0]])) {
