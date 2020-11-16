@@ -625,19 +625,19 @@ class Book
     }
 
 
-    private function exportRole(array $array, string $role): string
+    private function exportRole(array $people, string $role): string
     {
-        if (!$array) {
+        if (empty($people)) {
             return '';
         }
 
-        $people = [];
+        $array = [];
 
-        foreach ($array as $person) {
-            $people[] = $person['firstName'] . ' ' . $person['lastName'];
+        foreach (array_values($people) as $person) {
+            $array[] = $person['firstName'] . ' ' . $person['lastName'];
         }
 
-        return Butler::join($people, '; ');
+        return Butler::join($array, '; ');
     }
 
 
@@ -709,7 +709,7 @@ class Book
             return $this->illustrator;
         }
 
-        $this->exportRole($this->illustrator, 'illustrator');
+        return $this->exportRole($this->illustrator, 'illustrator');
     }
 
 
@@ -737,7 +737,7 @@ class Book
             return $this->translator;
         }
 
-        $this->exportRole($this->translator, 'translator');
+        return $this->exportRole($this->translator, 'translator');
     }
 
 
@@ -765,7 +765,7 @@ class Book
             return $this->director;
         }
 
-        $this->exportRole($this->director, 'director');
+        return $this->exportRole($this->director, 'director');
     }
 
 
@@ -793,7 +793,7 @@ class Book
             return $this->narrator;
         }
 
-        $this->exportRole($this->narrator, 'narrator');
+        return $this->exportRole($this->narrator, 'narrator');
     }
 
 
@@ -821,7 +821,7 @@ class Book
             return $this->participant;
         }
 
-        $this->exportRole($this->participant, 'participant');
+        return $this->exportRole($this->participant, 'participant');
     }
 
 
