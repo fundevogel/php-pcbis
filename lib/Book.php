@@ -229,8 +229,11 @@ class Book
      * @var array
      */
     protected $blockedTopics = [
+        'Buxtehuder Bulle',
         'Hörbuch',
         'Papp-Bilderbuch',
+        'Umwelt-Bilderbuch',
+        'Vorlesebuch',
     ];
 
 
@@ -1240,7 +1243,7 @@ class Book
         $this->category = $category;
     }
 
-    public function getCategory(): array
+    public function getCategory(): string
     {
         return $this->category;
     }
@@ -1263,13 +1266,46 @@ class Book
             $topics = (array) $topics;
         }
 
-        $topics = array_filter($topics, function ($topic) {
+        $translations = [
+            'Auto / Personenwagen / Pkw' => 'Autos',
+            'Coming of Age / Erwachsenwerden' => 'Erwachsenwerden',
+            'Demenz / Alzheimersche Krankheit' => 'Demenz',
+            'Deutsche Demokratische Republik (DDR)' => 'DDR',
+            'Flucht / Flüchtling' => 'Flucht',
+            'IM (Staatssicherheitsdienst)' => 'Inoffizielle MitarbeiterInnen',
+            'Klassenfahrt / Schulfahrt' => 'Klassenfahrt',
+            'Klassiker (Literatur)' => 'Klassiker',
+            'Klimaschutz, Klimawandel / Klimaveränderung' => 'Klimaschutz',
+            'Klimawandel / Klimaveränderung' => 'Klimawandel',
+            'Krebs (Krankheit) / Karzinom' => 'Krebserkrankung',
+            'Leichte Sprache / Einfache Sprache' => 'Einfache Sprache',
+            'Migration / Migrant' => 'Migration',
+            'Regenwald / Dschungel' => 'Regenwald',
+            'Schulanfang / Schulbeginn' => 'Schulanfang',
+            'Selbstmord / Suizid / Freitod / Selbsttötung' => 'Selbsttötung',
+            'Ski / Schi' => 'Skifahren',
+            'Soziales Netzwerk (Internet) / Social Networking' => 'Social Media',
+            'Spionage / Agent / Agentin / Spion / Spionin' => 'GeheimagentIn',
+            'Staatssicherheitsdienst (Stasi)' => 'Stasi',
+            'Traum / Träumen / Traumdeutung / Traumanalyse' => 'Traum',
+            'Wolf / Wölfe (Tier)' => 'Wölfe',
+        ];
+
+        if (!empty($this->translations)) {
+            $translations = $this->translations;
+        }
+
+        $topics = array_map(function ($topic) use ($translations) {
+            if (isset($translations[$topic])) {
+                return $translations[$topic];
+            }
+
             if (!in_array($topic, $this->blockedTopics, true)) {
                 return $topic;
             }
-        });
+        }, $topics);
 
-        return array_unique($topics);
+        return array_unique(array_filter($topics));
     }
 
     public function setTopics(array $topics)
