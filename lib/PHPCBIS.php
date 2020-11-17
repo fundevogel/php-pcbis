@@ -45,6 +45,14 @@ class PHPCBIS
 
 
     /**
+     * Translatable strings
+     *
+     * @var array
+     */
+    private $translations = [];
+
+
+    /**
      * Constructor
      */
 
@@ -81,6 +89,16 @@ class PHPCBIS
     public function getImagePath()
     {
         return $this->imagePath;
+    }
+
+    public function setTranslations(array $translations)
+    {
+        $this->translations = $translations;
+    }
+
+    public function getTranslations(): array
+    {
+        return $this->translations;
     }
 
 
@@ -224,6 +242,12 @@ class PHPCBIS
             $driver->save($isbn, $result);
         }
 
-        return new Book($isbn, $driver->fetch($isbn), $this->imagePath, $cached);
+        return new Book(
+            $isbn,
+            $driver->fetch($isbn),
+            $this->imagePath,
+            $this->translations,
+            $cached
+        );
     }
 }

@@ -274,14 +274,6 @@ class Book
 
 
     /**
-     * Translatable strings
-     *
-     * @var array
-     */
-    protected $translations = [];
-
-
-    /**
      * User-Agent used when downloading book cover images
      *
      * @var string
@@ -293,7 +285,13 @@ class Book
      * Constructor
      */
 
-    public function __construct(string $isbn, array $source, string $imagePath, bool $fromCache) {
+    public function __construct(
+        string $isbn,
+        array $source,
+        string $imagePath,
+        array $translations,
+        bool $fromCache
+    ) {
         # Store valid ISBN
         $this->isbn = $isbn;
 
@@ -303,9 +301,11 @@ class Book
         # .. or from cache?
         $this->fromCache = $fromCache;
 
-        # Import image path
+        # Import image path & translations
         $this->imagePath = $imagePath;
+        $this->translations = $translations;
 
+        # Determine if audiobook
         if (isset($source['Einband']) && $source['Einband'] === 'CD') {
             $this->isAudiobook = true;
         }
@@ -380,16 +380,6 @@ class Book
     public function getISBN(): string
     {
         return $this->isbn;
-    }
-
-    public function setTranslations(array $translations)
-    {
-        $this->translations = $translations;
-    }
-
-    public function getTranslations(): array
-    {
-        return $this->translations;
     }
 
     public function setUserAgent(string $userAgent)
