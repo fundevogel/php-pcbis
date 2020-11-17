@@ -1215,8 +1215,14 @@ class Book
         $category = $this->tags['category'];
 
         if (is_string($category)) {
-            if (Butler::contains(Butler::lower($category), 'sachbuch')) {
+            $lowercase = Butler::lower($category);
+
+            if (Butler::contains($lowercase, 'sachbuch')) {
                 return 'Sachbuch';
+            }
+
+            if (Butler::contains($lowercase, 'bilderbuch')) {
+                return 'Bilderbuch';
             }
 
             return $category;
