@@ -104,7 +104,7 @@ class Book
 
 
     /**
-     * Minimum age recommendation
+     * Minimum age recommendation (in years)
      *
      * @var string
      */
@@ -141,30 +141,6 @@ class Book
      * @var string
      */
     protected $duration;
-
-
-    /**
-     * Tags (category & topics)
-     *
-     * @var array
-     */
-    private $tags;
-
-
-    /**
-     * Category
-     *
-     * @var string
-     */
-    protected $category;
-
-
-    /**
-     * Topics
-     *
-     * @var array
-     */
-    protected $topics;
 
 
     /**
@@ -224,6 +200,30 @@ class Book
 
 
     /**
+     * Tags (category & topics)
+     *
+     * @var array
+     */
+    private $tags;
+
+
+    /**
+     * Categories
+     *
+     * @var array
+     */
+    protected $categories;
+
+
+    /**
+     * Topics
+     *
+     * @var array
+     */
+    protected $topics;
+
+
+    /**
      * Antolin rating (suitable grade)
      *
      * @var string
@@ -232,16 +232,28 @@ class Book
 
 
     /**
-     * Blocked topics
+     * List of blocked topics
      *
      * @var array
      */
-    protected $blockedTopics = [
-        'Buxtehuder Bulle',
+    protected $blockList = [
+        # Rather categories than tags
         'Hörbuch',
         'Papp-Bilderbuch',
         'Umwelt-Bilderbuch',
         'Vorlesebuch',
+
+        # Highly sophisticated ways to say 'book for kids'
+        # (1) Non-fiction for kids
+        'Kinder-/Jugendsachbuch',
+        'Kindersachbuch/Jugendsachbuch',
+        'Kindersachbuch/Jugendsachbuch.',
+        # (2) Literature for children & adolescents
+        'Kinderliteratur/Jugendliteratur',
+        'Kinder-/Jugendliteratur',
+        'Kinder/Jugendliteratur',
+        'Kinder-/Jugendlit.',
+        'Kinder/Jugendlit.',
     ];
 
 
@@ -291,11 +303,14 @@ class Book
         # .. or from cache?
         $this->fromCache = $fromCache;
 
+        # Import image path
+        $this->imagePath = $imagePath;
+
         if (isset($source['Einband']) && $source['Einband'] === 'CD') {
             $this->isAudiobook = true;
         }
 
-        # Extract category, topics & involved people
+        # Extract tags & involved people early on
         $this->tags        = $this->separateTags();
         $this->people      = $this->separatePeople();
 
@@ -312,17 +327,14 @@ class Book
         $this->pageCount   = $this->buildPageCount();
         $this->dimensions  = $this->buildDimensions();
         $this->duration    = $this->buildDuration();
-        $this->category    = $this->buildCategory();
-        $this->topics      = $this->buildTopics();
         $this->illustrator = $this->buildIllustrator();
         $this->translator  = $this->buildTranslator();
         $this->director    = $this->buildDirector();
         $this->narrator    = $this->buildNarrator();
         $this->narrator    = $this->buildEditor();
         $this->participant = $this->buildParticipant();
-
-        # Import image path & translations
-        $this->imagePath = $imagePath;
+        $this->categories  = $this->buildCategories();
+        $this->topics      = $this->buildTopics();
     }
 
 
@@ -340,14 +352,14 @@ class Book
         return $this->antolin;
     }
 
-    public function setBlockedTopics(array $blockedTopics)
+    public function setBlockList(array $blockList)
     {
-        $this->blockedTopics = $blockedTopics;
+        $this->blockList = $blockList;
     }
 
-    public function getBlockedTopics(): array
+    public function getBlockList(): array
     {
-        return $this->blockedTopics;
+        return $this->blockList;
     }
 
     public function setDelimiter(string $delimiter)
@@ -1171,35 +1183,27 @@ class Book
 
 
     /**
-     * Extracts category & topics from source array
+     * Extracts tags from source array
      *
      * @return array
      */
     private function separateTags(): array
     {
-        $tags = [
-            'category' => [],
-            'topics' => [],
-        ];
-
         if (!isset($this->source['IndexSchlagw'])) {
-            return $tags;
+            return [];
         }
 
         $data = $this->source['IndexSchlagw'];
 
+        # TODO: Not even sure if that's an edge case
         if (is_string($data)) {
             $data = Butler::split(trim($data), ';');
         }
 
-        foreach ($data as $tag) {
-            $array = Butler::split(trim($tag), ';');
+        $tags = [];
 
-            if (count($array) > 1) {
-                $tags['categories'][] = $array[1];
-            }
-
-            $tags['topics'][] = $array[0];
+        foreach ($data as $string) {
+            $tags = array_merge($tags, Butler::split(trim($string), ';'));
         }
 
         return $tags;
@@ -1207,47 +1211,55 @@ class Book
 
 
     /**
-     * Builds category
+     * Builds categories
      *
-     * @return string
+     * @return array
      */
-    protected function buildCategory(): string
+    protected function buildCategories(): array
     {
         if ($this->isAudiobook) {
-            return 'Hörbuch';
+            return ['Hörbuch'];
         }
 
-        if (empty($this->tags['categories'])) {
-            return '';
+        if (empty($this->tags)) {
+            return [];
         }
 
-        $categories = $this->tags['categories'];
+        $data = $this->tags;
 
-        if (is_string($categories)) {
-            $lowercase = Butler::lower($categories);
+        $categories = [];
 
-            if (Butler::contains($lowercase, 'sachbuch')) {
-                return 'Sachbuch';
-            }
+        foreach ($data as $string) {
+            $lowercase = Butler::lower($string);
 
             if (Butler::contains($lowercase, 'bilderbuch')) {
-                return 'Bilderbuch';
+                $categories[] = 'Bilderbuch';
             }
 
-            return $categories;
+            if (Butler::contains($lowercase, 'vorlesebuch')) {
+                $categories[] = 'Vorlesebuch';
+            }
+
+            if (Butler::contains($lowercase, 'sachbuch')) {
+                $categories[] = 'Sachbuch';
+            }
         }
 
-        return Butler::join(array_unique($categories), ', ');
+        return array_unique($categories);
     }
 
-    public function setCategory(string $category)
+    public function setCategories(array $categories)
     {
-        $this->category = $category;
+        $this->categories = $categories;
     }
 
-    public function getCategory(): string
+    public function getCategories(bool $formatted = false)
     {
-        return $this->category;
+        if (!$formatted) {
+            return $this->categories;
+        }
+
+        return Butler::join($this->categories, ', ');
     }
 
 
@@ -1258,15 +1270,11 @@ class Book
      */
     protected function buildTopics(): array
     {
-        if (!isset($this->tags['topics']) || $this->tags === false) {
+        if (empty($this->tags)) {
             return [];
         }
 
-        $topics = $this->tags['topics'];
-
-        if (is_string($topics)) {
-            $topics = (array) $topics;
-        }
+        $data = $this->tags;
 
         $translations = [
             'Auto / Personenwagen / Pkw' => 'Autos',
@@ -1312,10 +1320,10 @@ class Book
                 return $translations[$topic];
             }
 
-            if (!in_array($topic, $this->blockedTopics, true)) {
+            if (!in_array($topic, $this->blockList, true)) {
                 return $topic;
             }
-        }, $topics);
+        }, $data);
 
         return array_unique(array_filter($topics));
     }
@@ -1391,7 +1399,7 @@ class Book
             'RegisseurIn'      => $this->getDirector($formatted),
             'SprecherIn'       => $this->getNarrator($formatted),
             'Mitwirkende'      => $this->getParticipant($formatted),
-            'Kategorie'        => $this->getCategory(),
+            'Kategorien'       => $this->getCategories($formatted),
             'Themen'           => $this->getTopics($formatted),
         ];
 
