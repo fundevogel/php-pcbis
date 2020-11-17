@@ -480,7 +480,7 @@ class Book
 
 
     /**
-     * Extracts people from exploded strings (= arrays) & organizes them by first & last name
+     * Organizes involved people by first & last name
      *
      * @param array $people - Involved people
      * @return array
@@ -1195,7 +1195,6 @@ class Book
 
         $data = $this->source['IndexSchlagw'];
 
-        # TODO: Not even sure if that's an edge case
         if (is_string($data)) {
             $data = Butler::split(trim($data), ';');
         }
@@ -1345,7 +1344,6 @@ class Book
 
     /**
      * Builds duration (audiobook only)
-     * TODO: Use regex voodoo
      *
      * @return string
      */
@@ -1373,10 +1371,10 @@ class Book
 
 
     /**
-     * Exports all information, optionally as pre-formatted strings
+     * Exports all information, optionally as pre-formatted (human-readable) strings
      *
      * @param bool $formatted - Whether values should be strings (instead of arrays)
-     * @return array|string
+     * @return array
      */
     public function export(bool $formatted = false): array
     {
