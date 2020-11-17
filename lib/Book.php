@@ -235,6 +235,14 @@ class Book
 
 
     /**
+     * Delimiter between people when exported as string
+     *
+     * @var string
+     */
+    protected $delimiter = '; ';
+
+
+    /**
      * Path to downloaded book cover images
      *
      * @var string
@@ -311,22 +319,32 @@ class Book
      * Setters & getters
      */
 
-    public function setBlockedTopics(string $blockedTopics)
+    public function setBlockedTopics(array $blockedTopics)
     {
         $this->blockedTopics = $blockedTopics;
     }
 
-    public function getBlockedTopics()
+    public function getBlockedTopics(): array
     {
         return $this->blockedTopics;
     }
 
-    public function setISBN($isbn)
+    public function setDelimiter(string $delimiter)
+    {
+        $this->delimiter = $delimiter;
+    }
+
+    public function getDelimiter(): string
+    {
+        return $this->delimiter;
+    }
+
+    public function setISBN(string $isbn)
     {
         $this->isbn = $isbn;
     }
 
-    public function getISBN()
+    public function getISBN(): string
     {
         return $this->isbn;
     }
@@ -336,7 +354,7 @@ class Book
         $this->translations = $translations;
     }
 
-    public function getTranslations()
+    public function getTranslations(): array
     {
         return $this->translations;
     }
@@ -346,7 +364,7 @@ class Book
         $this->userAgent = $userAgent;
     }
 
-    public function getUserAgent()
+    public function getUserAgent(): string
     {
         return $this->userAgent;
     }
@@ -486,12 +504,10 @@ class Book
         return $authors;
     }
 
-
-    public function setAuthor($author)
+    public function setAuthor(array $author)
     {
         $this->author = $author;
     }
-
 
     public function getAuthor(bool $formatted = false)
     {
@@ -527,14 +543,12 @@ class Book
         return $this->source['Titel'];
     }
 
-
-    public function setTitle($title)
+    public function setTitle(string $title)
     {
         $this->title = $title;
     }
 
-
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -554,14 +568,12 @@ class Book
         return $this->source['Utitel'];
     }
 
-
-    public function setSubtitle($subtitle)
+    public function setSubtitle(string $subtitle)
     {
         $this->subtitle = $subtitle;
     }
 
-
-    public function getSubtitle()
+    public function getSubtitle(): string
     {
         return $this->subtitle;
     }
@@ -587,14 +599,12 @@ class Book
         return trim($publisher);
     }
 
-
-    public function setPublisher($publisher)
+    public function setPublisher(string $publisher)
     {
         $this->publisher = $publisher;
     }
 
-
-    public function getPublisher()
+    public function getPublisher(): string
     {
         return $this->publisher;
     }
@@ -745,50 +755,7 @@ class Book
             $array[] = Butler::join($person, ' ');
         }
 
-        return Butler::join($array, '; ');
-    }
-
-
-    /**
-     * Exports all involved people as (large) string
-     *
-     * @return string
-     */
-    public function exportPeople(): string
-    {
-        // $participants = [];
-
-        // foreach ($this->participants as $task => $group) {
-        //     if (empty($group)) {
-        //         continue;
-        //     }
-
-        //     $data = [];
-
-        //     foreach ($group as $participant) {
-        //         $data[] = $participant['firstName'] . ' ' . $participant['lastName'];
-        //     }
-
-        //     $translations = [
-        //         'illustrator' => 'IllustratorIn',
-        //         'translator' => 'ÜbersetzerIn',
-        //         'director' => 'RegisseurIn',
-        //         'narrator' => 'SprecherIn',
-        //         'participant' => 'Mitwirkende',
-        //     ];
-
-        //     if (!empty($this->translations)) {
-        //         $translations = $this->translations;
-        //     }
-
-        //     if (!isset($translations[$task])) {
-        //         throw new \Exception('No translation found: ' . $task);
-        //     }
-
-        //     $participants[] = $translations[$task] . ': ' . Butler::join($data, '; ');
-        // }
-
-        // return Butler::join($participants, '; ');
+        return Butler::join($array, $this->delimiter);
     }
 
 
@@ -802,12 +769,10 @@ class Book
         return $this->extractRole('illustrator');
     }
 
-
-    public function setIllustrator($illustrator)
+    public function setIllustrator(array $illustrator)
     {
         $this->illustrator = $illustrator;
     }
-
 
     public function getIllustrator(bool $formatted = false)
     {
@@ -829,12 +794,10 @@ class Book
         return $this->extractRole('translator');
     }
 
-
-    public function setTranslator($translator)
+    public function setTranslator(array $translator)
     {
         $this->translator = $translator;
     }
-
 
     public function getTranslator(bool $formatted = false)
     {
@@ -856,12 +819,10 @@ class Book
         return $this->extractRole('director');
     }
 
-
-    public function setDirector($director)
+    public function setDirector(array $director)
     {
         $this->director = $director;
     }
-
 
     public function getDirector(bool $formatted = false)
     {
@@ -883,12 +844,10 @@ class Book
         return $this->extractRole('narrator');
     }
 
-
-    public function setNarrator($narrator)
+    public function setNarrator(array $narrator)
     {
         $this->narrator = $narrator;
     }
-
 
     public function getNarrator(bool $formatted = false)
     {
@@ -910,12 +869,10 @@ class Book
         return $this->extractRole('editor');
     }
 
-
-    public function setEditor($editor)
+    public function setEditor(array $editor)
     {
         $this->editor = $editor;
     }
-
 
     public function getEditor(bool $formatted = false)
     {
@@ -937,12 +894,10 @@ class Book
         return $this->extractRole('participant');
     }
 
-
-    public function setParticipant($participant)
+    public function setParticipant(array $participant)
     {
         $this->participant = $participant;
     }
-
 
     public function getParticipant(bool $formatted = false)
     {
@@ -982,14 +937,12 @@ class Book
         return Butler::first($description);
     }
 
-
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
 
-
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -1013,14 +966,12 @@ class Book
         return number_format($retailPrice, 2, ',', '');
     }
 
-
-    public function setRetailPrice($retailPrice)
+    public function setRetailPrice(string $retailPrice)
     {
         $this->retailPrice = $retailPrice;
     }
 
-
-    public function getRetailPrice()
+    public function getRetailPrice(): string
     {
         return $this->retailPrice;
     }
@@ -1040,14 +991,12 @@ class Book
         return $this->source['Erschjahr'];
     }
 
-
-    public function setReleaseYear($releaseYear)
+    public function setReleaseYear(string $releaseYear)
     {
         $this->releaseYear = $releaseYear;
     }
 
-
-    public function getReleaseYear()
+    public function getReleaseYear(): string
     {
         return $this->releaseYear;
     }
@@ -1074,14 +1023,12 @@ class Book
       	return 'ab ' . $age . ' Jahren';
     }
 
-
-    public function setAge($age)
+    public function setAge(string $age)
     {
         $this->age = $age;
     }
 
-
-    public function getAge()
+    public function getAge(): string
     {
         return $this->age;
     }
@@ -1124,14 +1071,12 @@ class Book
         return $translations[$binding];
     }
 
-
-    public function setBinding($binding)
+    public function setBinding(string $binding)
     {
         $this->binding = $binding;
     }
 
-
-    public function getBinding()
+    public function getBinding(): string
     {
         return $this->binding;
     }
@@ -1160,14 +1105,12 @@ class Book
         return $string;
     }
 
-
-    public function setPageCount($pageCount)
+    public function setPageCount(string $pageCount)
     {
         $this->pageCount = $pageCount;
     }
 
-
-    public function getPageCount()
+    public function getPageCount(): string
     {
         return $this->pageCount;
     }
@@ -1195,14 +1138,12 @@ class Book
         return $width . ' x ' . $height;
     }
 
-
-    public function setDimensions($dimensions)
+    public function setDimensions(string $dimensions)
     {
         $this->dimensions = $dimensions;
     }
 
-
-    public function getDimensions()
+    public function getDimensions(): string
     {
         return $this->dimensions;
     }
@@ -1288,14 +1229,12 @@ class Book
         return Butler::join(array_unique($category), ', ');
     }
 
-
-    public function setCategory($category)
+    public function setCategory(string $category)
     {
         $this->category = $category;
     }
 
-
-    public function getCategory()
+    public function getCategory(): array
     {
         return $this->category;
     }
@@ -1327,12 +1266,10 @@ class Book
         return array_unique($topics);
     }
 
-
-    public function setTopics($topics)
+    public function setTopics(array $topics)
     {
         $this->topics = $topics;
     }
-
 
     public function getTopics(bool $formatted = false)
     {
@@ -1362,14 +1299,12 @@ class Book
         return Butler::replace(Butler::last($array), ' Min', '');
     }
 
-
-    public function setDuration($duration)
+    public function setDuration(string $duration)
     {
         $this->duration = $duration;
     }
 
-
-    public function getDuration()
+    public function getDuration(): string
     {
         return $this->duration;
     }
@@ -1378,7 +1313,8 @@ class Book
     /**
      * Exports all information, optionally as pre-formatted strings
      *
-     * @return array
+     * @param bool $formatted - Whether values should be strings (instead of arrays)
+     * @return array|string
      */
     public function export(bool $formatted = false): array
     {
