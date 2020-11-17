@@ -224,6 +224,14 @@ class Book
 
 
     /**
+     * Antolin rating (suitable grade)
+     *
+     * @var string
+     */
+    protected $antolin = '';
+
+
+    /**
      * Blocked topics
      *
      * @var array
@@ -321,6 +329,16 @@ class Book
     /**
      * Setters & getters
      */
+
+    public function setAntolin(string $antolin)
+    {
+        $this->antolin = $antolin;
+    }
+
+    public function getAntolin(): string
+    {
+        return $this->antolin;
+    }
 
     public function setBlockedTopics(array $blockedTopics)
     {
@@ -1159,44 +1177,32 @@ class Book
      */
     private function separateTags(): array
     {
-        if (!isset($this->source['IndexSchlagw'])) {
-            return [];
-        }
-
-        $string = $this->source['IndexSchlagw'];
-
-        if (is_string($string)) {
-            $array = Butler::split(trim($string), ';');
-
-            $category = count($array) === 2 ? $array[1] : '';
-            $topics = Butler::contains($array[0], 'Antolin') ? '' : $array[0];
-        } else {
-            $category = [];
-            $topics = [];
-
-            foreach ($string as $tag) {
-                $array = Butler::split(trim($tag), ';');
-
-                // We don't need no .. Antolin
-                if (count($array) === 1) {
-                    if (Butler::contains($array[0], 'Antolin')) {
-                        continue;
-                    }
-
-                    $topics[] = $array[0];
-                }
-
-                if (count($array) > 1) {
-                    $topics[] = $array[0];
-                    $category[] = $array[1];
-                }
-            }
-        }
-
-        return [
-            'category' => $category,
-            'topics' => $topics,
+        $tags = [
+            'category' => [],
+            'topics' => [],
         ];
+
+        if (!isset($this->source['IndexSchlagw'])) {
+            return $tags;
+        }
+
+        $data = $this->source['IndexSchlagw'];
+
+        if (is_string($data)) {
+            $data = Butler::split(trim($data), ';');
+        }
+
+        foreach ($data as $tag) {
+            $array = Butler::split(trim($tag), ';');
+
+            if (count($array) > 1) {
+                $tags['categories'][] = $array[1];
+            }
+
+            $tags['topics'][] = $array[0];
+        }
+
+        return $tags;
     }
 
 
@@ -1211,14 +1217,14 @@ class Book
             return 'Hörbuch';
         }
 
-        if (!isset($this->tags['category'])) {
+        if (empty($this->tags['categories'])) {
             return '';
         }
 
-        $category = $this->tags['category'];
+        $categories = $this->tags['categories'];
 
-        if (is_string($category)) {
-            $lowercase = Butler::lower($category);
+        if (is_string($categories)) {
+            $lowercase = Butler::lower($categories);
 
             if (Butler::contains($lowercase, 'sachbuch')) {
                 return 'Sachbuch';
@@ -1228,14 +1234,10 @@ class Book
                 return 'Bilderbuch';
             }
 
-            return $category;
+            return $categories;
         }
 
-        if (empty($category)) {
-            return '';
-        }
-
-        return Butler::join(array_unique($category), ', ');
+        return Butler::join(array_unique($categories), ', ');
     }
 
     public function setCategory(string $category)
@@ -1296,6 +1298,16 @@ class Book
         }
 
         $topics = array_map(function ($topic) use ($translations) {
+            # Add 'Antolin' rating if available ..
+            if (Butler::startsWith($topic, 'Antolin')) {
+                $string = Butler::replace($topic, ['(', ')'], '');
+
+                # .. but not as topic
+                $this->antolin = Butler::split($string, 'Antolin')[0];
+
+                return '';
+            }
+
             if (isset($translations[$topic])) {
                 return $translations[$topic];
             }
