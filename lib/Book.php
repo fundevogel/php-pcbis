@@ -517,22 +517,27 @@ class Book
 
         $string = $this->source['AutorSachtitel'];
 
-        $delimiter = ';';
+        $groupDelimiter = ';';
+        $personDelimiter = ',';
 
-        # When `AutorSachtitel` contains something other than a person
-        if (!Butler::contains($string, $delimiter)) {
+        # Edge case: `AutorSachtitel` contains something other than a person
+        if (!Butler::contains($string, $groupDelimiter) && !Butler::contains($string, $personDelimiter)) {
             if (!empty($this->people['original'])) {
                 return $this->people['original'];
             }
 
-            return [];
+            if (is_string($this->source['IndexAutor'])) {
+                $string = trim($this->source['IndexAutor']);
+            } else {
+                return [];
+            }
         }
 
-        $array = Butler::split($string, $delimiter);
+        $array = Butler::split($string, $groupDelimiter);
         $authors = [];
 
         foreach ($array as $author) {
-            $group = Butler::split($author, ',');
+            $group = Butler::split($author, $personDelimiter);
 
             $authors[] = $this->organizePeople($group);
         }
