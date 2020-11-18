@@ -113,7 +113,7 @@ class PHPCBIS
      * @param string $isbn - International Standard Book Number
      * @return string|InvalidArgumentException
      */
-    public function validateISBN(string $isbn)
+    private function validateISBN(string $isbn)
     {
         if (Butler::length($isbn) === 13 && Butler::startsWith($isbn, '4')) {
             # Most likely non-convertable EAN
@@ -160,7 +160,7 @@ class PHPCBIS
      * @param string $isbn
      * @return array|Exception
      */
-    public function fetchData(string $isbn)
+    private function fetchData(string $isbn)
     {
         $client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
             'soap_version' => SOAP_1_2,
@@ -228,12 +228,10 @@ class PHPCBIS
      * otherwise loads them & saves to cache
      *
      * @param string $isbn - A given book's ISBN
-     * @return PHPCBIS\Book
+     * @return array
      */
-    public function loadBook($isbn)
+    private function fetchBook(string $isbn): array
     {
-        $isbn = $this->validateISBN($isbn);
-
         $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
         $cached = $driver->contains($isbn);
 
@@ -242,12 +240,48 @@ class PHPCBIS
             $driver->save($isbn, $result);
         }
 
+        return [
+            'data' => $driver->fetch($isbn),
+            'cached' => $cached,
+        ];
+    }
+
+
+    /**
+     * Validates ISBN & builds `\PHPCBIS\Book` object
+     *
+     * @param string $isbn - A given book's ISBN
+     * @return \PHPCBIS\Book
+     */
+    public function loadBook(string $isbn): \PHPCBIS\Book
+    {
+        $isbn = $this->validateISBN($isbn);
+        $book = $this->fetchBook($isbn);
+
         return new Book(
             $isbn,
-            $driver->fetch($isbn),
+            $book['data'],
             $this->imagePath,
             $this->translations,
-            $cached
+            $book['cached']
         );
+    }
+
+
+    /**
+     * Validates ISBNs & builds `\PHPCBIS\Books` object
+     *
+     * @param array $isbns - A group of books' ISBNs
+     * @return \PHPCBIS\Books
+     */
+    public function loadBooks(array $isbns): \PHPCBIS\Books
+    {
+        $books = [];
+
+        foreach ($isbns as $isbn) {
+            $books[] = $this->loadBook($isbn);
+        }
+
+        return new Books($books);
     }
 }

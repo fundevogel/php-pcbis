@@ -29,15 +29,44 @@ $object = new PHPCBIS\PHPCBIS;
 
 try {
     // After loading a book, you might want to ..
-    $book = $object->loadBook('978-3-407-81238-4');
+    $book = $object->loadBook('978-3-522-20255-8');
     // (1) .. export its bibliographic data
     $data = $book->export();
 
     // (2) .. access specific information
-     echo $book->title();
+     echo $book->getTitle();
 
     // (3) .. download its cover
     $book->downloadCover();
+} catch (\Exception $e) {
+    echo 'Error: ' . $e->getMessage(), "\n";
+}
+```
+
+If you want to load multiple books at once, you may pass their ISBNs to `loadBooks()`, like this:
+
+```php
+<?php
+
+require_once('vendor/autoload.php');
+
+$object = new PHPCBIS\PHPCBIS;
+
+try {
+    $isbns = [
+        '978-3-522-20255-8',
+        '978-3-522-20072-1',
+        '978-3-12-674104-0',
+        '978-0-14-031753-4',
+        '978-3-522-20210-7',
+        '978-3-95751-338-0',
+    ];
+
+    $books = $object->loadBooks($isbns);
+
+    foreach ($books as $book) {
+        echo $book->getTitle();
+    }
 } catch (\Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
 }
