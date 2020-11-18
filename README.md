@@ -18,7 +18,30 @@ composer require fundevogel/php-pcbis
 
 
 ## Basic workflow
-.. to be continued.
+Getting started is pretty straight-forward:
+
+```php
+<?php
+
+require_once('vendor/autoload.php');
+
+$object = new PHPCBIS\PHPCBIS;
+
+try {
+    // After loading a book, you might want to ..
+    $book = $object->loadBook('978-3-407-81238-4');
+    // (1) .. export its bibliographic data
+    $data = $book->export();
+
+    // (2) .. access specific information
+     echo $book->title();
+
+    // (3) .. download its cover
+    $book->downloadCover();
+} catch (\Exception $e) {
+    echo 'Error: ' . $e->getMessage(), "\n";
+}
+```
 
 ### Loading translations
 This library provides minimal translations for german strings out-of-the-box. However, you may want to bring your own - for example, you could load a JSON file, looking like this:
@@ -26,7 +49,6 @@ This library provides minimal translations for german strings out-of-the-box. Ho
 ```json
 {
     "BUCH": "gebunden",
-    "CD": "CD",
     "HL": "Halbleinen",
     "KT": "kartoniert",
     "LN": "Leinen",
@@ -47,9 +69,11 @@ This library provides minimal translations for german strings out-of-the-box. Ho
 $file = file_get_contents('/path/to/translations.json');
 $translations = json_decode($file, true);
 
-// For providing login credentials, see above
-$book = new PHPCBIS()->loadBook('some-isbn');
-$book->setTranslations($translations);
+$object = new PHPCBIS();
+$object->setTranslations($translations);
+
+$book = $object->loadBook('some-isbn');
+echo $book->getTitle();  // Some Title
 ```
 
 
