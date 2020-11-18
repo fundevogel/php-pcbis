@@ -339,6 +339,19 @@ class Book
 
 
     /**
+     * Magic methods
+     */
+
+    public function __toString(): string {
+        if (empty($this->author)) {
+            return $this->getTitle();
+        }
+
+        return $this->getAuthor(true) . ': ' . $this->getTitle();
+    }
+
+
+    /**
      * Setters & getters
      */
 
@@ -1125,7 +1138,7 @@ class Book
             }
         }
 
-        return $string;
+        return '';
     }
 
     public function setPageCount(string $pageCount)
