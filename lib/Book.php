@@ -128,7 +128,7 @@ class Book
 
 
     /**
-     * Dimensions (width x height)
+     * Dimensions (width x height in centimeters)
      *
      * @var string
      */
@@ -165,7 +165,6 @@ class Book
      * @var array
      */
     protected $translator;
-
 
 
     /**
@@ -1196,17 +1195,23 @@ class Book
 
     /**
      * Builds dimensions (width x height)
-     * TODO: Cover unconventional cases
      *
      * @return string
      */
     protected function buildDimensions(): string
     {
+        # Width & height are either both present, or not at all
         if (!isset($this->source['Breite'])) {
-            return '';
-        }
+            $delimiter = ' cm';
 
-        if (!isset($this->source['Hoehe'])) {
+            # If they aren't though, check 'Abb' for further hints on dimensions
+            if (Butler::contains($this->source['Abb'], $delimiter)) {
+                $string = Butler::replace($this->source['Abb'], $delimiter, '');
+                $array = Butler::split($string, ' ');
+
+                return Butler::convertMM(Butler::last($array));
+            }
+
             return '';
         }
 
