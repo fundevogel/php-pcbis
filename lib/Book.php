@@ -136,7 +136,7 @@ class Book
 
 
     /**
-     * Duration (audiobook only)
+     * Duration (in minutes) (audiobook only)
      *
      * @var string
      */
@@ -176,7 +176,7 @@ class Book
 
 
     /**
-     * Narrator
+     * Narrator (audiobook only)
      *
      * @var array
      */
@@ -189,6 +189,14 @@ class Book
      * @var array
      */
     protected $editor;
+
+
+    /**
+     * Producer (audiobook only)
+     *
+     * @var array
+     */
+    protected $producer;
 
 
     /**
@@ -332,6 +340,7 @@ class Book
         $this->director    = $this->buildDirector();
         $this->narrator    = $this->buildNarrator();
         $this->narrator    = $this->buildEditor();
+        $this->producer    = $this->buildProducer();
         $this->participant = $this->buildParticipant();
         $this->categories  = $this->buildCategories();
         $this->topics      = $this->buildTopics();
@@ -666,6 +675,7 @@ class Book
             'director' => [],
             'narrator' => [],
             'editor' => [],
+            'producer' => [],
             'participant' => [],
         ];
 
@@ -737,6 +747,7 @@ class Book
             'Übersetzung'  => 'translator',
             'Regie'        => 'director',
             'Mitarbeit'    => 'participant',
+            'Produktion'   => 'producer',
             'Vorlage'      => 'original',
         ];
 
@@ -922,6 +933,31 @@ class Book
         }
 
         return $this->exportRole('editor');
+    }
+
+
+    /**
+     * Builds editor
+     *
+     * @return array
+     */
+    protected function buildProducer(): array
+    {
+        return $this->extractRole('producer');
+    }
+
+    public function setProducer(array $producer)
+    {
+        $this->producer = $producer;
+    }
+
+    public function getProducer(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->producer;
+        }
+
+        return $this->exportRole('producer');
     }
 
 
@@ -1351,7 +1387,7 @@ class Book
 
 
     /**
-     * Builds duration (audiobook only)
+     * Builds duration
      *
      * @return string
      */
@@ -1404,6 +1440,7 @@ class Book
             'ÜbersetzerIn'     => $this->getTranslator($formatted),
             'RegisseurIn'      => $this->getDirector($formatted),
             'SprecherIn'       => $this->getNarrator($formatted),
+            'ProduzentIn'      => $this->getProducer($formatted),
             'Mitwirkende'      => $this->getParticipant($formatted),
             'Kategorien'       => $this->getCategories($formatted),
             'Themen'           => $this->getTopics($formatted),
