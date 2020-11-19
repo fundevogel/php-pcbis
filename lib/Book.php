@@ -167,12 +167,13 @@ class Book
     protected $translator;
 
 
+
     /**
-     * Director
+     * Editor
      *
      * @var array
      */
-    protected $director;
+    protected $editor;
 
 
     /**
@@ -184,11 +185,11 @@ class Book
 
 
     /**
-     * Editor
+     * Director (audiobook only)
      *
      * @var array
      */
-    protected $editor;
+    protected $director;
 
 
     /**
@@ -337,9 +338,9 @@ class Book
         $this->duration    = $this->buildDuration();
         $this->illustrator = $this->buildIllustrator();
         $this->translator  = $this->buildTranslator();
-        $this->director    = $this->buildDirector();
+        $this->editor      = $this->buildEditor();
         $this->narrator    = $this->buildNarrator();
-        $this->narrator    = $this->buildEditor();
+        $this->director    = $this->buildDirector();
         $this->producer    = $this->buildProducer();
         $this->participant = $this->buildParticipant();
         $this->categories  = $this->buildCategories();
@@ -862,27 +863,27 @@ class Book
 
 
     /**
-     * Builds director
+     * Builds editor
      *
      * @return array
      */
-    protected function buildDirector(): array
+    protected function buildEditor(): array
     {
-        return $this->extractRole('director');
+        return $this->extractRole('editor');
     }
 
-    public function setDirector(array $director)
+    public function setEditor(array $editor)
     {
-        $this->director = $director;
+        $this->editor = $editor;
     }
 
-    public function getDirector(bool $formatted = false)
+    public function getEditor(bool $formatted = false)
     {
         if (!$formatted) {
-            return $this->director;
+            return $this->editor;
         }
 
-        return $this->exportRole('director');
+        return $this->exportRole('editor');
     }
 
 
@@ -912,32 +913,32 @@ class Book
 
 
     /**
-     * Builds editor
+     * Builds director
      *
      * @return array
      */
-    protected function buildEditor(): array
+    protected function buildDirector(): array
     {
-        return $this->extractRole('editor');
+        return $this->extractRole('director');
     }
 
-    public function setEditor(array $editor)
+    public function setDirector(array $director)
     {
-        $this->editor = $editor;
+        $this->director = $director;
     }
 
-    public function getEditor(bool $formatted = false)
+    public function getDirector(bool $formatted = false)
     {
         if (!$formatted) {
-            return $this->editor;
+            return $this->director;
         }
 
-        return $this->exportRole('editor');
+        return $this->exportRole('director');
     }
 
 
     /**
-     * Builds editor
+     * Builds producer
      *
      * @return array
      */
@@ -1438,8 +1439,9 @@ class Book
             'Dauer'            => $this->getDuration(),
             'IllustratorIn'    => $this->getIllustrator($formatted),
             'ÜbersetzerIn'     => $this->getTranslator($formatted),
-            'RegisseurIn'      => $this->getDirector($formatted),
+            'HerausgeberIn'    => $this->getEditor($formatted),
             'SprecherIn'       => $this->getNarrator($formatted),
+            'RegisseurIn'      => $this->getDirector($formatted),
             'ProduzentIn'      => $this->getProducer($formatted),
             'Mitwirkende'      => $this->getParticipant($formatted),
             'Kategorien'       => $this->getCategories($formatted),
