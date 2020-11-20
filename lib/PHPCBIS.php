@@ -258,6 +258,35 @@ class PHPCBIS
 
 
     /**
+     * Checks if book is available for delivery via OLA query
+     *
+     * @param string $isbn - A given book's ISBN
+     * @param int $quantity - Number of books to be delivered
+     * @return bool
+     */
+    public function ola(string $isbn, int $quantity = 1): bool
+    {
+        $isbn = $this->validateISBN($isbn);
+
+        $query = $this->client->WSCall([
+            # Log in using sessionID
+            'SessionID' => $this->sessionID,
+            'OLA' => [
+                'Art' => 'Abfrage',
+                'OLAItem' => [
+                    'Bestellnummer' => [
+                        'ISBN' => $isbn,
+                    ],
+                    'Menge' => $quantity,
+                ],
+            ],
+        ]);
+
+        return new KNV\OLA($query->OLAResponse->OLAResponseRecord);
+    }
+
+
+    /**
      * Fetches book information from cache if they exist,
      * otherwise loads them & saves to cache
      *
