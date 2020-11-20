@@ -207,13 +207,12 @@ class OLA
      * Methods
      */
 
-
     /**
      * Shows original OLA query fetched from KNV's API
      *
      * @return \stdObject
      */
-    public function showSourcce(): \stdObject
+    public function showSource(): \stdObject
     {
         return $this->data;
     }
