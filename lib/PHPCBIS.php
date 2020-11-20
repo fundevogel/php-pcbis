@@ -37,11 +37,27 @@ class PHPCBIS
 
 
     /**
+     * SOAP client used when connecting to KNV's API
+     *
+     * @var \SoapClient
+     */
+    private $client = null;
+
+
+    /**
      * Path to downloaded book cover images
      *
      * @var string
      */
     private $imagePath = './images';
+
+
+    /**
+     * Session identifier retrieved when first connecting to KNV's API
+     *
+     * @var string
+     */
+    private $sessionID;
 
 
     /**
@@ -58,12 +74,32 @@ class PHPCBIS
 
     public function __construct(array $credentials = null)
     {
-        // Credentials for KNV's restricted API
-        $this->credentials = $credentials;
+        # Fire up SOAP client
+        $this->client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
+            'soap_version' => SOAP_1_2,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
+            'cache_wsdl' => WSDL_CACHE_BOTH,
+            'trace' => true,
+            'exceptions' => true,
+        ]);
 
+        # Insert credentials for KNV's API
         if ($credentials === null) {
-            $this->credentials = $this->authenticate();
+            throw new \Exception('Please provide valid login credentials.');
         }
+
+        # Log in & store sessionID
+        $this->sessionID = $this->logIn($credentials);
+    }
+
+
+    /**
+     * Destructor
+     */
+
+    public function __destruct()
+    {
+        $this->logOut();
     }
 
 
@@ -113,7 +149,7 @@ class PHPCBIS
      * @param string $isbn - International Standard Book Number
      * @return string|InvalidArgumentException
      */
-    private function validateISBN(string $isbn)
+    private function validateISBN(string $isbn): string
     {
         if (Butler::length($isbn) === 13 && Butler::startsWith($isbn, '4')) {
             # Most likely non-convertable EAN
@@ -134,26 +170,41 @@ class PHPCBIS
 
 
     /**
-     * Loads credentials saved in a local JSON file as array
+     * Uses credentials to log into KNV's API & generates a sessionID
      *
-     * @param string $fileName - Name of file to be included
-     * @return array|Exception
+     * @param array $credentials
+     * @return string|InvalidArgumentException
      */
-    private function authenticate()
+    private function logIn(array $credentials): string
     {
-        if (file_exists($file = realpath('./login.json'))) {
-            $json = file_get_contents($file);
-            $array = json_decode($json, true);
-
-            return $array;
+        try {
+            $query = $this->client->WSCall([
+                'LoginInfo' => $credentials,
+            ]);
+        } catch (\SoapFault $e) {
+            throw new \InvalidArgumentException($e->getMessage());
         }
 
-        throw new \Exception('Please provide valid login credentials.');
+        return $query->SessionID;
     }
 
 
     /**
-     * Returns raw book data from KNV
+     * Uses sessionID to log out of KNV's API
+     *
+     * @return void
+     */
+    private function logOut(): void
+    {
+        $this->client->WSCall([
+            'SessionID' => $this->sessionID,
+            'Logout' => true,
+        ]);
+    }
+
+
+    /**
+     * Fetches raw book data from KNV
      *
      * .. if book for given ISBN exists
      *
@@ -162,22 +213,15 @@ class PHPCBIS
      */
     private function fetchData(string $isbn)
     {
-        $client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
-            'soap_version' => SOAP_1_2,
-            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-            'cache_wsdl' => WSDL_CACHE_BOTH,
-            'trace' => true,
-            'exceptions' => true,
-        ]);
+        # For getting started with KNV's (surprisingly well documented) german API,
+        # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
+        $query = $this->client->WSCall([
+            # Log in using sessionID
+            'SessionID' => $this->sessionID,
 
-        // For getting started with KNV's (surprisingly well documented) german API,
-        // see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
-        $query = $client->WSCall([
-            // Login using credentials provided by `login.json`
-            'LoginInfo' => $this->credentials,
-            // Starting a new database query
+            # Start new database query
             'Suchen' => [
-                // Basically searching all databases they got
+                # Search across all databases
                 'Datenbank' => [
                     'KNV',
                     'KNVBG',
@@ -186,8 +230,7 @@ class PHPCBIS
                 ],
                 'Suche' => [
                     'SimpleTerm' => [
-                        // Simple search suffices as from exported CSV,
-                        // we already know they know .. you know?
+                        # Simple search suffices for querying single ISBN
                         'Suchfeld' => 'ISBN',
                         'Suchwert' => $isbn,
                         'Schwert2' => '',
@@ -195,31 +238,22 @@ class PHPCBIS
                     ],
                 ],
             ],
-            // Reading the results of the query above
+            # Read results of the query & return first result
             'Lesen' => [
-                // Returning the first result is alright, since given ISBN is unique
                 'SatzVon' => 1,
                 'SatzBis' => 1,
                 'Format' => 'KNVXMLLangText',
             ],
-            // .. and logging out, that's it!
-            'Logout' => true,
         ]);
 
-        if ($query->Suchergebnis->TrefferGesamt === 0) {
-            throw new \Exception('No database entry found.');
+        if ($query->Suchergebnis->TrefferGesamt > 0) {
+            $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
+            $array = Butler::loadXML($result);
+
+            return Butler::last($array);
         }
 
-        // Getting raw XML response & preparing it to be loaded by SimpleXML
-        $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
-        $result = Butler::replace($result, '&', '&amp;');
-
-        // XML to JSON to PHP array - we want its last entry
-        $xml = simplexml_load_string($result);
-        $json = json_encode($xml);
-        $array = json_decode($json, true);
-
-        return Butler::last($array);
+        return [];
     }
 
 

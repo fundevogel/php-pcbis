@@ -15,6 +15,25 @@ if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 class Butler
 {
     /**
+     * Converts XML to PHP array
+     *
+     * @param \stdClass $data - Response object from KNV's API
+     * @return array
+     */
+    public static function loadXML(\stdClass $data): array
+    {
+        # Prepare raw XML response to be loaded by SimpleXML
+        $data = static::replace($data, '&', '&amp;');
+
+        # Convert XML to JSON to PHP array
+        $xml = simplexml_load_string($data);
+        $json = json_encode($xml);
+
+        return json_decode($json, true);
+    }
+
+
+    /**
      * Reverses name, going from 'Doe, John' to 'John Doe'
      *
      * @param string $string - Name to be reversed
