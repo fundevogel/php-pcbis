@@ -160,6 +160,22 @@ class Book
 
 
     /**
+     * Drawer
+     *
+     * @var array
+     */
+    protected $drawer;
+
+
+    /**
+     * Photographer
+     *
+     * @var array
+     */
+    protected $photographer;
+
+
+    /**
      * Translator
      *
      * @var array
@@ -319,31 +335,33 @@ class Book
         }
 
         # Extract tags & involved people early on
-        $this->tags        = $this->separateTags();
-        $this->people      = $this->separatePeople();
+        $this->tags         = $this->separateTags();
+        $this->people       = $this->separatePeople();
 
         # Build bibliographic dataset
-        $this->author      = $this->buildAuthor();
-        $this->title       = $this->buildTitle();
-        $this->subtitle    = $this->buildSubtitle();
-        $this->publisher   = $this->buildPublisher();
-        $this->description = $this->buildDescription();
-        $this->retailPrice = $this->buildretailPrice();
-        $this->releaseYear = $this->buildreleaseYear();
-        $this->age         = $this->buildAge();
-        $this->binding     = $this->buildBinding();
-        $this->pageCount   = $this->buildPageCount();
-        $this->dimensions  = $this->buildDimensions();
-        $this->duration    = $this->buildDuration();
-        $this->illustrator = $this->buildIllustrator();
-        $this->translator  = $this->buildTranslator();
-        $this->editor      = $this->buildEditor();
-        $this->narrator    = $this->buildNarrator();
-        $this->director    = $this->buildDirector();
-        $this->producer    = $this->buildProducer();
-        $this->participant = $this->buildParticipant();
-        $this->categories  = $this->buildCategories();
-        $this->topics      = $this->buildTopics();
+        $this->author       = $this->buildAuthor();
+        $this->title        = $this->buildTitle();
+        $this->subtitle     = $this->buildSubtitle();
+        $this->publisher    = $this->buildPublisher();
+        $this->description  = $this->buildDescription();
+        $this->retailPrice  = $this->buildretailPrice();
+        $this->releaseYear  = $this->buildreleaseYear();
+        $this->age          = $this->buildAge();
+        $this->binding      = $this->buildBinding();
+        $this->pageCount    = $this->buildPageCount();
+        $this->dimensions   = $this->buildDimensions();
+        $this->duration     = $this->buildDuration();
+        $this->illustrator  = $this->buildIllustrator();
+        $this->drawer       = $this->buildDrawer();
+        $this->photographer = $this->buildPhotographer();
+        $this->translator   = $this->buildTranslator();
+        $this->editor       = $this->buildEditor();
+        $this->narrator     = $this->buildNarrator();
+        $this->director     = $this->buildDirector();
+        $this->producer     = $this->buildProducer();
+        $this->participant  = $this->buildParticipant();
+        $this->categories   = $this->buildCategories();
+        $this->topics       = $this->buildTopics();
     }
 
 
@@ -670,13 +688,15 @@ class Book
     private function separatePeople(): array
     {
         $people = [
-            'illustrator' => [],
-            'translator' => [],
-            'director' => [],
-            'narrator' => [],
-            'editor' => [],
-            'producer' => [],
-            'participant' => [],
+            'illustrator'  => [],
+            'drawer'       => [],
+            'photographer' => [],
+            'translator'   => [],
+            'editor'       => [],
+            'narrator'     => [],
+            'director'     => [],
+            'producer'     => [],
+            'participant'  => [],
         ];
 
         if (!isset($this->source['Mitarb'])) {
@@ -744,6 +764,8 @@ class Book
         # Remaining roles
         $tasks = [
             'Illustration' => 'illustrator',
+            'Zeichnungen'  => 'drawer',
+            'Fotos'        => 'photographer',
             'Übersetzung'  => 'translator',
             'Regie'        => 'director',
             'Mitarbeit'    => 'participant',
@@ -833,6 +855,56 @@ class Book
         }
 
         return $this->exportRole('illustrator');
+    }
+
+
+    /**
+     * Builds drawer
+     *
+     * @return array
+     */
+    protected function buildDrawer(): array
+    {
+        return $this->extractRole('drawer');
+    }
+
+    public function setDrawer(array $drawer)
+    {
+        $this->drawer = $drawer;
+    }
+
+    public function getDrawer(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->drawer;
+        }
+
+        return $this->exportRole('drawer');
+    }
+
+
+    /**
+     * Builds photographer
+     *
+     * @return array
+     */
+    protected function buildPhotographer(): array
+    {
+        return $this->extractRole('photographer');
+    }
+
+    public function setPhotographer(array $photographer)
+    {
+        $this->photographer = $photographer;
+    }
+
+    public function getPhotographer(bool $formatted = false)
+    {
+        if (!$formatted) {
+            return $this->photographer;
+        }
+
+        return $this->exportRole('photographer');
     }
 
 
@@ -1443,6 +1515,8 @@ class Book
             'Abmessungen'      => $this->getDimensions(),
             'Dauer'            => $this->getDuration(),
             'IllustratorIn'    => $this->getIllustrator($formatted),
+            'ZeichnerIn'       => $this->getDrawer($formatted),
+            'PhotographIn'     => $this->getPhotographer($formatted),
             'ÜbersetzerIn'     => $this->getTranslator($formatted),
             'HerausgeberIn'    => $this->getEditor($formatted),
             'SprecherIn'       => $this->getNarrator($formatted),
