@@ -1,8 +1,9 @@
 <?php
 
-namespace PHPCBIS;
+namespace PHPCBIS\Products\Books;
 
 use PHPCBIS\Helpers\Butler;
+
 
 /**
  * Class Book
@@ -13,40 +14,8 @@ use PHPCBIS\Helpers\Butler;
  * @package PHPCBIS
  */
 
-class Book extends ProductAbstract
+class Book extends \PHPCBIS\Products\Product
 {
-    /**
-     * International Standard Book Number
-     *
-     * @var string
-     */
-    private $isbn;
-
-
-    /**
-     * Source data fetched from KNV's API
-     *
-     * @var array
-     */
-    private $source;
-
-
-    /**
-     * Whether source data was fetched from cache
-     *
-     * @var bool
-     */
-    protected $fromCache;
-
-
-    /**
-     * Whether it's an audiobook
-     *
-     * @var bool
-     */
-    protected $isAudiobook = false;
-
-
     /**
      * Author
      *
@@ -290,11 +259,11 @@ class Book extends ProductAbstract
 
 
     /**
-     * Path to downloaded book cover images
+     * Type of product
      *
      * @var string
      */
-    protected $imagePath;
+    protected $type;
 
 
     /**
@@ -309,30 +278,8 @@ class Book extends ProductAbstract
      * Constructor
      */
 
-    public function __construct(
-        string $isbn,
-        array $source,
-        string $imagePath,
-        array $translations,
-        bool $fromCache
-    ) {
-        # Store valid ISBN
-        $this->isbn = $isbn;
-
-        # Store source data, fetched from KNV's API ..
-        $this->source = $source;
-
-        # .. or from cache?
-        $this->fromCache = $fromCache;
-
-        # Import image path & translations
-        $this->imagePath = $imagePath;
-        $this->translations = $translations;
-
-        # Determine if audiobook
-        if (isset($source['Einband']) && $source['Einband'] === 'CD') {
-            $this->isAudiobook = true;
-        }
+    public function __construct(array $source, array $props) {
+        parent::__construct($source, $props);
 
         # Extract tags & involved people early on
         $this->tags         = $this->separateTags();
@@ -473,39 +420,6 @@ class Book extends ProductAbstract
         }
 
         return $success;
-    }
-
-
-    /**
-     * Shows source data fetched from KNV's API
-     *
-     * @return array
-     */
-    public function showSource(): array
-    {
-        return $this->source;
-    }
-
-
-    /**
-     * Checks whether source data was fetched from cache
-     *
-     * @return bool
-     */
-    public function fromCache(): bool
-    {
-        return $this->fromCache;
-    }
-
-
-    /**
-     * Checks whether this is an audiobook
-     *
-     * @return bool
-     */
-    public function isAudiobook(): bool
-    {
-        return $this->isAudiobook;
     }
 
 
@@ -1338,7 +1252,7 @@ class Book extends ProductAbstract
      */
     protected function buildCategories(): array
     {
-        if ($this->isAudiobook) {
+        if ($this->isAudiobook()) {
             return ['Hörbuch'];
         }
 

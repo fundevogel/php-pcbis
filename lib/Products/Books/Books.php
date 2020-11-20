@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS;
+namespace PHPCBIS\Products\Books;
 
 
 /**
@@ -11,7 +11,7 @@ namespace PHPCBIS;
  * @package PHPCBIS
  */
 
-class Books extends BookList
+class Books extends \PHPCBIS\Products\Listing
 {
     /**
      * Methods
