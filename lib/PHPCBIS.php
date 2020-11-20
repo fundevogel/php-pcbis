@@ -11,6 +11,7 @@ namespace PHPCBIS;
 
 use PHPCBIS\Helpers\Butler;
 
+
 /**
  * Class PHPCBIS
  *
@@ -296,48 +297,52 @@ class PHPCBIS
     private function fetchBook(string $isbn): array
     {
         $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
-        $cached = $driver->contains($isbn);
+        $fromCache = $driver->contains($isbn);
 
-        if (!$cached) {
+        if (!$fromCache) {
             $result = $this->fetchData($isbn);
             $driver->save($isbn, $result);
         }
 
         return [
-            'data' => $driver->fetch($isbn),
-            'cached' => $cached,
+            'fromCache' => $fromCache,
+            'source'    => $driver->fetch($isbn),
         ];
     }
 
 
     /**
-     * Validates ISBN & builds `\PHPCBIS\Book` object
+     * Validates ISBN & builds `Book` object
      *
      * @param string $isbn - A given book's ISBN
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
-    public function loadBook(string $isbn): \PHPCBIS\Book
+    public function loadBook(string $isbn): \PHPCBIS\Products\Books\Book
     {
         $isbn = $this->validateISBN($isbn);
-        $book = $this->fetchBook($isbn);
+        $data = $this->fetchBook($isbn);
 
-        return new Book(
-            $isbn,
-            $book['data'],
-            $this->imagePath,
-            $this->translations,
-            $book['cached']
-        );
+        # Determine product type
+        // $this->productGroup = $this->productGroups[$source['Sortimentskennzeichen']];
+
+        $props = [
+            'fromCache'    => $data['fromCache'],
+            'isbn'         => $isbn,
+            'imagePath'    => $this->imagePath,
+            'translations' => $this->translations,
+        ];
+
+        return \PHPCBIS\Products\Factory::factory($data['source'], $props);
     }
 
 
     /**
-     * Validates ISBNs & builds `\PHPCBIS\Books` object
+     * Validates ISBNs & builds `Books` object
      *
      * @param array $isbns - A group of books' ISBNs
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
-    public function loadBooks(array $isbns): \PHPCBIS\Books
+    public function loadBooks(array $isbns): \PHPCBIS\Products\Books\Books
     {
         $books = [];
 
@@ -345,6 +350,6 @@ class PHPCBIS
             $books[] = $this->loadBook($isbn);
         }
 
-        return new Books($books);
+        return new \PHPCBIS\Products\Books\Books($books);
     }
 }

@@ -1,18 +1,17 @@
 <?php
 
-namespace PHPCBIS;
+namespace PHPCBIS\Products;
 
 
 /**
- * Class Books
+ * Class BookList
  *
- * Serves as container class for books,
- * providing a wide array of useful methods
+ * Serves as template for collections of books
  *
  * @package PHPCBIS
  */
 
- class Books implements \Countable, \Iterator
+abstract class Listing implements \Countable, \Iterator
 {
     /**
      * Group of `PHPCBIS\Book` objects
@@ -33,20 +32,13 @@ namespace PHPCBIS;
 
 
     /**
-     * Setters & getters
-     */
-
-    # Nothing to see here yet
-
-
-    /**
      * `Iterator` methods plus `prev`
      */
 
     /**
      * Returns the current book
      *
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function current()
     {
@@ -68,7 +60,7 @@ namespace PHPCBIS;
     /**
      * Moves the cursor to the next book and returns it
      *
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function next()
     {
@@ -79,7 +71,7 @@ namespace PHPCBIS;
     /**
      * Moves the cursor to the previous book and returns it
      *
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function prev()
     {
@@ -130,7 +122,7 @@ namespace PHPCBIS;
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
     public function prepend(...$args)
     {
@@ -153,7 +145,7 @@ namespace PHPCBIS;
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
     public function append(...$args)
     {
@@ -170,7 +162,7 @@ namespace PHPCBIS;
     /**
      * Returns the books in reverse order
      *
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
     public function flip()
     {
@@ -184,7 +176,7 @@ namespace PHPCBIS;
     /**
      * Returns the first book
      *
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function first()
     {
@@ -195,7 +187,7 @@ namespace PHPCBIS;
     /**
      * Returns the last book
      *
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function last()
     {
@@ -207,7 +199,7 @@ namespace PHPCBIS;
      * Returns the nth book from the collection
      *
      * @param int $n
-     * @return \PHPCBIS\Book
+     * @return \PHPCBIS\Products\Books\Book
      */
     public function nth(int $n)
     {
@@ -219,7 +211,7 @@ namespace PHPCBIS;
      * Returns a Collection without the given book(s)
      *
      * @param string ...$keys any number of keys, passed as individual arguments
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
     public function not(...$keys)
     {
@@ -281,7 +273,7 @@ namespace PHPCBIS;
      * Map a function to each book
      *
      * @param callable $callback
-     * @return \PHPCBIS\Books
+     * @return \PHPCBIS\Products\Books\Books
      */
     public function map(callable $callback)
     {
