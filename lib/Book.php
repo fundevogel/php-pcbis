@@ -13,7 +13,7 @@ use PHPCBIS\Helpers\Butler;
  * @package PHPCBIS
  */
 
-class Book
+class Book extends ProductAbstract
 {
     /**
      * International Standard Book Number
