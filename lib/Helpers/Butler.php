@@ -17,10 +17,10 @@ class Butler
     /**
      * Converts XML to PHP array
      *
-     * @param \stdClass $data - Response object from KNV's API
+     * @param string $data - Response object from KNV's API
      * @return array
      */
-    public static function loadXML(\stdClass $data): array
+    public static function loadXML(string $data): array
     {
         # Prepare raw XML response to be loaded by SimpleXML
         $data = static::replace($data, '&', '&amp;');
