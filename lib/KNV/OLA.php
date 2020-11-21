@@ -204,6 +204,16 @@ class OLA
 
 
     /**
+     * Magic methods
+     */
+
+    public function __toString(): string
+    {
+        return $this->success ? 'Verfügbar' : 'Nicht verfügbar';
+    }
+
+
+    /**
      * Methods
      */
 
