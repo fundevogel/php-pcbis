@@ -316,7 +316,8 @@ class Book extends \PHPCBIS\Products\Product
      * Magic methods
      */
 
-    public function __toString(): string {
+    public function __toString(): string
+    {
         if (empty($this->author)) {
             return $this->getTitle();
         }
@@ -617,95 +618,62 @@ class Book extends \PHPCBIS\Products\Product
             return $people;
         }
 
-        $string = $this->source['Mitarb'];
-
-        # Editor role
-        $publishedBy = 'Herausgegeben von';
-
-        if (Butler::startsWith($string, $publishedBy)) {
-            $case1 = Butler::replace($string, $publishedBy, '');
-            $group = Butler::split($case1, ',');
-
-            $people['editor'][] = $this->organizePeople($group);
-
-            # Case 1 yields only a single editor
-            return $people;
-        }
-
-        # Narrator role
-        $delimiter1 = 'Gesprochen von';
-        $delimiter2 = 'Gesprochen:';
-
-        foreach ([$delimiter1, $delimiter2] as $delimiter) {
-            # Case 1: 'Gesprochen von / Gesprochen: XY'
-            if (Butler::startsWith($string, $delimiter)) {
-                $case1 = Butler::replace($string, $delimiter, '');
-                $group = Butler::split($case1, ',');
-
-                $people['narrator'][] = $this->organizePeople($group);
-
-                # Case 1 yields only a single narrator
-                return $people;
-            }
-
-            # Case 2: '... Gesprochen von / Gesprochen: XY'
-            if (Butler::contains($string, $delimiter)) {
-                $array = Butler::split($string, '.');
-                $case2 = Butler::replace(Butler::last($array), $delimiter, '');
-
-                foreach (Butler::split($case2, ';') as $narrator) {
-                    $narratorArray = Butler::split($narrator, ',');
-
-                    # Edge case: single entry, such as 'Diverse'
-                    $firstName = '';
-
-                    if (count($narratorArray) > 1) {
-                        $firstName = $narratorArray[1];
-                    }
-
-                    $people['narrator'][] = [
-                        'firstName' => $firstName,
-                        'lastName'  => $narratorArray[0],
-                    ];
-                }
-
-                # Case 2 yields more participants
-                $string = Butler::split($string, $delimiter)[0];
-                break;
-            }
-        }
-
-        # Remaining roles
-        $tasks = [
+        # Available roles
+        $roles = [
             'Illustration' => 'illustrator',
             'Zeichnungen'  => 'drawer',
             'Fotos'        => 'photographer',
             'Übersetzung'  => 'translator',
+            'Gesprochen'   => 'narrator',
             'Regie'        => 'director',
-            'Mitarbeit'    => 'participant',
             'Produktion'   => 'producer',
+            'Mitarbeit'    => 'participant',
+            # Edge case: author of original works
             'Vorlage'      => 'original',
         ];
 
-        foreach (Butler::split($string, '.') as $array) {
-            $array = Butler::split($array, ':');
+        # Default role
+        $role = 'participant';
 
-            # Determine role
-            $task = 'participant';
+        # Alternative delimiters
+        # (1) Participant
+        # (2) Narrator
+        # (3) Editor
+        $delimiters = [
+            'Mit '               => 'participant',
+            'Gesprochen von '    => 'narrator',
+            'Herausgegeben von ' => 'editor',
+        ];
 
-            if (isset($tasks[$array[0]])) {
-                $task = $tasks[$array[0]];
+        foreach (Butler::split($this->source['Mitarb'], '.') as $string) {
+            # First, see if there's a colon
+            if (!Butler::contains($string, ':')) {
+                # If not, the string is eligible for an alternative delimiter
+                foreach ($delimiters as $delimiter => $role) {
+                    if (Butler::startsWith($string, $delimiter)) {
+                        # If so, remove it from the string, change role and end the loop
+                        $group = Butler::replace($string, $delimiter, '');
+                        $role = $delimiters[$delimiter];  # .. or $role
+
+                        break;
+                    }
+                }
+            } else {
+                # Otherwise, split role & people as usual
+                $array = Butler::split($string, ':');
+
+                if (isset($roles[$array[0]])) {
+                    $role = $roles[$array[0]];
+                }
+
+                $group = $array[1];
             }
 
-            $array = Butler::split($array[1], ';');
+            $person = Butler::split($group, ';');
 
-            foreach ($array as $case3) {
-                $person = Butler::split($case3, ',');
-
-                $people[$task][] = [
-                    'firstName' => $person[1],
-                    'lastName'  => $person[0],
-                ];
+            foreach ($person as $name) {
+                $nameArray = Butler::split($name, ',');
+                $people[$role][] = $this->organizePeople($nameArray);
             }
         }
 
