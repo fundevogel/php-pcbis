@@ -263,9 +263,9 @@ class PHPCBIS
      *
      * @param string $isbn - A given book's ISBN
      * @param int $quantity - Number of books to be delivered
-     * @return bool
+     * @return \PHPCBIS\KNV\OLA
      */
-    public function ola(string $isbn, int $quantity = 1): bool
+    public function ola(string $isbn, int $quantity = 1): \PHPCBIS\KNV\OLA
     {
         $isbn = $this->validateISBN($isbn);
 
@@ -283,7 +283,7 @@ class PHPCBIS
             ],
         ]);
 
-        return new KNV\OLA($query->OLAResponse->OLAResponseRecord);
+        return new \PHPCBIS\KNV\OLA($query->OLAResponse->OLAResponseRecord);
     }
 
 
