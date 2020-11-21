@@ -4,14 +4,14 @@ namespace PHPCBIS\Products;
 
 
 /**
- * Class BookList
+ * Class ProductList
  *
  * Serves as template for collections of books
  *
  * @package PHPCBIS
  */
 
-abstract class Listing implements \Countable, \Iterator
+abstract class ProductList implements \Countable, \Iterator
 {
     /**
      * Group of `PHPCBIS\Book` objects
@@ -38,7 +38,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Returns the current book
      *
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function current()
     {
@@ -60,7 +60,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Moves the cursor to the next book and returns it
      *
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function next()
     {
@@ -71,7 +71,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Moves the cursor to the previous book and returns it
      *
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function prev()
     {
@@ -122,7 +122,7 @@ abstract class Listing implements \Countable, \Iterator
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \\PHPCBIS\Products\ProductList
      */
     public function prepend(...$args)
     {
@@ -145,7 +145,7 @@ abstract class Listing implements \Countable, \Iterator
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \\PHPCBIS\Products\ProductList
      */
     public function append(...$args)
     {
@@ -162,7 +162,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Returns the books in reverse order
      *
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \\PHPCBIS\Products\ProductList
      */
     public function flip()
     {
@@ -176,7 +176,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Returns the first book
      *
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function first()
     {
@@ -187,7 +187,7 @@ abstract class Listing implements \Countable, \Iterator
     /**
      * Returns the last book
      *
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function last()
     {
@@ -199,7 +199,7 @@ abstract class Listing implements \Countable, \Iterator
      * Returns the nth book from the collection
      *
      * @param int $n
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
     public function nth(int $n)
     {
@@ -211,7 +211,7 @@ abstract class Listing implements \Countable, \Iterator
      * Returns a Collection without the given book(s)
      *
      * @param string ...$keys any number of keys, passed as individual arguments
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \\PHPCBIS\Products\ProductList
      */
     public function not(...$keys)
     {
@@ -273,7 +273,7 @@ abstract class Listing implements \Countable, \Iterator
      * Map a function to each book
      *
      * @param callable $callback
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \\PHPCBIS\Products\ProductList
      */
     public function map(callable $callback)
     {
