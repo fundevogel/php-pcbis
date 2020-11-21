@@ -18,13 +18,13 @@ final class Factory
      *
      * @param array $source - Source data fetched from KNV's API
      * @param array $props - Properties being passed to product
+     * @throws \PHPCBIS\Exceptions\UnknownTypeException
      * @return \PHPCBIS\Product
      */
     public static function factory(array $source, array $props): Product
     {
         $productGroups = [
             'AB' => 'Nonbook',
-            'AC' => 'Hörbuch',
             'AD' => 'Film',
             'AE' => 'Software',
             'AF' => 'Tonträger',
@@ -40,6 +40,7 @@ final class Factory
         ];
 
         $books = [
+            'AC' => 'Hörbuch',
             'HC' => 'Hardcover',
             'SB' => 'Schulbuch',
             'TB' => 'Taschenbuch',
@@ -51,14 +52,9 @@ final class Factory
             $props['type'] = $books[$productGroup];
 
             return new \PHPCBIS\Products\Books\Book($source, $props);
-        } elseif ($productGroup === 'AC') {
-            $props['type'] = 'Hörbuch';
-
-            return new \PHPCBIS\Products\Books\Book($source, $props);
-            # TODO: Add audiobook subclass
-            # return new \PHPCBIS\Products\Books\Audiobook($source, $props);
         }
 
-        throw new \InvalidArgumentException('Unknown format given');
+        # TODO: Extend product group support
+        throw new \PHPCBIS\Exceptions\UnknownTypeException('Unknown type: "' . $productGroups[$productGroup] . '"');
     }
 }

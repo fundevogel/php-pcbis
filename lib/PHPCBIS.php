@@ -86,7 +86,7 @@ class PHPCBIS
 
         # Insert credentials for KNV's API
         if ($credentials === null) {
-            throw new \Exception('Please provide valid login credentials.');
+            throw new \PHPCBIS\Exceptions\InvalidLoginException('Please provide valid login credentials.');
         }
 
         # Log in & store sessionID
@@ -148,7 +148,8 @@ class PHPCBIS
      * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
-     * @return string|InvalidArgumentException
+     * @throws \PHPCBIS\Exceptions\InvalidISBNException
+     * @return string
      */
     private function validateISBN(string $isbn): string
     {
@@ -163,7 +164,7 @@ class PHPCBIS
             $isbn->validate();
             $isbn = $isbn->format('ISBN-13');
         } catch(\Exception $e) {
-            throw new \InvalidArgumentException($e->getMessage());
+            throw new \PHPCBIS\Exceptions\InvalidISBNException($e->getMessage());
         }
 
         return $isbn;
@@ -174,7 +175,8 @@ class PHPCBIS
      * Uses credentials to log into KNV's API & generates a sessionID
      *
      * @param array $credentials
-     * @return string|InvalidArgumentException
+     * @throws \PHPCBIS\Exceptions\InvalidLoginException
+     * @return string
      */
     private function logIn(array $credentials): string
     {
@@ -183,7 +185,7 @@ class PHPCBIS
                 'LoginInfo' => $credentials,
             ]);
         } catch (\SoapFault $e) {
-            throw new \InvalidArgumentException($e->getMessage());
+            throw new \PHPCBIS\Exceptions\InvalidLoginException($e->getMessage());
         }
 
         return $query->SessionID;
@@ -210,7 +212,7 @@ class PHPCBIS
      * .. if book for given ISBN exists
      *
      * @param string $isbn
-     * @return array|Exception
+     * @return array
      */
     private function fetchData(string $isbn)
     {
