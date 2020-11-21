@@ -26,7 +26,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '1.5.0';
+    const VERSION = '1.5.1';
 
 
     /**
