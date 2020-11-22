@@ -23,8 +23,9 @@ final class Factory
      */
     public static function factory(array $source, array $props): Product
     {
-        $productGroups = [
+        $groups = [
             'AB' => 'Nonbook',
+            'AC' => 'Hörbuch',
             'AD' => 'Film',
             'AE' => 'Software',
             'AF' => 'Tonträger',
@@ -37,24 +38,27 @@ final class Factory
             'AM' => 'Papeterie/PBS',
             'AN' => 'Spiel',
             'AO' => 'Spielzeug',
-        ];
-
-        $books = [
-            'AC' => 'Hörbuch',
             'HC' => 'Hardcover',
             'SB' => 'Schulbuch',
             'TB' => 'Taschenbuch',
         ];
 
-        $productGroup = $source['Sortimentskennzeichen'];
+        $group = $source['Sortimentskennzeichen'];
 
-        if (array_key_exists($productGroup, $books)) {
-            $props['type'] = $books[$productGroup];
+        if (array_key_exists($group, $groups)) {
+            $props['type'] = $groups[$group];
 
-            return new \PHPCBIS\Products\Books\Book($source, $props);
+            switch ($groups[$group]) {
+                # Books
+                case 'Hardcover':
+                    return new \PHPCBIS\Products\Books\Types\Hardcover($source, $props);
+                case 'Taschenbuch':
+                    return new \PHPCBIS\Products\Books\Types\Softcover($source, $props);
+                case 'Schulbuch':
+                    return new \PHPCBIS\Products\Books\Types\Schoolbook($source, $props);
         }
 
         # TODO: Extend product group support
-        throw new \PHPCBIS\Exceptions\UnknownTypeException('Unknown type: "' . $productGroups[$productGroup] . '"');
+        throw new \PHPCBIS\Exceptions\UnknownTypeException('Unknown type: "' . $groups[$group] . '"');
     }
 }
