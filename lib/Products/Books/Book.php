@@ -521,9 +521,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->author = $author;
     }
 
-    public function getAuthor(bool $formatted = false)
+    public function getAuthor(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->author;
         }
 
@@ -754,9 +754,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->illustrator = $illustrator;
     }
 
-    public function getIllustrator(bool $formatted = false)
+    public function getIllustrator(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->illustrator;
         }
 
@@ -779,9 +779,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->drawer = $drawer;
     }
 
-    public function getDrawer(bool $formatted = false)
+    public function getDrawer(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->drawer;
         }
 
@@ -804,9 +804,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->photographer = $photographer;
     }
 
-    public function getPhotographer(bool $formatted = false)
+    public function getPhotographer(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->photographer;
         }
 
@@ -829,9 +829,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->translator = $translator;
     }
 
-    public function getTranslator(bool $formatted = false)
+    public function getTranslator(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->translator;
         }
 
@@ -854,9 +854,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->editor = $editor;
     }
 
-    public function getEditor(bool $formatted = false)
+    public function getEditor(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->editor;
         }
 
@@ -879,9 +879,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->narrator = $narrator;
     }
 
-    public function getNarrator(bool $formatted = false)
+    public function getNarrator(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->narrator;
         }
 
@@ -904,9 +904,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->director = $director;
     }
 
-    public function getDirector(bool $formatted = false)
+    public function getDirector(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->director;
         }
 
@@ -929,9 +929,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->producer = $producer;
     }
 
-    public function getProducer(bool $formatted = false)
+    public function getProducer(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->producer;
         }
 
@@ -954,9 +954,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->participant = $participant;
     }
 
-    public function getParticipant(bool $formatted = false)
+    public function getParticipant(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->participant;
         }
 
@@ -1280,9 +1280,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->categories = $categories;
     }
 
-    public function getCategories(bool $formatted = false)
+    public function getCategories(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->categories;
         }
 
@@ -1360,9 +1360,9 @@ class Book extends \PHPCBIS\Products\Product
         $this->topics = $topics;
     }
 
-    public function getTopics(bool $formatted = false)
+    public function getTopics(bool $asArray = false)
     {
-        if (!$formatted) {
+        if ($asArray) {
             return $this->topics;
         }
 
@@ -1399,16 +1399,16 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Exports all information, optionally as pre-formatted (human-readable) strings
+     * Exports all information, optionally as (unformatted) array
      *
-     * @param bool $formatted - Whether values should be strings (instead of arrays)
+     * @param bool $asArray - Whether values should be arrays (instead of strings)
      * @return array
      */
-    public function export(bool $formatted = false): array
+    public function export(bool $asArray = false): array
     {
         $data = [
             'ISBN'             => $this->getISBN(),
-            'AutorIn'          => $this->getAuthor($formatted),
+            'AutorIn'          => $this->getAuthor($asArray),
             'Titel'            => $this->getTitle(),
             'Untertitel'       => $this->getSubtitle(),
             'Verlag'           => $this->getPublisher(),
@@ -1420,17 +1420,17 @@ class Book extends \PHPCBIS\Products\Product
             'Seitenzahl'       => $this->getPageCount(),
             'Abmessungen'      => $this->getDimensions(),
             'Dauer'            => $this->getDuration(),
-            'IllustratorIn'    => $this->getIllustrator($formatted),
-            'ZeichnerIn'       => $this->getDrawer($formatted),
-            'PhotographIn'     => $this->getPhotographer($formatted),
-            'ÜbersetzerIn'     => $this->getTranslator($formatted),
-            'HerausgeberIn'    => $this->getEditor($formatted),
-            'SprecherIn'       => $this->getNarrator($formatted),
-            'RegisseurIn'      => $this->getDirector($formatted),
-            'ProduzentIn'      => $this->getProducer($formatted),
-            'Mitwirkende'      => $this->getParticipant($formatted),
-            'Kategorien'       => $this->getCategories($formatted),
-            'Themen'           => $this->getTopics($formatted),
+            'IllustratorIn'    => $this->getIllustrator($asArray),
+            'ZeichnerIn'       => $this->getDrawer($asArray),
+            'PhotographIn'     => $this->getPhotographer($asArray),
+            'ÜbersetzerIn'     => $this->getTranslator($asArray),
+            'HerausgeberIn'    => $this->getEditor($asArray),
+            'SprecherIn'       => $this->getNarrator($asArray),
+            'RegisseurIn'      => $this->getDirector($asArray),
+            'ProduzentIn'      => $this->getProducer($asArray),
+            'Mitwirkende'      => $this->getParticipant($asArray),
+            'Kategorien'       => $this->getCategories($asArray),
+            'Themen'           => $this->getTopics($asArray),
         ];
 
         return $data;
