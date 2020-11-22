@@ -425,24 +425,51 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Organizes involved people by first & last name
+     * Parses & organizes involved people by first & last name
      *
-     * @param array $people - Involved people
+     * Example:
+     * 'Doe, John; Doe, Jane'
+     *
+     * =>
+     *
+     * [
+     *   [
+     *     'firstName' => 'John',
+     *     'lastName'  => 'Doe',
+     *   ],
+     *   [
+     *     'firstName' => 'Jane',
+     *     'lastName'  => 'Doe',
+     *   ],
+     * ]
+     *
+     * @param string $string - Involved people
+     * @param string $groupDelimiter - Character between people
+     * @param string $nameDelimiter - Character between first & last name
      * @return array
      */
-    private function organizePeople(array $people): array
+    private function organizePeople(string $string, string $groupDelimiter = ';', string $nameDelimiter = ','): array
     {
-        # Edge case: single person entry, such as 'Diverse'
-        $array = [$people[0]];
+        $group = Butler::split($string, $groupDelimiter);
+        $people = [];
 
-        if (count($people) > 1) {
-            $array = [
-                'firstName' => $people[1],
-                'lastName'  => $people[0],
-            ];
+        foreach ($group as $member) {
+            $names = Butler::split($member, $nameDelimiter);
+
+            # Edge case: single person entry, such as 'Diverse'
+            $person = ['name' => $names[0]];
+
+            if (count($names) > 1) {
+                $person = [
+                    'firstName' => $names[1],
+                    'lastName'  => $names[0],
+                ];
+            }
+
+            $people[] = $person;
         }
 
-        return $array;
+        return $people;
     }
 
 
@@ -454,7 +481,7 @@ class Book extends \PHPCBIS\Products\Product
     protected function buildAuthor(): array
     {
         if (!isset($this->source['AutorSachtitel'])) {
-            return '';
+            return [];
         }
 
         $string = $this->source['AutorSachtitel'];
@@ -475,14 +502,16 @@ class Book extends \PHPCBIS\Products\Product
             }
         }
 
-        $array = Butler::split($string, $groupDelimiter);
-        $authors = [];
+        // $array = Butler::split($string, $groupDelimiter);
+        // $authors = [];
 
-        foreach ($array as $author) {
-            $group = Butler::split($author, $personDelimiter);
+        // foreach ($array as $author) {
+        //     $group = Butler::split($author, $personDelimiter);
 
-            $authors[] = $this->organizePeople($group);
-        }
+        //     $authors[] = $this->organizePeople($group);
+        // }
+
+        $authors = $this->organizePeople($string);
 
         return $authors;
     }
@@ -669,12 +698,7 @@ class Book extends \PHPCBIS\Products\Product
                 $group = $array[1];
             }
 
-            $person = Butler::split($group, ';');
-
-            foreach ($person as $name) {
-                $nameArray = Butler::split($name, ',');
-                $people[$role][] = $this->organizePeople($nameArray);
-            }
+            $people[$role] = $this->organizePeople($group);
         }
 
         return $people;
