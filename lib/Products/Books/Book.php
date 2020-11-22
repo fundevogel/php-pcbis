@@ -468,7 +468,7 @@ class Book extends \PHPCBIS\Products\Product
                 return $this->people['original'];
             }
 
-            if (is_string($this->source['IndexAutor'])) {
+            if (isset($this->source['IndexAutor']) && is_string($this->source['IndexAutor'])) {
                 $string = trim($this->source['IndexAutor']);
             } else {
                 return [];
