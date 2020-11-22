@@ -317,9 +317,9 @@ class PHPCBIS
      * Validates ISBN & builds `Book` object
      *
      * @param string $isbn - A given book's ISBN
-     * @return \PHPCBIS\Products\Books\Book
+     * @return \PHPCBIS\Products\Product
      */
-    public function loadBook(string $isbn): \PHPCBIS\Products\Books\Book
+    public function loadBook(string $isbn): \PHPCBIS\Products\Product
     {
         $isbn = $this->validateISBN($isbn);
         $data = $this->fetchBook($isbn);
@@ -342,9 +342,9 @@ class PHPCBIS
      * Validates ISBNs & builds `Books` object
      *
      * @param array $isbns - A group of books' ISBNs
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \PHPCBIS\Products\ProductList
      */
-    public function loadBooks(array $isbns): \PHPCBIS\Products\Books\Books
+    public function loadBooks(array $isbns): \PHPCBIS\Products\ProductList
     {
         $books = [];
 
