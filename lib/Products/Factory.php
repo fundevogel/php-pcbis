@@ -2,6 +2,16 @@
 
 namespace PHPCBIS\Products;
 
+use PHPCBIS\Exceptions\UnknownTypeException;
+
+use PHPCBIS\Products\Audio\Types\Audiobook;
+use PHPCBIS\Products\Audio\Types\Music;
+use PHPCBIS\Products\Audio\Types\Sound;
+use PHPCBIS\Products\Books\Types\eBook;
+use PHPCBIS\Products\Books\Types\Hardcover;
+use PHPCBIS\Products\Books\Types\Schoolbook;
+use PHPCBIS\Products\Books\Types\Softcover;
+
 
 /**
  * Class ProductFactory
@@ -43,22 +53,38 @@ final class Factory
             'TB' => 'Taschenbuch',
         ];
 
-        $group = $source['Sortimentskennzeichen'];
+        # Default group (rarely)
+        $group = 'HC';
+
+        if (isset($source['Sortimentskennzeichen'])) {
+            $group = $source['Sortimentskennzeichen'];
+        }
 
         if (array_key_exists($group, $groups)) {
             $props['type'] = $groups[$group];
 
             switch ($groups[$group]) {
                 # Books
+                case 'ePublikation':
+                    return new eBook($source, $props);
                 case 'Hardcover':
-                    return new \PHPCBIS\Products\Books\Types\Hardcover($source, $props);
-                case 'Taschenbuch':
-                    return new \PHPCBIS\Products\Books\Types\Softcover($source, $props);
+                    return new Hardcover($source, $props);
                 case 'Schulbuch':
-                    return new \PHPCBIS\Products\Books\Types\Schoolbook($source, $props);
+                    return new Schoolbook($source, $props);
+                case 'Taschenbuch':
+                    return new Softcover($source, $props);
+
+                # Audio
+                case 'Hörbuch':
+                    return new Audiobook($source, $props);
+                case 'Musik':
+                    return new Music($source, $props);
+                case 'Tonträger':
+                    return new Sound($source, $props);
+            }
         }
 
         # TODO: Extend product group support
-        throw new \PHPCBIS\Exceptions\UnknownTypeException('Unknown type: "' . $groups[$group] . '"');
+        throw new UnknownTypeException('Unknown type: "' . $groups[$group] . '"');
     }
 }
