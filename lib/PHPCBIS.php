@@ -9,7 +9,21 @@
 
 namespace PHPCBIS;
 
+use PHPCBIS\Exceptions\InvalidLoginException;
+use PHPCBIS\Exceptions\InvalidISBNException;
+
 use PHPCBIS\Helpers\Butler;
+use PHPCBIS\KNV\OLA;
+
+use PHPCBIS\Products\Factory;
+use PHPCBIS\Products\Books\Books;
+
+use Biblys\Isbn\Isbn as ISBN;
+use Doctrine\Common\Cache\FilesystemCache as FileCache;
+
+use Exception;
+use SoapClient;
+use SoapFault;
 
 
 /**
@@ -26,7 +40,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '1.5.2';
+    const VERSION = '2.0.0-alpha.1';
 
 
     /**
@@ -76,7 +90,7 @@ class PHPCBIS
     public function __construct(array $credentials = null)
     {
         # Fire up SOAP client
-        $this->client = new \SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
+        $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
             'soap_version' => SOAP_1_2,
             'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
             'cache_wsdl' => WSDL_CACHE_BOTH,
@@ -86,7 +100,7 @@ class PHPCBIS
 
         # Insert credentials for KNV's API
         if ($credentials === null) {
-            throw new \PHPCBIS\Exceptions\InvalidLoginException('Please provide valid login credentials.');
+            throw new InvalidLoginException('Please provide valid login credentials.');
         }
 
         # Log in & store sessionID
@@ -158,13 +172,13 @@ class PHPCBIS
             return $isbn;
         }
 
-        $isbn = new \Biblys\Isbn\Isbn($isbn);
+        $isbn = new ISBN($isbn);
 
         try {
             $isbn->validate();
             $isbn = $isbn->format('ISBN-13');
-        } catch(\Exception $e) {
-            throw new \PHPCBIS\Exceptions\InvalidISBNException($e->getMessage());
+        } catch(Exception $e) {
+            throw new InvalidISBNException($e->getMessage());
         }
 
         return $isbn;
@@ -184,8 +198,8 @@ class PHPCBIS
             $query = $this->client->WSCall([
                 'LoginInfo' => $credentials,
             ]);
-        } catch (\SoapFault $e) {
-            throw new \PHPCBIS\Exceptions\InvalidLoginException($e->getMessage());
+        } catch (SoapFault $e) {
+            throw new InvalidLoginException($e->getMessage());
         }
 
         return $query->SessionID;
@@ -267,7 +281,7 @@ class PHPCBIS
      * @param int $quantity - Number of books to be delivered
      * @return \PHPCBIS\KNV\OLA
      */
-    public function ola(string $isbn, int $quantity = 1): \PHPCBIS\KNV\OLA
+    public function ola(string $isbn, int $quantity = 1)
     {
         $isbn = $this->validateISBN($isbn);
 
@@ -285,7 +299,7 @@ class PHPCBIS
             ],
         ]);
 
-        return new \PHPCBIS\KNV\OLA($query->OLAResponse->OLAResponseRecord);
+        return new OLA($query->OLAResponse->OLAResponseRecord);
     }
 
 
@@ -298,7 +312,7 @@ class PHPCBIS
      */
     private function fetchBook(string $isbn): array
     {
-        $driver = new \Doctrine\Common\Cache\FilesystemCache($this->cachePath);
+        $driver = new FileCache($this->cachePath);
         $fromCache = $driver->contains($isbn);
 
         if (!$fromCache) {
@@ -334,7 +348,7 @@ class PHPCBIS
             'translations' => $this->translations,
         ];
 
-        return \PHPCBIS\Products\Factory::factory($data['source'], $props);
+        return Factory::factory($data['source'], $props);
     }
 
 
@@ -352,6 +366,6 @@ class PHPCBIS
             $books[] = $this->loadBook($isbn);
         }
 
-        return new \PHPCBIS\Products\Books\Books($books);
+        return new Books($books);
     }
 }
