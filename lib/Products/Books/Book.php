@@ -3,6 +3,7 @@
 namespace PHPCBIS\Products\Books;
 
 use PHPCBIS\Helpers\Butler;
+use PHPCBIS\Products\Product;
 
 
 /**
@@ -14,8 +15,12 @@ use PHPCBIS\Helpers\Butler;
  * @package PHPCBIS
  */
 
-class Book extends \PHPCBIS\Products\Product
+class Book extends Product
 {
+    /**
+     * Properties
+     */
+
     /**
      * Author
      *
@@ -105,22 +110,6 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Duration (in minutes) (audiobook only)
-     *
-     * @var string
-     */
-    protected $duration;
-
-
-    /**
-     * Involved people (all roles)
-     *
-     * @var array
-     */
-    private $people;
-
-
-    /**
      * Illustrator
      *
      * @var array
@@ -161,59 +150,11 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Narrator (audiobook only)
-     *
-     * @var array
-     */
-    protected $narrator;
-
-
-    /**
-     * Director (audiobook only)
-     *
-     * @var array
-     */
-    protected $director;
-
-
-    /**
-     * Producer (audiobook only)
-     *
-     * @var array
-     */
-    protected $producer;
-
-
-    /**
      * Participant
      *
      * @var array
      */
     protected $participant;
-
-
-    /**
-     * Tags (category & topics)
-     *
-     * @var array
-     */
-    private $tags;
-
-
-    /**
-     * Categories
-     *
-     * @var array
-     */
-    protected $categories;
-
-
-    /**
-     * Topics
-     *
-     * @var array
-     */
-    protected $topics;
 
 
     /**
@@ -251,22 +192,6 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Delimiter between people when exported as string
-     *
-     * @var string
-     */
-    protected $delimiter = '; ';
-
-
-    /**
-     * Type of product
-     *
-     * @var string
-     */
-    protected $type;
-
-
-    /**
      * User-Agent used when downloading book cover images
      *
      * @var string
@@ -281,11 +206,7 @@ class Book extends \PHPCBIS\Products\Product
     public function __construct(array $source, array $props) {
         parent::__construct($source, $props);
 
-        # Extract tags & involved people early on
-        $this->tags         = $this->separateTags();
-        $this->people       = $this->separatePeople();
-
-        # Build bibliographic dataset
+        # Build dataset
         $this->author       = $this->buildAuthor();
         $this->title        = $this->buildTitle();
         $this->subtitle     = $this->buildSubtitle();
@@ -297,18 +218,14 @@ class Book extends \PHPCBIS\Products\Product
         $this->binding      = $this->buildBinding();
         $this->pageCount    = $this->buildPageCount();
         $this->dimensions   = $this->buildDimensions();
-        $this->duration     = $this->buildDuration();
-        $this->illustrator  = $this->buildIllustrator();
-        $this->drawer       = $this->buildDrawer();
-        $this->photographer = $this->buildPhotographer();
-        $this->translator   = $this->buildTranslator();
-        $this->editor       = $this->buildEditor();
-        $this->narrator     = $this->buildNarrator();
-        $this->director     = $this->buildDirector();
-        $this->producer     = $this->buildProducer();
-        $this->participant  = $this->buildParticipant();
-        $this->categories   = $this->buildCategories();
-        $this->topics       = $this->buildTopics();
+
+        # Build involved people
+        $this->illustrator  = $this->getRole('illustrator', true);
+        $this->drawer       = $this->getRole('drawer', true);
+        $this->photographer = $this->getRole('photographer', true);
+        $this->translator   = $this->getRole('translator', true);
+        $this->editor       = $this->getRole('editor', true);
+        $this->participant  = $this->getRole('participant');
     }
 
 
@@ -338,36 +255,6 @@ class Book extends \PHPCBIS\Products\Product
     public function getAntolin(): string
     {
         return $this->antolin;
-    }
-
-    public function setBlockList(array $blockList)
-    {
-        $this->blockList = $blockList;
-    }
-
-    public function getBlockList(): array
-    {
-        return $this->blockList;
-    }
-
-    public function setDelimiter(string $delimiter)
-    {
-        $this->delimiter = $delimiter;
-    }
-
-    public function getDelimiter(): string
-    {
-        return $this->delimiter;
-    }
-
-    public function setISBN(string $isbn)
-    {
-        $this->isbn = $isbn;
-    }
-
-    public function getISBN(): string
-    {
-        return $this->isbn;
     }
 
     public function setUserAgent(string $userAgent)
@@ -425,55 +312,6 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Parses & organizes involved people by first & last name
-     *
-     * Example:
-     * 'Doe, John; Doe, Jane'
-     *
-     * =>
-     *
-     * [
-     *   [
-     *     'firstName' => 'John',
-     *     'lastName'  => 'Doe',
-     *   ],
-     *   [
-     *     'firstName' => 'Jane',
-     *     'lastName'  => 'Doe',
-     *   ],
-     * ]
-     *
-     * @param string $string - Involved people
-     * @param string $groupDelimiter - Character between people
-     * @param string $nameDelimiter - Character between first & last name
-     * @return array
-     */
-    private function organizePeople(string $string, string $groupDelimiter = ';', string $nameDelimiter = ','): array
-    {
-        $group = Butler::split($string, $groupDelimiter);
-        $people = [];
-
-        foreach ($group as $member) {
-            $names = Butler::split($member, $nameDelimiter);
-
-            # Edge case: single person entry, such as 'Diverse'
-            $person = ['name' => $names[0]];
-
-            if (count($names) > 1) {
-                $person = [
-                    'firstName' => $names[1],
-                    'lastName'  => $names[0],
-                ];
-            }
-
-            $people[] = $person;
-        }
-
-        return $people;
-    }
-
-
-    /**
      * Builds author(s)
      *
      * @return array
@@ -516,12 +354,8 @@ class Book extends \PHPCBIS\Products\Product
         return $authors;
     }
 
-    public function setAuthor(array $author)
-    {
-        $this->author = $author;
-    }
 
-    public function getAuthor(bool $asArray = false)
+    public function author(bool $asArray = false)
     {
         if ($asArray) {
             return $this->author;
@@ -555,12 +389,8 @@ class Book extends \PHPCBIS\Products\Product
         return $this->source['Titel'];
     }
 
-    public function setTitle(string $title)
-    {
-        $this->title = $title;
-    }
 
-    public function getTitle(): string
+    public function title(): string
     {
         return $this->title;
     }
@@ -580,12 +410,8 @@ class Book extends \PHPCBIS\Products\Product
         return $this->source['Utitel'];
     }
 
-    public function setSubtitle(string $subtitle)
-    {
-        $this->subtitle = $subtitle;
-    }
 
-    public function getSubtitle(): string
+    public function subtitle(): string
     {
         return $this->subtitle;
     }
@@ -611,356 +437,10 @@ class Book extends \PHPCBIS\Products\Product
         return trim($publisher);
     }
 
-    public function setPublisher(string $publisher)
-    {
-        $this->publisher = $publisher;
-    }
 
-    public function getPublisher(): string
+    public function publisher(): string
     {
         return $this->publisher;
-    }
-
-
-    /**
-     * Extracts involved people from source array
-     *
-     * This includes `illustrator`, `translator`, `director`, `narrator` & `participant`
-     *
-     * @return array
-     */
-    private function separatePeople(): array
-    {
-        $people = [
-            'illustrator'  => [],
-            'drawer'       => [],
-            'photographer' => [],
-            'translator'   => [],
-            'editor'       => [],
-            'narrator'     => [],
-            'director'     => [],
-            'producer'     => [],
-            'participant'  => [],
-        ];
-
-        if (!isset($this->source['Mitarb'])) {
-            return $people;
-        }
-
-        # Available roles
-        $roles = [
-            'Illustration' => 'illustrator',
-            'Zeichnungen'  => 'drawer',
-            'Fotos'        => 'photographer',
-            'Übersetzung'  => 'translator',
-            'Gesprochen'   => 'narrator',
-            'Regie'        => 'director',
-            'Produktion'   => 'producer',
-            'Mitarbeit'    => 'participant',
-            # Edge case: author of original works
-            'Vorlage'      => 'original',
-        ];
-
-        # Default role
-        $role = 'participant';
-
-        # Alternative delimiters
-        # (1) Participant
-        # (2) Narrator
-        # (3) Editor
-        $delimiters = [
-            'Mit '               => 'participant',
-            'Gesprochen von '    => 'narrator',
-            'Herausgegeben von ' => 'editor',
-        ];
-
-        foreach (Butler::split($this->source['Mitarb'], '.') as $string) {
-            # First, see if there's a colon
-            if (!Butler::contains($string, ':')) {
-                # If not, the string is eligible for an alternative delimiter
-                foreach ($delimiters as $delimiter => $role) {
-                    if (Butler::startsWith($string, $delimiter)) {
-                        # If so, remove it from the string, change role and end the loop
-                        $group = Butler::replace($string, $delimiter, '');
-                        $role = $delimiters[$delimiter];  # .. or $role
-
-                        break;
-                    }
-                }
-            } else {
-                # Otherwise, split role & people as usual
-                $array = Butler::split($string, ':');
-
-                if (isset($roles[$array[0]])) {
-                    $role = $roles[$array[0]];
-                }
-
-                $group = $array[1];
-            }
-
-            $people[$role] = $this->organizePeople($group);
-        }
-
-        return $people;
-    }
-
-
-    /**
-     * Extracts involved people from array created by `separatePeople()`
-     *
-     * @param string $role - Individual role
-     * @return array
-     */
-    private function extractRole(string $role): array
-    {
-        return $this->people[$role];
-    }
-
-
-    /**
-     * Exports involved people as string
-     *
-     * @param string $role - Individual role
-     * @return string
-     */
-    private function exportRole(string $role): string
-    {
-        if (empty($this->people[$role])) {
-            return '';
-        }
-
-        $array = [];
-
-        foreach (array_values($this->people[$role]) as $person) {
-            $array[] = Butler::join($person, ' ');
-        }
-
-        return Butler::join($array, $this->delimiter);
-    }
-
-
-    /**
-     * Builds illustrator
-     *
-     * @return array
-     */
-    protected function buildIllustrator(): array
-    {
-        return $this->extractRole('illustrator');
-    }
-
-    public function setIllustrator(array $illustrator)
-    {
-        $this->illustrator = $illustrator;
-    }
-
-    public function getIllustrator(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->illustrator;
-        }
-
-        return $this->exportRole('illustrator');
-    }
-
-
-    /**
-     * Builds drawer
-     *
-     * @return array
-     */
-    protected function buildDrawer(): array
-    {
-        return $this->extractRole('drawer');
-    }
-
-    public function setDrawer(array $drawer)
-    {
-        $this->drawer = $drawer;
-    }
-
-    public function getDrawer(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->drawer;
-        }
-
-        return $this->exportRole('drawer');
-    }
-
-
-    /**
-     * Builds photographer
-     *
-     * @return array
-     */
-    protected function buildPhotographer(): array
-    {
-        return $this->extractRole('photographer');
-    }
-
-    public function setPhotographer(array $photographer)
-    {
-        $this->photographer = $photographer;
-    }
-
-    public function getPhotographer(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->photographer;
-        }
-
-        return $this->exportRole('photographer');
-    }
-
-
-    /**
-     * Builds translator
-     *
-     * @return array
-     */
-    protected function buildTranslator(): array
-    {
-        return $this->extractRole('translator');
-    }
-
-    public function setTranslator(array $translator)
-    {
-        $this->translator = $translator;
-    }
-
-    public function getTranslator(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->translator;
-        }
-
-        return $this->exportRole('translator');
-    }
-
-
-    /**
-     * Builds editor
-     *
-     * @return array
-     */
-    protected function buildEditor(): array
-    {
-        return $this->extractRole('editor');
-    }
-
-    public function setEditor(array $editor)
-    {
-        $this->editor = $editor;
-    }
-
-    public function getEditor(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->editor;
-        }
-
-        return $this->exportRole('editor');
-    }
-
-
-    /**
-     * Builds narrator
-     *
-     * @return array
-     */
-    protected function buildNarrator(): array
-    {
-        return $this->extractRole('narrator');
-    }
-
-    public function setNarrator(array $narrator)
-    {
-        $this->narrator = $narrator;
-    }
-
-    public function getNarrator(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->narrator;
-        }
-
-        return $this->exportRole('narrator');
-    }
-
-
-    /**
-     * Builds director
-     *
-     * @return array
-     */
-    protected function buildDirector(): array
-    {
-        return $this->extractRole('director');
-    }
-
-    public function setDirector(array $director)
-    {
-        $this->director = $director;
-    }
-
-    public function getDirector(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->director;
-        }
-
-        return $this->exportRole('director');
-    }
-
-
-    /**
-     * Builds producer
-     *
-     * @return array
-     */
-    protected function buildProducer(): array
-    {
-        return $this->extractRole('producer');
-    }
-
-    public function setProducer(array $producer)
-    {
-        $this->producer = $producer;
-    }
-
-    public function getProducer(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->producer;
-        }
-
-        return $this->exportRole('producer');
-    }
-
-
-    /**
-     * Builds participant
-     *
-     * @return array
-     */
-    protected function buildParticipant(): array
-    {
-        return $this->extractRole('participant');
-    }
-
-    public function setParticipant(array $participant)
-    {
-        $this->participant = $participant;
-    }
-
-    public function getParticipant(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->participant;
-        }
-
-        return $this->exportRole('participant');
     }
 
 
@@ -992,12 +472,7 @@ class Book extends \PHPCBIS\Products\Product
         return Butler::first($description);
     }
 
-    public function setDescription(string $description)
-    {
-        $this->description = $description;
-    }
-
-    public function getDescription(): string
+    public function description(): string
     {
         return $this->description;
     }
@@ -1021,12 +496,7 @@ class Book extends \PHPCBIS\Products\Product
         return number_format($retailPrice, 2, ',', '');
     }
 
-    public function setRetailPrice(string $retailPrice)
-    {
-        $this->retailPrice = $retailPrice;
-    }
-
-    public function getRetailPrice(): string
+    public function retailPrice(): string
     {
         return $this->retailPrice;
     }
@@ -1046,12 +516,7 @@ class Book extends \PHPCBIS\Products\Product
         return $this->source['Erschjahr'];
     }
 
-    public function setReleaseYear(string $releaseYear)
-    {
-        $this->releaseYear = $releaseYear;
-    }
-
-    public function getReleaseYear(): string
+    public function releaseYear(): string
     {
         return $this->releaseYear;
     }
@@ -1076,11 +541,6 @@ class Book extends \PHPCBIS\Products\Product
         }
 
       	return 'ab ' . $age . ' Jahren';
-    }
-
-    public function setAge(string $age)
-    {
-        $this->age = $age;
     }
 
     public function getAge(): string
@@ -1126,12 +586,7 @@ class Book extends \PHPCBIS\Products\Product
         return $translations[$binding];
     }
 
-    public function setBinding(string $binding)
-    {
-        $this->binding = $binding;
-    }
-
-    public function getBinding(): string
+    public function binding(): string
     {
         return $this->binding;
     }
@@ -1160,12 +615,7 @@ class Book extends \PHPCBIS\Products\Product
         return '';
     }
 
-    public function setPageCount(string $pageCount)
-    {
-        $this->pageCount = $pageCount;
-    }
-
-    public function getPageCount(): string
+    public function pageCount(): string
     {
         return $this->pageCount;
     }
@@ -1211,97 +661,13 @@ class Book extends \PHPCBIS\Products\Product
 
 
     /**
-     * Extracts tags from source array
-     *
-     * @return array
-     */
-    private function separateTags(): array
-    {
-        if (!isset($this->source['IndexSchlagw'])) {
-            return [];
-        }
-
-        $data = $this->source['IndexSchlagw'];
-
-        if (is_string($data)) {
-            $data = Butler::split(trim($data), ';');
-        }
-
-        $tags = [];
-
-        foreach ($data as $string) {
-            $tags = array_merge($tags, Butler::split(trim($string), ';'));
-        }
-
-        return $tags;
-    }
-
-
-    /**
-     * Builds categories
-     *
-     * @return array
-     */
-    protected function buildCategories(): array
-    {
-        if ($this->isAudiobook()) {
-            return ['Hörbuch'];
-        }
-
-        if (empty($this->tags)) {
-            return [];
-        }
-
-        $data = $this->tags;
-
-        $categories = [];
-
-        foreach ($data as $string) {
-            $lowercase = Butler::lower($string);
-
-            if (Butler::contains($lowercase, 'bilderbuch')) {
-                $categories[] = 'Bilderbuch';
-            }
-
-            if (Butler::contains($lowercase, 'vorlesebuch')) {
-                $categories[] = 'Vorlesebuch';
-            }
-
-            if (Butler::contains($lowercase, 'sachbuch')) {
-                $categories[] = 'Sachbuch';
-            }
-        }
-
-        return array_unique($categories);
-    }
-
-    public function setCategories(array $categories)
-    {
-        $this->categories = $categories;
-    }
-
-    public function getCategories(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->categories;
-        }
-
-        return Butler::join($this->categories, ', ');
-    }
-
-
-    /**
-     * Builds topic(s)
+     * Builds topics
      *
      * @return array
      */
     protected function buildTopics(): array
     {
-        if (empty($this->tags)) {
-            return [];
-        }
-
-        $data = $this->tags;
+        $tags = parent::buildTopics();
 
         $translations = [
             'Auto / Personenwagen / Pkw' => 'Autos',
@@ -1346,93 +712,8 @@ class Book extends \PHPCBIS\Products\Product
             if (isset($translations[$topic])) {
                 return $translations[$topic];
             }
+        }, $tags);
 
-            if (!in_array($topic, $this->blockList, true)) {
-                return $topic;
-            }
-        }, $data);
-
-        return array_unique(array_filter($topics));
-    }
-
-    public function setTopics(array $topics)
-    {
-        $this->topics = $topics;
-    }
-
-    public function getTopics(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->topics;
-        }
-
-        return Butler::join($this->topics, ', ');
-    }
-
-
-    /**
-     * Builds duration
-     *
-     * @return string
-     */
-    protected function buildDuration(): string
-    {
-        if (!isset($this->source['Utitel']) || !$this->isAudiobook()) {
-            return '';
-        }
-
-        $string = $this->source['Utitel'];
-        $array = Butler::split($string, '.');
-
-        return Butler::replace(Butler::last($array), ' Min', '');
-    }
-
-    public function setDuration(string $duration)
-    {
-        $this->duration = $duration;
-    }
-
-    public function getDuration(): string
-    {
-        return $this->duration;
-    }
-
-
-    /**
-     * Exports all information, optionally as (unformatted) array
-     *
-     * @param bool $asArray - Whether values should be arrays (instead of strings)
-     * @return array
-     */
-    public function export(bool $asArray = false): array
-    {
-        $data = [
-            'ISBN'             => $this->getISBN(),
-            'AutorIn'          => $this->getAuthor($asArray),
-            'Titel'            => $this->getTitle(),
-            'Untertitel'       => $this->getSubtitle(),
-            'Verlag'           => $this->getPublisher(),
-            'Preis'            => $this->getRetailPrice(),
-            'Erscheinungsjahr' => $this->getReleaseYear(),
-            'Altersempfehlung' => $this->getAge(),
-            'Inhaltsangabe'    => $this->getDescription(),
-            'Einband'          => $this->getBinding(),
-            'Seitenzahl'       => $this->getPageCount(),
-            'Abmessungen'      => $this->getDimensions(),
-            'Dauer'            => $this->getDuration(),
-            'IllustratorIn'    => $this->getIllustrator($asArray),
-            'ZeichnerIn'       => $this->getDrawer($asArray),
-            'PhotographIn'     => $this->getPhotographer($asArray),
-            'ÜbersetzerIn'     => $this->getTranslator($asArray),
-            'HerausgeberIn'    => $this->getEditor($asArray),
-            'SprecherIn'       => $this->getNarrator($asArray),
-            'RegisseurIn'      => $this->getDirector($asArray),
-            'ProduzentIn'      => $this->getProducer($asArray),
-            'Mitwirkende'      => $this->getParticipant($asArray),
-            'Kategorien'       => $this->getCategories($asArray),
-            'Themen'           => $this->getTopics($asArray),
-        ];
-
-        return $data;
+        return array_filter($topics);
     }
 }

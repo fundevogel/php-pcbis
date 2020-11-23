@@ -3,14 +3,15 @@
 namespace PHPCBIS\Products\Books\Types;
 
 use PHPCBIS\Helpers\Butler;
+use PHPCBIS\Products\Books\Book;
 
 
 /**
  * Class Softcover
  *
- * KNV product category 'Schulbuch'
+ * KNV product category 'Taschenbuch'
  *
  * @package PHPCBIS
  */
 
-class Softcover extends \PHPCBIS\Products\Books\Book {}
+class Softcover extends Book {}

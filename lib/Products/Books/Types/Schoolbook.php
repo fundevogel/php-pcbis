@@ -3,15 +3,15 @@
 namespace PHPCBIS\Products\Books\Types;
 
 use PHPCBIS\Helpers\Butler;
+use PHPCBIS\Products\Books\Book;
 
 
 /**
  * Class Schoolbook
  *
- * Holds information from KNV's API in a human-readable form &
- * downloads book covers from the German National Library
+ * KNV product category 'Schulbuch'
  *
  * @package PHPCBIS
  */
 
-class Schoolbook extends \PHPCBIS\Products\Books\Book {}
+class Schoolbook extends Book {}

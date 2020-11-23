@@ -2,102 +2,48 @@
 
 namespace PHPCBIS\Products;
 
+use PHPCBIS\Traits\Iteration;
+
+use Countable;
+use Iterator;
+
 
 /**
  * Class ProductList
  *
- * Serves as template for collections of books
+ * Serves as template for collections of `Product` objects
  *
  * @package PHPCBIS
  */
 
-abstract class ProductList implements \Countable, \Iterator
+abstract class ProductList implements Countable, Iterator
 {
     /**
-     * Group of `PHPCBIS\Book` objects
+     * Traits
+     */
+
+    use Iteration;
+
+
+    /**
+     * Properties
+     */
+
+    /**
+     * Group of `PHPCBIS\Products\Product` objects
      *
      * @var array
      */
-    private $books;
+    private $data;
 
 
     /**
      * Constructor
      */
 
-    public function __construct(array $books) {
-        # Store books
-        $this->books = $books;
-    }
-
-
-    /**
-     * `Iterator` methods plus `prev`
-     */
-
-    /**
-     * Returns the current book
-     *
-     * @return \PHPCBIS\Products\Product
-     */
-    public function current()
-    {
-        return current($this->books);
-    }
-
-
-    /**
-     * Returns the current key
-     *
-     * @return string
-     */
-    public function key()
-    {
-        return key($this->books);
-    }
-
-
-    /**
-     * Moves the cursor to the next book and returns it
-     *
-     * @return \PHPCBIS\Products\Product
-     */
-    public function next()
-    {
-        return next($this->books);
-    }
-
-
-    /**
-     * Moves the cursor to the previous book and returns it
-     *
-     * @return \PHPCBIS\Products\Product
-     */
-    public function prev()
-    {
-        return prev($this->books);
-    }
-
-
-    /**
-     * Moves the cusor to the first book
-     *
-     * @return void
-     */
-    public function rewind(): void
-    {
-        reset($this->books);
-    }
-
-
-    /**
-     * Checks if the current book is valid
-     *
-     * @return bool
-     */
-    public function valid(): bool
-    {
-        return $this->current() !== false;
+    public function __construct(array $data) {
+        # Store objects
+        $this->data = $data;
     }
 
 
@@ -106,33 +52,33 @@ abstract class ProductList implements \Countable, \Iterator
      */
 
     /**
-     * Counts all books
+     * Counts all objects
      *
      * @return int
      */
     public function count(): int
     {
-        return count($this->books);
+        return count($this->data);
     }
 
 
     /**
-     * Prepends a book to the data array
+     * Prepends an object to the data array
      *
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \\PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\ProductList
      */
     public function prepend(...$args)
     {
         if (count($args) === 1) {
-            array_unshift($this->books, $args[0]);
+            array_unshift($this->data, $args[0]);
         } elseif (count($args) > 1) {
-            $data = $this->books;
-            $this->books = [];
+            $data = $this->data;
+            $this->data = [];
             $this->set($args[0], $args[1]);
-            $this->books += $data;
+            $this->data += $data;
         }
 
         return $this;
@@ -140,17 +86,17 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Appends a book
+     * Appends an object
      *
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \\PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\ProductList
      */
     public function append(...$args)
     {
         if (count($args) === 1) {
-            $this->books[] = $args[0];
+            $this->data[] = $args[0];
         } elseif (count($args) > 1) {
             $this->set($args[0], $args[1]);
         }
@@ -160,65 +106,65 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Returns the books in reverse order
+     * Returns the objects in reverse order
      *
-     * @return \\PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\ProductList
      */
     public function flip()
     {
         $collection = clone $this;
-        $collection->books = array_reverse($this->books, true);
+        $collection->data = array_reverse($this->data, true);
 
         return $collection;
     }
 
 
     /**
-     * Returns the first book
+     * Returns the first object
      *
      * @return \PHPCBIS\Products\Product
      */
     public function first()
     {
-        return array_shift($this->books);
+        return array_shift($this->data);
     }
 
 
     /**
-     * Returns the last book
+     * Returns the last object
      *
      * @return \PHPCBIS\Products\Product
      */
     public function last()
     {
-        return array_pop($this->books);
+        return array_pop($this->data);
     }
 
 
     /**
-     * Returns the nth book from the collection
+     * Returns the nth object from the collection
      *
      * @param int $n
      * @return \PHPCBIS\Products\Product
      */
     public function nth(int $n)
     {
-        return array_values($this->books)[$n] ?? null;
+        return array_values($this->data)[$n] ?? null;
     }
 
 
     /**
-     * Returns a Collection without the given book(s)
+     * Returns a Collection without the given object(s)
      *
      * @param string ...$keys any number of keys, passed as individual arguments
-     * @return \\PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\ProductList
      */
     public function not(...$keys)
     {
         $collection = clone $this;
 
         foreach ($keys as $key) {
-            unset($collection->books[$key]);
+            unset($collection->data[$key]);
         }
 
         return $collection;
@@ -226,7 +172,7 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Checks if the number of books is zero
+     * Checks if the number of objects is zero
      *
      * @return bool
      */
@@ -237,7 +183,7 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Checks if the number of books is more than zero
+     * Checks if the number of objects is more than zero
      *
      * @return bool
      */
@@ -248,7 +194,7 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Checks if the number of books is even
+     * Checks if the number of objects is even
      *
      * @return bool
      */
@@ -259,7 +205,7 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Checks if the number of books is odd
+     * Checks if the number of objects is odd
      *
      * @return bool
      */
@@ -270,14 +216,14 @@ abstract class ProductList implements \Countable, \Iterator
 
 
     /**
-     * Map a function to each book
+     * Map a function to each object
      *
      * @param callable $callback
-     * @return \\PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\ProductList
      */
     public function map(callable $callback)
     {
-        $this->books = array_map($callback, $this->books);
+        $this->data = array_map($callback, $this->data);
 
         return $this;
     }
@@ -295,7 +241,7 @@ abstract class ProductList implements \Countable, \Iterator
     {
         $result = [];
 
-        foreach ($this->books as $item) {
+        foreach ($this->data as $item) {
             $row = $this->getAttribute($item, $field);
 
             if ($split !== null) {

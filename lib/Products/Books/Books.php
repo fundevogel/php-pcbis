@@ -2,6 +2,8 @@
 
 namespace PHPCBIS\Products\Books;
 
+use PHPCBIS\Products\ProductList;
+
 
 /**
  * Class Books
@@ -11,13 +13,13 @@ namespace PHPCBIS\Products\Books;
  * @package PHPCBIS
  */
 
-class Books extends \PHPCBIS\Products\ProductList
+class Books extends ProductList
 {
     /**
      * Methods
      */
 
-    public function findByISBN($isbn): \PHPCBIS\Book
+    public function findByISBN($isbn)
     {
 
     }

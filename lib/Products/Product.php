@@ -2,6 +2,12 @@
 
 namespace PHPCBIS\Products;
 
+use PHPCBIS\Interfaces\Sociable;
+use PHPCBIS\Interfaces\Taggable;
+
+use PHPCBIS\Traits\People;
+use PHPCBIS\Traits\Tags;
+
 
 /**
  * Class Product
@@ -11,8 +17,20 @@ namespace PHPCBIS\Products;
  * @package PHPCBIS
  */
 
-abstract class Product
+abstract class Product implements Sociable, Taggable
 {
+    /**
+     * Traits
+     */
+
+    use People;
+    use Tags;
+
+
+    /**
+     * Properties
+     */
+
     /**
      * International Standard Book Number
      *
@@ -38,14 +56,6 @@ abstract class Product
 
 
     /**
-     * Whether it's an audiobook
-     *
-     * @var bool
-     */
-    protected $isAudiobook = false;
-
-
-    /**
      * Path to downloaded book cover images
      *
      * @var string
@@ -59,6 +69,102 @@ abstract class Product
      * @var array
      */
     protected $translations;
+
+
+    /**
+     * Involved people (all roles)
+     *
+     * @var array
+     */
+    protected $people;
+
+
+    /**
+     * Delimiter between people when exported as string
+     *
+     * @var string
+     */
+    protected $delimiter = '; ';
+
+
+    /**
+     * Tags (categories & topics)
+     *
+     * @var array
+     */
+    protected $tags;
+
+
+    /**
+     * Categories
+     *
+     * @var array
+     */
+    protected $categories;
+
+
+    /**
+     * Topics
+     *
+     * @var array
+     */
+    protected $topics;
+
+
+    /**
+     * Type of product
+     *
+     * @var string
+     */
+    protected $type;
+
+
+    /**
+     * Product group 'Audio'
+     *
+     * @var array
+     */
+
+    protected $audio = [
+        'Hörbuch',
+        'Tonträger',
+        'Musik',
+        # 'Noten',
+    ];
+
+
+    /**
+     * Product group 'Book'
+     *
+     * @var array
+     */
+
+    protected $book = [
+        'ePublikation',
+        # 'Noten',
+        'Hardcover',
+        'Schulbuch',
+        'Taschenbuch',
+    ];
+
+
+    /**
+     * Product group 'Nonbook'
+     *
+     * @var array
+     */
+
+    protected $nonbook = [
+        'Nonbook',
+        'Software',
+        'Games',
+        'Kalender',
+        'Landkarte/Globus',
+        'Noten',
+        'Papeterie/PBS',
+        'Spiel',
+        'Spielzeug',
+    ];
 
 
     /**
@@ -76,14 +182,35 @@ abstract class Product
         # Store valid ISBN
         $this->isbn = $props['isbn'];
 
-        # Determine if audiobook
-        if ($props['type'] === 'Hörbuch') {
-            $this->isAudiobook = true;
-        }
+        # Store product type
+        $this->type = $props['type'];
+
+        # Extract tags & involved people early on
+        $this->tags         = $this->separateTags();
+        $this->people       = $this->separatePeople();
+
+        # Build categories & topics from tags
+        $this->categories   = $this->buildCategories();
+        $this->topics       = $this->buildTopics();
 
         # Import image path & translations
         $this->imagePath = $props['imagePath'];
         $this->translations = $props['translations'];
+    }
+
+
+    /**
+     * Setters & getters
+     */
+
+    public function setType(string $type)
+    {
+        $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
 
@@ -114,12 +241,56 @@ abstract class Product
 
 
     /**
+     * Checks whether this is an audio
+     *
+     * @return bool
+     */
+    public function isAudio(): bool
+    {
+        return in_array($this->type, $this->audio);
+    }
+
+
+    /**
      * Checks whether this is an audiobook
      *
      * @return bool
      */
     public function isAudiobook(): bool
     {
-        return $this->isAudiobook;
+        return $this->type === 'Hörbuch';
+    }
+
+
+    /**
+     * Checks whether this is a book
+     *
+     * @return bool
+     */
+    public function isBook(): bool
+    {
+        return in_array($this->type, $this->book);
+    }
+
+
+    /**
+     * Checks whether this is an eBook
+     *
+     * @return bool
+     */
+    public function isEbook(): bool
+    {
+        return $this->type === 'ePublikation';
+    }
+
+
+    /**
+     * Checks whether this is a nonbook
+     *
+     * @return bool
+     */
+    public function isNonbook(): bool
+    {
+        return in_array($this->type, $this->nonbook);
     }
 }
