@@ -171,6 +171,22 @@ class OLA
 
 
     /**
+     * Current KNV 'Fehlernummer'
+     *
+     * @var string
+     */
+    private $errorCode = null;
+
+
+    /**
+     * Current KNV 'Fehlernummer' description
+     *
+     * @var string
+     */
+    private $errorMessage = null;
+
+
+    /**
      * Constructor
      */
 
@@ -275,6 +291,54 @@ class OLA
     {
         if (array_key_exists($this->statusCode, $this->statusMessages)) {
             return $this->statusMessages[$this->statusCode];
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Checks if KNV 'Fehlernummer' is available
+     *
+     * @return bool
+     */
+    public function hasErrorCode(): bool
+    {
+        return $this->errorCode !== null;
+    }
+
+
+    /**
+     * Prints current KNV 'Fehlernummer'
+     *
+     * @return string|null
+     */
+    public function errorCode()
+    {
+        return $this->errorCode;
+    }
+
+
+    /**
+     * Checks if KNV 'Fehlertext' is available
+     *
+     * @return bool
+     */
+    public function hasErrorMessage(): bool
+    {
+        return $this->errorMessage !== null;
+    }
+
+
+    /**
+     * Prints current KNV 'Fehlertext'
+     *
+     * @return string|null
+     */
+    public function errorMessage()
+    {
+        if ($this->hasErrorMessage()) {
+            return $this->errorMessage;
         }
 
         return '';
