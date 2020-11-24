@@ -5,6 +5,8 @@ namespace PHPCBIS\Products;
 use PHPCBIS\Interfaces\Sociable;
 use PHPCBIS\Interfaces\Taggable;
 
+use PHPCBIS\Traits\CheckType;
+use PHPCBIS\Traits\DownloadCover;
 use PHPCBIS\Traits\People;
 use PHPCBIS\Traits\Tags;
 
@@ -23,6 +25,8 @@ abstract class Product implements Sociable, Taggable
      * Traits
      */
 
+    use CheckType;
+    use DownloadCover;
     use People;
     use Tags;
 
@@ -72,99 +76,11 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Involved people (all roles)
-     *
-     * @var array
-     */
-    protected $people;
-
-
-    /**
-     * Delimiter between people when exported as string
-     *
-     * @var string
-     */
-    protected $delimiter = '; ';
-
-
-    /**
-     * Tags (categories & topics)
-     *
-     * @var array
-     */
-    protected $tags;
-
-
-    /**
-     * Categories
-     *
-     * @var array
-     */
-    protected $categories;
-
-
-    /**
-     * Topics
-     *
-     * @var array
-     */
-    protected $topics;
-
-
-    /**
      * Type of product
      *
      * @var string
      */
     protected $type;
-
-
-    /**
-     * Product group 'Audio'
-     *
-     * @var array
-     */
-
-    protected $audio = [
-        'Hörbuch',
-        'Tonträger',
-        'Musik',
-        # 'Noten',
-    ];
-
-
-    /**
-     * Product group 'Book'
-     *
-     * @var array
-     */
-
-    protected $book = [
-        'ePublikation',
-        # 'Noten',
-        'Hardcover',
-        'Schulbuch',
-        'Taschenbuch',
-    ];
-
-
-    /**
-     * Product group 'Nonbook'
-     *
-     * @var array
-     */
-
-    protected $nonbook = [
-        'Nonbook',
-        'Software',
-        'Games',
-        'Kalender',
-        'Landkarte/Globus',
-        'Noten',
-        'Papeterie/PBS',
-        'Spiel',
-        'Spielzeug',
-    ];
 
 
     /**
@@ -237,60 +153,5 @@ abstract class Product implements Sociable, Taggable
     public function fromCache(): bool
     {
         return $this->fromCache;
-    }
-
-
-    /**
-     * Checks whether this is an audio
-     *
-     * @return bool
-     */
-    public function isAudio(): bool
-    {
-        return in_array($this->type, $this->audio);
-    }
-
-
-    /**
-     * Checks whether this is an audiobook
-     *
-     * @return bool
-     */
-    public function isAudiobook(): bool
-    {
-        return $this->type === 'Hörbuch';
-    }
-
-
-    /**
-     * Checks whether this is a book
-     *
-     * @return bool
-     */
-    public function isBook(): bool
-    {
-        return in_array($this->type, $this->book);
-    }
-
-
-    /**
-     * Checks whether this is an eBook
-     *
-     * @return bool
-     */
-    public function isEbook(): bool
-    {
-        return $this->type === 'ePublikation';
-    }
-
-
-    /**
-     * Checks whether this is a nonbook
-     *
-     * @return bool
-     */
-    public function isNonbook(): bool
-    {
-        return in_array($this->type, $this->nonbook);
     }
 }
