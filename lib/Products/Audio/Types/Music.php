@@ -2,7 +2,6 @@
 
 namespace PHPCBIS\Products\Audio\Types;
 
-use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Audio\Audio;
 
 

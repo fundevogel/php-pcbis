@@ -2,7 +2,6 @@
 
 namespace PHPCBIS\Products\Books\Types;
 
-use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Books\Book;
 
 
