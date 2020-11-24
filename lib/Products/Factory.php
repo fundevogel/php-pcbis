@@ -66,7 +66,7 @@ final class Factory
             switch ($groups[$group]) {
                 # Books
                 case 'ePublikation':
-                    return new eBook($source, $props);
+                    return new Ebook($source, $props);
                 case 'Hardcover':
                     return new Hardcover($source, $props);
                 case 'Schulbuch':
