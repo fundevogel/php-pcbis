@@ -16,6 +16,34 @@ use PHPCBIS\Helpers\Butler;
 trait Tags
 {
     /**
+     * Properties
+     */
+
+    /**
+     * Tags (categories & topics)
+     *
+     * @var array
+     */
+    protected $tags;
+
+
+    /**
+     * Categories
+     *
+     * @var array
+     */
+    protected $categories;
+
+
+    /**
+     * Topics
+     *
+     * @var array
+     */
+    protected $topics;
+
+
+    /**
      * Methods
      */
 

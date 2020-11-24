@@ -17,6 +17,26 @@ use PHPCBIS\Helpers\Butler;
 trait People
 {
     /**
+     * Properties
+     */
+
+    /**
+     * Involved people (all roles)
+     *
+     * @var array
+     */
+    protected $people;
+
+
+    /**
+     * Delimiter between people when exported as string
+     *
+     * @var string
+     */
+    protected $delimiter = '; ';
+
+
+    /**
      * Methods
      */
 
