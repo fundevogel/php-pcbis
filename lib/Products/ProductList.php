@@ -2,7 +2,7 @@
 
 namespace PHPCBIS\Products;
 
-use PHPCBIS\Traits\Iteration;
+use PHPCBIS\Helpers\Butler;
 
 use Countable;
 use Iterator;
@@ -18,13 +18,6 @@ use Iterator;
 
 abstract class ProductList implements Countable, Iterator
 {
-    /**
-     * Traits
-     */
-
-    use Iteration;
-
-
     /**
      * Properties
      */
@@ -52,6 +45,10 @@ abstract class ProductList implements Countable, Iterator
      */
 
     /**
+     * 1) Countable
+     */
+
+    /**
      * Counts all objects
      *
      * @return int
@@ -61,6 +58,84 @@ abstract class ProductList implements Countable, Iterator
         return count($this->data);
     }
 
+
+    /**
+     * 2) Iterable
+     */
+
+    /**
+     * Methods
+     */
+
+    /**
+     * Returns the current object
+     *
+     * @return \PHPCBIS\Products\Product
+     */
+    public function current()
+    {
+        return current($this->data);
+    }
+
+
+    /**
+     * Returns the current key
+     *
+     * @return string
+     */
+    public function key()
+    {
+        return key($this->data);
+    }
+
+
+    /**
+     * Moves the cursor to the next object and returns it
+     *
+     * @return \PHPCBIS\Products\Product
+     */
+    public function next()
+    {
+        return next($this->data);
+    }
+
+
+    /**
+     * Moves the cursor to the previous object and returns it
+     *
+     * @return \PHPCBIS\Products\Product
+     */
+    public function prev()
+    {
+        return prev($this->data);
+    }
+
+
+    /**
+     * Moves the cusor to the first object
+     *
+     * @return void
+     */
+    public function rewind(): void
+    {
+        reset($this->data);
+    }
+
+
+    /**
+     * Checks if the current object is valid
+     *
+     * @return bool
+     */
+    public function valid(): bool
+    {
+        return $this->current() !== false;
+    }
+
+
+    /**
+     * 3) Utilities
+     */
 
     /**
      * Prepends an object to the data array
