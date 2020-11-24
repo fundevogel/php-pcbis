@@ -55,9 +55,12 @@ trait People
      *
      * @return array
      */
-    private function separatePeople(): array
+    protected function separatePeople(): array
     {
+        $this->author = $this->buildAuthor();
+
         $people = [
+            'author'       => $this->author,
             'illustrator'  => [],
             'drawer'       => [],
             'photographer' => [],
@@ -190,19 +193,7 @@ trait People
      */
     public function getRole(string $role, bool $asArray = false)
     {
-        $roles = [
-            'illustrator',
-            'drawer',
-            'photographer',
-            'translator',
-            'editor',
-            'narrator',
-            'director',
-            'producer',
-            'participant',
-        ];
-
-        if (!in_array($role, $roles)) {
+        if (!array_key_exists($role, $this->people)) {
             throw new UnknownRoleException('Unknown role: "' . $role . '"');
         }
 
@@ -221,6 +212,47 @@ trait People
         }
 
         return Butler::join($people, $this->delimiter);
+    }
+
+
+    /**
+     * Builds author(s)
+     *
+     * @return array
+     */
+    protected function buildAuthor(): array
+    {
+        if (!isset($this->source['AutorSachtitel'])) {
+            return [];
+        }
+
+        $string = $this->source['AutorSachtitel'];
+
+        $groupDelimiter = ';';
+        $personDelimiter = ',';
+
+        # Edge case: `AutorSachtitel` contains something other than a person
+        if (!Butler::contains($string, $groupDelimiter) && !Butler::contains($string, $personDelimiter)) {
+            if (!empty($this->people['original'])) {
+                return $this->people['original'];
+            }
+
+            if (isset($this->source['IndexAutor']) && is_string($this->source['IndexAutor'])) {
+                $string = trim($this->source['IndexAutor']);
+            } else {
+                return [];
+            }
+        }
+
+        $authors = $this->organizePeople($string);
+
+        return $authors;
+    }
+
+
+    public function author(bool $asArray = false)
+    {
+        return $this->getRole('author', $asArray);
     }
 
 

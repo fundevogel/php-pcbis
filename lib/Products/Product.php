@@ -27,8 +27,7 @@ abstract class Product implements Sociable, Taggable
 
     use CheckType;
     use DownloadCover;
-    use People;
-    use Tags;
+    use People, Tags;
 
 
     /**
@@ -84,6 +83,58 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Dataset properties
+     */
+
+    /**
+     * Title
+     *
+     * @var string
+     */
+    protected $title;
+
+
+    /**
+     * Subtitle
+     *
+     * @var string
+     */
+    protected $subtitle;
+
+
+    /**
+     * Description
+     *
+     * @var string
+     */
+    protected $description;
+
+
+    /**
+     * Retail price (in €)
+     *
+     * @var string
+     */
+    protected $retailPrice;
+
+
+    /**
+     * Release year
+     *
+     * @var string
+     */
+    protected $releaseYear;
+
+
+    /**
+     * Minimum age recommendation (in years)
+     *
+     * @var string
+     */
+    protected $age;
+
+
+    /**
      * Constructor
      */
 
@@ -105,13 +156,35 @@ abstract class Product implements Sociable, Taggable
         $this->tags         = $this->separateTags();
         $this->people       = $this->separatePeople();
 
+        # Build basic dataset
+        $this->title        = $this->buildTitle();
+        $this->subtitle     = $this->buildSubtitle();
+        $this->description  = $this->buildDescription();
+        $this->retailPrice  = $this->buildretailPrice();
+        $this->releaseYear  = $this->buildreleaseYear();
+        $this->age          = $this->buildAge();
+
         # Build categories & topics from tags
         $this->categories   = $this->buildCategories();
         $this->topics       = $this->buildTopics();
 
         # Import image path & translations
-        $this->imagePath = $props['imagePath'];
+        $this->imagePath    = $props['imagePath'];
         $this->translations = $props['translations'];
+    }
+
+
+    /**
+     * Magic methods
+     */
+
+    public function __toString(): string
+    {
+        if (empty($this->author)) {
+            return $this->title();
+        }
+
+        return $this->author(true) . ': ' . $this->title();
     }
 
 
@@ -153,5 +226,156 @@ abstract class Product implements Sociable, Taggable
     public function fromCache(): bool
     {
         return $this->fromCache;
+    }
+
+
+    /**
+     * Dataset methods
+     */
+
+    /**
+     * Builds title
+     *
+     * @return string
+     */
+    protected function buildTitle(): string
+    {
+        if (!isset($this->source['Titel'])) {
+            return '';
+        }
+
+        return $this->source['Titel'];
+    }
+
+
+    public function title(): string
+    {
+        return $this->title;
+    }
+
+
+    /**
+     * Builds subtitle
+     *
+     * @return string
+     */
+    protected function buildSubtitle(): string
+    {
+        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
+            return '';
+        }
+
+        return $this->source['Utitel'];
+    }
+
+
+    public function subtitle(): string
+    {
+        return $this->subtitle;
+    }
+
+
+    /**
+     * Builds description
+     *
+     * @return string
+     */
+    protected function buildDescription(): string
+    {
+        if (!isset($array['Text1'])) {
+            return '';
+        }
+
+        $string = $array['Text1'];
+        $description = Butler::split($string, 'º');
+
+        foreach ($description as $index => $text) {
+            $text = htmlspecialchars_decode($text);
+            $text = Butler::replace($text, '<br><br>', '. ');
+            $text = Butler::unhtml($text);
+            $description[$index] = $text;
+
+            if (Butler::length($description[$index]) < 130 && count($description) > 1) {
+                unset($description[array_search($text, $description)]);
+            }
+        }
+
+        return Butler::first($description);
+    }
+
+    public function description(): string
+    {
+        return $this->description;
+    }
+
+
+    /**
+     * Builds retail price (in €)
+     *
+     * @return string
+     */
+    protected function buildRetailPrice(): string
+    {
+        // Input: XX(.YY)
+        // Output: XX,YY
+        if (!isset($this->source['PreisEurD'])) {
+            return '';
+        }
+
+        $retailPrice = (float) $this->source['PreisEurD'];
+
+        return number_format($retailPrice, 2, ',', '');
+    }
+
+    public function retailPrice(): string
+    {
+        return $this->retailPrice;
+    }
+
+
+    /**
+     * Builds release year
+     *
+     * @return string
+     */
+    protected function buildReleaseYear(): string
+    {
+        if (!isset($this->source['Erschjahr'])) {
+            return '';
+        }
+
+        return $this->source['Erschjahr'];
+    }
+
+    public function releaseYear(): string
+    {
+        return $this->releaseYear;
+    }
+
+
+    /**
+     * Builds minimum age recommendation (in years)
+     * TODO: Cater for months
+     *
+     * @return string
+     */
+    protected function buildAge(): string
+    {
+        if (!isset($this->source['Alter'])) {
+            return '';
+        }
+
+        $age = Butler::substr($this->source['Alter'], 0, 2);
+
+        if (Butler::substr($age, 0, 1) === '0') {
+            $age = Butler::substr($age, 1, 1);
+        }
+
+      	return 'ab ' . $age . ' Jahren';
+    }
+
+    public function age(): string
+    {
+        return $this->age;
     }
 }

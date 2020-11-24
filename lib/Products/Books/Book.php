@@ -27,67 +27,11 @@ class Book extends Product
      */
 
     /**
-     * Author
-     *
-     * @var array
-     */
-    protected $author;
-
-
-    /**
-     * Title
-     *
-     * @var string
-     */
-    protected $title;
-
-
-    /**
-     * Subtitle
-     *
-     * @var string
-     */
-    protected $subtitle;
-
-
-    /**
      * Publisher
      *
      * @var string
      */
     protected $publisher;
-
-
-    /**
-     * Description
-     *
-     * @var string
-     */
-    protected $description;
-
-
-    /**
-     * Retail price (in €)
-     *
-     * @var string
-     */
-    protected $retailPrice;
-
-
-    /**
-     * Release year
-     *
-     * @var string
-     */
-    protected $releaseYear;
-
-
-    /**
-     * Minimum age recommendation (in years)
-     *
-     * @var string
-     */
-    protected $age;
 
 
     /**
@@ -203,15 +147,8 @@ class Book extends Product
     public function __construct(array $source, array $props) {
         parent::__construct($source, $props);
 
-        # Build dataset
-        $this->author       = $this->buildAuthor();
-        $this->title        = $this->buildTitle();
-        $this->subtitle     = $this->buildSubtitle();
+        # Extend dataset
         $this->publisher    = $this->buildPublisher();
-        $this->description  = $this->buildDescription();
-        $this->retailPrice  = $this->buildretailPrice();
-        $this->releaseYear  = $this->buildreleaseYear();
-        $this->age          = $this->buildAge();
         $this->binding      = $this->buildBinding();
         $this->pageCount    = $this->buildPageCount();
         $this->dimensions   = $this->buildDimensions();
@@ -222,21 +159,7 @@ class Book extends Product
         $this->photographer = $this->getRole('photographer', true);
         $this->translator   = $this->getRole('translator', true);
         $this->editor       = $this->getRole('editor', true);
-        $this->participant  = $this->getRole('participant');
-    }
-
-
-    /**
-     * Magic methods
-     */
-
-    public function __toString(): string
-    {
-        if (empty($this->author)) {
-            return $this->getTitle();
-        }
-
-        return $this->getAuthor(true) . ': ' . $this->getTitle();
+        $this->participant  = $this->getRole('participant', true);
     }
 
 
@@ -258,112 +181,6 @@ class Book extends Product
     /**
      * Methods
      */
-
-    /**
-     * Builds author(s)
-     *
-     * @return array
-     */
-    protected function buildAuthor(): array
-    {
-        if (!isset($this->source['AutorSachtitel'])) {
-            return [];
-        }
-
-        $string = $this->source['AutorSachtitel'];
-
-        $groupDelimiter = ';';
-        $personDelimiter = ',';
-
-        # Edge case: `AutorSachtitel` contains something other than a person
-        if (!Butler::contains($string, $groupDelimiter) && !Butler::contains($string, $personDelimiter)) {
-            if (!empty($this->people['original'])) {
-                return $this->people['original'];
-            }
-
-            if (isset($this->source['IndexAutor']) && is_string($this->source['IndexAutor'])) {
-                $string = trim($this->source['IndexAutor']);
-            } else {
-                return [];
-            }
-        }
-
-        // $array = Butler::split($string, $groupDelimiter);
-        // $authors = [];
-
-        // foreach ($array as $author) {
-        //     $group = Butler::split($author, $personDelimiter);
-
-        //     $authors[] = $this->organizePeople($group);
-        // }
-
-        $authors = $this->organizePeople($string);
-
-        return $authors;
-    }
-
-
-    public function author(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->author;
-        }
-
-        if (empty($this->author)) {
-            return '';
-        }
-
-        $authors = [];
-
-        foreach ($this->author as $author) {
-            $authors[] = Butler::join($author, ' ');
-        }
-
-        return Butler::join($authors, '; ');
-    }
-
-
-    /**
-     * Builds title
-     *
-     * @return string
-     */
-    protected function buildTitle(): string
-    {
-        if (!isset($this->source['Titel'])) {
-            return '';
-        }
-
-        return $this->source['Titel'];
-    }
-
-
-    public function title(): string
-    {
-        return $this->title;
-    }
-
-
-    /**
-     * Builds subtitle
-     *
-     * @return string
-     */
-    protected function buildSubtitle(): string
-    {
-        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
-            return '';
-        }
-
-        return $this->source['Utitel'];
-    }
-
-
-    public function subtitle(): string
-    {
-        return $this->subtitle;
-    }
-
 
     /**
      * Builds publisher
@@ -389,111 +206,6 @@ class Book extends Product
     public function publisher(): string
     {
         return $this->publisher;
-    }
-
-
-    /**
-     * Builds description
-     *
-     * @return string
-     */
-    protected function buildDescription(): string
-    {
-        if (!isset($array['Text1'])) {
-            return '';
-        }
-
-        $string = $array['Text1'];
-        $description = Butler::split($string, 'º');
-
-        foreach ($description as $index => $text) {
-            $text = htmlspecialchars_decode($text);
-            $text = Butler::replace($text, '<br><br>', '. ');
-            $text = Butler::unhtml($text);
-            $description[$index] = $text;
-
-            if (Butler::length($description[$index]) < 130 && count($description) > 1) {
-                unset($description[array_search($text, $description)]);
-            }
-        }
-
-        return Butler::first($description);
-    }
-
-    public function description(): string
-    {
-        return $this->description;
-    }
-
-
-    /**
-     * Builds retail price (in €)
-     *
-     * @return string
-     */
-    protected function buildRetailPrice(): string
-    {
-        // Input: XX(.YY)
-        // Output: XX,YY
-        if (!isset($this->source['PreisEurD'])) {
-            return '';
-        }
-
-        $retailPrice = (float) $this->source['PreisEurD'];
-
-        return number_format($retailPrice, 2, ',', '');
-    }
-
-    public function retailPrice(): string
-    {
-        return $this->retailPrice;
-    }
-
-
-    /**
-     * Builds release year
-     *
-     * @return string
-     */
-    protected function buildReleaseYear(): string
-    {
-        if (!isset($this->source['Erschjahr'])) {
-            return '';
-        }
-
-        return $this->source['Erschjahr'];
-    }
-
-    public function releaseYear(): string
-    {
-        return $this->releaseYear;
-    }
-
-
-    /**
-     * Builds minimum age recommendation (in years)
-     * TODO: Cater for months
-     *
-     * @return string
-     */
-    protected function buildAge(): string
-    {
-        if (!isset($this->source['Alter'])) {
-            return '';
-        }
-
-        $age = Butler::substr($this->source['Alter'], 0, 2);
-
-        if (Butler::substr($age, 0, 1) === '0') {
-            $age = Butler::substr($age, 1, 1);
-        }
-
-      	return 'ab ' . $age . ' Jahren';
-    }
-
-    public function getAge(): string
-    {
-        return $this->age;
     }
 
 
