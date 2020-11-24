@@ -4,19 +4,24 @@ namespace PHPCBIS\Products\Books;
 
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
+use PHPCBIS\Traits\DownloadCover;
 
 
 /**
  * Class Book
- *
- * Holds information from KNV's API in a human-readable form &
- * downloads book covers from the German National Library
  *
  * @package PHPCBIS
  */
 
 class Book extends Product
 {
+    /**
+     * Traits
+     */
+
+    use DownloadCover;
+
+
     /**
      * Properties
      */
@@ -192,14 +197,6 @@ class Book extends Product
 
 
     /**
-     * User-Agent used when downloading book cover images
-     *
-     * @var string
-     */
-    protected $userAgent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0';
-
-
-    /**
      * Constructor
      */
 
@@ -257,59 +254,10 @@ class Book extends Product
         return $this->antolin;
     }
 
-    public function setUserAgent(string $userAgent)
-    {
-        $this->userAgent = $userAgent;
-    }
-
-    public function getUserAgent(): string
-    {
-        return $this->userAgent;
-    }
-
 
     /**
      * Methods
      */
-
-    /**
-     * Downloads book cover from DNB
-     *
-     * @param string $fileName - Filename for the image to be downloaded
-     * @param bool $overwrite - Whether existing file should be overwritten
-     * @return bool
-     */
-    public function downloadCover(string $fileName = null, bool $overwrite = false): bool
-    {
-        if ($fileName == null) {
-            $fileName = $this->isbn;
-        }
-
-        $file = realpath($this->imagePath . '/' . $fileName . '.jpg');
-
-        if (!file_exists(dirname($file))) {
-            mkdir(dirname($file), 0755, true);
-        }
-
-        if (file_exists($file) && !$overwrite) {
-            return true;
-        }
-
-        $success = false;
-
-        if ($handle = fopen($file, 'w')) {
-            $client = new \GuzzleHttp\Client();
-            $url = 'https://portal.dnb.de/opac/mvb/cover.htm?isbn=' . $this->isbn;
-
-            try {
-                $response = $client->get($url, ['sink' => $handle]);
-                $success = true;
-            } catch (\GuzzleHttp\Exception\ClientException $e) {}
-        }
-
-        return $success;
-    }
-
 
     /**
      * Builds author(s)
