@@ -118,26 +118,6 @@ trait Tags
             return [];
         }
 
-        // if (!empty($this->translations)) {
-        //     $translations = $this->translations;
-        // }
-
-        // $topics = array_map(function ($topic) use ($translations) {
-        //     # Add 'Antolin' rating if available ..
-        //     if (Butler::startsWith($topic, 'Antolin')) {
-        //         $string = Butler::replace($topic, ['(', ')'], '');
-
-        //         # .. but not as topic
-        //         $this->antolin = Butler::split($string, 'Antolin')[0];
-
-        //         return '';
-        //     }
-
-        //     if (isset($translations[$topic])) {
-        //         return $translations[$topic];
-        //     }
-        // }, $this->tags);
-
         return array_unique($this->tags);
     }
 

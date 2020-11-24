@@ -2,9 +2,10 @@
 
 namespace PHPCBIS\Products\Audio;
 
-use PHPCBIS\Interfaces\Taggable;
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
+
+use PHPCBIS\Traits\DownloadCover;
 
 
 /**
@@ -13,8 +14,15 @@ use PHPCBIS\Products\Product;
  * @package PHPCBIS
  */
 
-class Audio extends Product implements Taggable
+class Audio extends Product
 {
+    /**
+     * Traits
+     */
+
+    use DownloadCover;
+
+
     /**
      * Properties
      */
@@ -58,40 +66,10 @@ class Audio extends Product implements Taggable
     public function __construct(array $source, array $props) {
         parent::__construct($source, $props);
 
-        # Build dataset
-        // $this->author       = $this->buildAuthor();
-        // $this->title        = $this->buildTitle();
-        // $this->subtitle     = $this->buildSubtitle();
-        // $this->publisher    = $this->buildPublisher();
-        // $this->description  = $this->buildDescription();
-        // $this->retailPrice  = $this->buildretailPrice();
-        // $this->releaseYear  = $this->buildreleaseYear();
-        // $this->age          = $this->buildAge();
-
         # Build involved people
-        $this->illustrator  = $this->getRole('illustrator', true);
-        $this->drawer       = $this->getRole('drawer', true);
-        $this->photographer = $this->getRole('photographer', true);
-        $this->translator   = $this->getRole('translator', true);
-        $this->editor       = $this->getRole('editor', true);
-        $this->narrator     = $this->getRole('narrator', true);
-        $this->director     = $this->getRole('director', true);
-        $this->producer     = $this->getRole('producer', true);
-        $this->participant  = $this->getRole('participant');
-    }
-
-
-    /**
-     * Magic methods
-     */
-
-    public function __toString(): string
-    {
-        if (empty($this->author)) {
-            return $this->getTitle();
-        }
-
-        return $this->getAuthor(true) . ': ' . $this->getTitle();
+        $this->narrator = $this->getRole('narrator', true);
+        $this->director = $this->getRole('director', true);
+        $this->producer = $this->getRole('producer', true);
     }
 
 
@@ -116,12 +94,8 @@ class Audio extends Product implements Taggable
         return Butler::replace(Butler::last($array), ' Min', '');
     }
 
-    public function setDuration(string $duration)
-    {
-        $this->duration = $duration;
-    }
 
-    public function getDuration(): string
+    public function duration(): string
     {
         return $this->duration;
     }
