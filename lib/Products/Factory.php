@@ -4,13 +4,15 @@ namespace PHPCBIS\Products;
 
 use PHPCBIS\Exceptions\UnknownTypeException;
 
-use PHPCBIS\Products\Audio\Types\Audiobook;
-use PHPCBIS\Products\Audio\Types\Music;
-use PHPCBIS\Products\Audio\Types\Sound;
 use PHPCBIS\Products\Books\Types\eBook;
 use PHPCBIS\Products\Books\Types\Hardcover;
 use PHPCBIS\Products\Books\Types\Schoolbook;
 use PHPCBIS\Products\Books\Types\Softcover;
+
+use PHPCBIS\Products\Media\Types\Audiobook;
+use PHPCBIS\Products\Media\Types\Movie;
+use PHPCBIS\Products\Media\Types\Music;
+use PHPCBIS\Products\Media\Types\Sound;
 
 
 /**
@@ -74,7 +76,9 @@ final class Factory
                 case 'Taschenbuch':
                     return new Softcover($source, $props);
 
-                # Audio
+                # Media
+                case 'Film':
+                    return new Movie($source, $props);
                 case 'Hörbuch':
                     return new Audiobook($source, $props);
                 case 'Musik':

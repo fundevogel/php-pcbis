@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS\Products\Audio;
+namespace PHPCBIS\Products\Media;
 
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
@@ -9,12 +9,12 @@ use PHPCBIS\Traits\DownloadCover;
 
 
 /**
- * Class Audio
+ * Class Medium
  *
  * @package PHPCBIS
  */
 
-class Audio extends Product
+class Medium extends Product
 {
     /**
      * Traits
