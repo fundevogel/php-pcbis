@@ -126,6 +126,14 @@ class OLA
 
 
     /**
+     * Current KNV 'Meldenummer' description
+     *
+     * @var string
+     */
+    private $statusMessage = null;
+
+
+    /**
      * All KNV 'Meldenummer' descriptions
      *
      * @var array
@@ -163,14 +171,6 @@ class OLA
 
 
     /**
-     * Current KNV 'Meldenummer' description
-     *
-     * @var string
-     */
-    private $statusMessage = null;
-
-
-    /**
      * Current KNV 'Fehlernummer'
      *
      * @var string
@@ -184,6 +184,41 @@ class OLA
      * @var string
      */
     private $errorMessage = null;
+
+
+    /**
+     * All KNV 'Fehlernummer' descriptions
+     *
+     * @var array
+     */
+    private $errorMessages = [
+        '19003' => 'Benutzerfehler',
+        '19004' => 'Passwortfehler',
+        '19005' => 'Hostfehler',
+        '19006' => 'Falsche ACT',
+        '19007' => 'Verkehrsnummer fehlt',
+        '19008' => 'Bestellnummer fehlt',
+        '19009' => 'Menge fehlt',
+        '19010' => 'Kommunikationsfehler',
+        '19011' => 'Antwortfehler',
+        '19012' => 'Antwortunterbrechung',
+        '19013' => 'Timeout',
+        '19014' => 'Busy',
+        '19015' => 'No carrier',
+        '19016' => 'Beeendigungsfehler',
+        '19017' => 'Schreibfehler',
+        '19018' => 'OLA-Konfiguration fehlt',
+        '19031' => 'Bei einer OLA-Anfrage darf die Menge maximal 99 betragen',
+        '19032' => 'Fehlende Referenznummer',
+        '19033' => 'Fehlendes Bestelldatum',
+        '19034' => 'Menge darf bei einer Onlinebestellung maximal 30000 betragen',
+        '19040' => 'Fehler bei der TCPIP Initialisierung',
+        '19041' => 'Fehler beim TCPIP Connect',
+        '19050' => 'Referenznummer konnte nicht generiert werden',
+        '19060' => 'Keine Vormerkung gefunden',
+        '19061' => 'Storno nicht erlaubt',
+        # TODO: 19062 ?
+    ];
 
 
     /**
@@ -202,19 +237,23 @@ class OLA
         $this->quantityOrdered = $data->Bestellmenge;
         $this->quantityAvailable = $data->Lieferbaremenge;
 
+        # Set status code & status message
         if (isset($data->Meldenummer)) {
             $this->statusCode = (string) $data->Meldenummer;
-
-            if (array_key_exists($this->statusCode, $this->statusMessages)) {
-                $this->statusMessage = $this->statusMessages[$this->statusCode];
-            }
         }
 
+        if (array_key_exists($this->statusCode, $this->statusMessages)) {
+            $this->statusMessage = $this->statusMessages[$this->statusCode];
+        }
+
+        # Set error code & error message
         if (isset($data->Fehlercode)) {
-            $this->errorCode = $data->Fehlercode;
+            $this->errorCode = (string) $data->Fehlercode;
         }
 
-        if (isset($data->Fehlertext)) {
+        if (array_key_exists($this->errorCode, $this->errorMessages)) {
+            $this->errorMessage = $this->errorMessages[$this->errorCode];
+        } elseif (isset($data->Fehlertext)) {
             $this->errorMessage = $data->Fehlertext;
         }
     }
@@ -259,11 +298,15 @@ class OLA
     /**
      * Prints current KNV 'Meldenummer'
      *
-     * @return string|null
+     * @return string
      */
-    public function statusCode()
+    public function statusCode(): string
     {
-        return $this->statusCode;
+        if (hasStatusCode()) {
+            return $this->statusCode;
+        }
+
+        return '';
     }
 
 
@@ -274,23 +317,19 @@ class OLA
      */
     public function hasStatusMessage(): bool
     {
-        if ($this->hasStatusCode()) {
-            return array_key_exists($this->statusCode, $this->statusMessages);
-        }
-
-        return false;
+        return $this->statusMessage !== null;
     }
 
 
     /**
      * Prints current KNV 'Meldenummer' description
      *
-     * @return string|null
+     * @return string
      */
-    public function statusMessage()
+    public function statusMessage(): string
     {
-        if (array_key_exists($this->statusCode, $this->statusMessages)) {
-            return $this->statusMessages[$this->statusCode];
+        if (hasStatusMessage()) {
+            return $this->statusMessage;
         }
 
         return '';
@@ -311,11 +350,15 @@ class OLA
     /**
      * Prints current KNV 'Fehlernummer'
      *
-     * @return string|null
+     * @return string
      */
-    public function errorCode()
+    public function errorCode(): string
     {
-        return $this->errorCode;
+        if (hasErrorCode()) {
+            return $this->errorCode;
+        }
+
+        return '';
     }
 
 
@@ -333,9 +376,9 @@ class OLA
     /**
      * Prints current KNV 'Fehlertext'
      *
-     * @return string|null
+     * @return string
      */
-    public function errorMessage()
+    public function errorMessage(): string
     {
         if ($this->hasErrorMessage()) {
             return $this->errorMessage;
