@@ -179,6 +179,43 @@ class Book extends Product
 
 
     /**
+     * Overrides
+     */
+
+    /**
+     * Builds categories
+     *
+     * @return array
+     */
+    protected function buildCategories(): array
+    {
+        if (empty($this->tags)) {
+            return [];
+        }
+
+        $categories = [];
+
+        foreach ($this->tags as $tag) {
+            $lowercase = Butler::lower($tag);
+
+            if (Butler::contains($lowercase, 'bilderbuch')) {
+                $categories[] = 'Bilderbuch';
+            }
+
+            if (Butler::contains($lowercase, 'vorlesebuch')) {
+                $categories[] = 'Vorlesebuch';
+            }
+
+            if (Butler::contains($lowercase, 'sachbuch')) {
+                $categories[] = 'Sachbuch';
+            }
+        }
+
+        return array_unique($categories);
+    }
+
+
+    /**
      * Methods
      */
 
