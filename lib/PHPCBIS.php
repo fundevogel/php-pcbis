@@ -29,8 +29,7 @@ use SoapFault;
 /**
  * Class PHPCBIS
  *
- * Retrieves information from KNV's API, makes the result human-readable &
- * downloads book covers from the German National Library
+ * Retrieves information from KNV's API & caches the resulting data
  *
  * @package PHPCBIS
  */

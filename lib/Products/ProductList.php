@@ -2,8 +2,6 @@
 
 namespace PHPCBIS\Products;
 
-use PHPCBIS\Helpers\Butler;
-
 use Countable;
 use Iterator;
 
