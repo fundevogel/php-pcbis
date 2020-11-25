@@ -14,6 +14,12 @@ use PHPCBIS\Products\Media\Types\Movie;
 use PHPCBIS\Products\Media\Types\Music;
 use PHPCBIS\Products\Media\Types\Sound;
 
+use PHPCBIS\Products\Nonbook\Types\Calendar;
+use PHPCBIS\Products\Nonbook\Types\Map;
+use PHPCBIS\Products\Nonbook\Types\Nonbook;
+use PHPCBIS\Products\Nonbook\Types\Software;
+use PHPCBIS\Products\Nonbook\Types\Stationery;
+
 
 /**
  * Class ProductFactory
@@ -85,10 +91,29 @@ final class Factory
                     return new Music($source, $props);
                 case 'Tonträger':
                     return new Sound($source, $props);
+
+                # Nonbook
+                case 'Games':
+                    return new Videogame($source, $props);
+                case 'Kalender':
+                    return new Calendar($source, $props);
+                case 'Landkarte/Globus':
+                    return new Map($source, $props);
+                case 'Nonbook':
+                    return new Nonbook($source, $props);
+                case 'Noten':
+                    return new Notes($source, $props);
+                case 'Papeterie/PBS':
+                    return new Stationery($source, $props);
+                case 'Software':
+                    return new Software($source, $props);
+                case 'Spiel':
+                    return new Boardgame($source, $props);
+                case 'Spielzeug':
+                    return new Toy($source, $props);
             }
         }
 
-        # TODO: Extend product group support
         throw new UnknownTypeException('Unknown type: "' . $groups[$group] . '"');
     }
 }
