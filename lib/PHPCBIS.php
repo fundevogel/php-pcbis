@@ -9,6 +9,7 @@
 
 namespace PHPCBIS;
 
+use PHPCBIS\Exceptions\IncompatibleClientException;
 use PHPCBIS\Exceptions\InvalidLoginException;
 use PHPCBIS\Exceptions\InvalidISBNException;
 
@@ -97,6 +98,11 @@ class PHPCBIS
             'exceptions' => true,
         ]);
 
+        # Check compatibility
+        if (!$this->isCompatible()) {
+            throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
+        }
+
         # Insert credentials for KNV's API
         if ($credentials === null) {
             throw new InvalidLoginException('Please provide valid login credentials.');
@@ -166,7 +172,7 @@ class PHPCBIS
      */
     private function validateISBN(string $isbn): string
     {
-        if (Butler::length($isbn) === 13 && Butler::startsWith($isbn, '4')) {
+        if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
             # Most likely non-convertable EAN
             return $isbn;
         }
@@ -202,6 +208,17 @@ class PHPCBIS
         }
 
         return $query->SessionID;
+    }
+
+
+    /**
+     * Checks compatibility of PHPCBIS & KNV's API
+     *
+     * @return bool
+     */
+    private function isCompatible(): bool
+    {
+        return $this->client->CheckVersion('2.0') !== '2';
     }
 
 
