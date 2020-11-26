@@ -189,6 +189,7 @@ abstract class Product implements Sociable, Taggable
         $this->type = $type;
     }
 
+
     public function getType(): string
     {
         return $this->type;
@@ -218,6 +219,17 @@ abstract class Product implements Sociable, Taggable
     public function fromCache(): bool
     {
         return $this->fromCache;
+    }
+
+
+    /**
+     * Returns ISBN
+     *
+     * @return string
+     */
+    public function isbn(): string
+    {
+        return $this->isbn;
     }
 
 
