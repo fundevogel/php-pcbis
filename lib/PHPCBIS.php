@@ -44,7 +44,7 @@ class PHPCBIS
 
 
     /**
-     * Path to cached book information received from KNV's API
+     * Path to cached product information received from KNV's API
      *
      * @var string
      */
@@ -152,7 +152,7 @@ class PHPCBIS
      * @throws \PHPCBIS\Exceptions\InvalidISBNException
      * @return string
      */
-    private function validateISBN(string $isbn): string
+    private function validate(string $isbn): string
     {
         if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
             # Most likely non-convertable EAN
@@ -219,14 +219,14 @@ class PHPCBIS
 
 
     /**
-     * Fetches raw book data from KNV
+     * Fetches raw product data from KNV
      *
-     * .. if book for given ISBN exists
+     * .. if product for given EAN/ISBN exists
      *
      * @param string $isbn
      * @return array
      */
-    private function fetchData(string $isbn)
+    private function fetch(string $isbn)
     {
         # For getting started with KNV's (surprisingly well documented) german API,
         # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
@@ -273,15 +273,15 @@ class PHPCBIS
 
 
     /**
-     * Checks if book is available for delivery via OLA query
+     * Checks if product is available for delivery via OLA query
      *
-     * @param string $isbn - A given book's ISBN
-     * @param int $quantity - Number of books to be delivered
+     * @param string $isbn - A given product's EAN/ISBN
+     * @param int $quantity - Number of products to be delivered
      * @return \PHPCBIS\KNV\OLA
      */
     public function ola(string $isbn, int $quantity = 1)
     {
-        $isbn = $this->validateISBN($isbn);
+        $isbn = $this->validate($isbn);
 
         $query = $this->client->WSCall([
             # Log in using sessionID
@@ -302,19 +302,19 @@ class PHPCBIS
 
 
     /**
-     * Fetches book information from cache if they exist,
+     * Fetches information from cache if they exist,
      * otherwise loads them & saves to cache
      *
-     * @param string $isbn - A given book's ISBN
+     * @param string $isbn - A given product's EAN/ISBN
      * @return array
      */
-    private function fetchBook(string $isbn): array
+    private function fetchData(string $isbn): array
     {
         $driver = new FileCache($this->cachePath);
         $fromCache = $driver->contains($isbn);
 
         if (!$fromCache) {
-            $result = $this->fetchData($isbn);
+            $result = $this->fetch($isbn);
             $driver->save($isbn, $result);
         }
 
@@ -326,22 +326,19 @@ class PHPCBIS
 
 
     /**
-     * Validates ISBN & builds `Book` object
+     * Validates ISBN & builds `Product` object
      *
-     * @param string $isbn - A given book's ISBN
+     * @param string $isbn - A given product's EAN/ISBN
      * @return \PHPCBIS\Products\Product
      */
-    public function loadBook(string $isbn): \PHPCBIS\Products\Product
+    public function load(string $isbn): \PHPCBIS\Products\Product
     {
-        $isbn = $this->validateISBN($isbn);
-        $data = $this->fetchBook($isbn);
-
-        # Determine product type
-        // $this->productGroup = $this->productGroups[$source['Sortimentskennzeichen']];
+        $isbn = $this->validate($isbn);
+        $data = $this->fetchData($isbn);
 
         $props = [
-            'fromCache'    => $data['fromCache'],
             'isbn'         => $isbn,
+            'fromCache'    => $data['fromCache'],
             'translations' => $this->translations,
         ];
 
@@ -352,15 +349,17 @@ class PHPCBIS
     /**
      * Validates ISBNs & builds `Books` object
      *
+     * TODO: This needs to be re-evaluated / outsourced to a factory
+     *
      * @param array $isbns - A group of books' ISBNs
-     * @return \PHPCBIS\Products\ProductList
+     * @return \PHPCBIS\Products\Books\Books
      */
-    public function loadBooks(array $isbns): \PHPCBIS\Products\ProductList
+    public function loadBooks(array $isbns): \PHPCBIS\Products\Books\Books
     {
         $books = [];
 
         foreach ($isbns as $isbn) {
-            $books[] = $this->loadBook($isbn);
+            $books[] = $this->load($isbn);
         }
 
         return new Books($books);
