@@ -4,7 +4,7 @@ namespace PHPCBIS\Products;
 
 use PHPCBIS\Exceptions\UnknownTypeException;
 
-use PHPCBIS\Products\Books\Types\eBook;
+use PHPCBIS\Products\Books\Types\Ebook;
 use PHPCBIS\Products\Books\Types\Hardcover;
 use PHPCBIS\Products\Books\Types\Schoolbook;
 use PHPCBIS\Products\Books\Types\Softcover;
@@ -14,11 +14,15 @@ use PHPCBIS\Products\Media\Types\Movie;
 use PHPCBIS\Products\Media\Types\Music;
 use PHPCBIS\Products\Media\Types\Sound;
 
+use PHPCBIS\Products\Nonbook\Types\Boardgame;
 use PHPCBIS\Products\Nonbook\Types\Calendar;
 use PHPCBIS\Products\Nonbook\Types\Map;
 use PHPCBIS\Products\Nonbook\Types\Nonbook;
+use PHPCBIS\Products\Nonbook\Types\Notes;
 use PHPCBIS\Products\Nonbook\Types\Software;
 use PHPCBIS\Products\Nonbook\Types\Stationery;
+use PHPCBIS\Products\Nonbook\Types\Toy;
+use PHPCBIS\Products\Nonbook\Types\Videogame;
 
 
 /**
