@@ -194,6 +194,12 @@ class Book extends Product
         return $translations[$binding];
     }
 
+
+    /**
+     * Returns binding
+     *
+     * @return string
+     */
     public function binding(): string
     {
         return $this->binding;
@@ -223,6 +229,12 @@ class Book extends Product
         return '';
     }
 
+
+    /**
+     * Returns page count
+     *
+     * @return string
+     */
     public function pageCount(): string
     {
         return $this->pageCount;
@@ -257,6 +269,12 @@ class Book extends Product
         return $width . ' x ' . $height;
     }
 
+
+    /**
+     * Returns dimensions
+     *
+     * @return string
+     */
     public function dimensions(): string
     {
         return $this->dimensions;
@@ -322,7 +340,7 @@ class Book extends Product
 
 
     /**
-     * Returns `antolin` age rating
+     * Returns Antolin rating
      *
      * @return string
      */
