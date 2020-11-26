@@ -29,12 +29,12 @@ $object = new PHPCBIS\PHPCBIS;
 
 try {
     // After loading a book, you might want to ..
-    $book = $object->loadBook('978-3-522-20255-8');
+    $book = $object->load('978-3-522-20255-8');
     // (1) .. export its bibliographic data
     $data = $book->export();
 
     // (2) .. access specific information
-     echo $book->getTitle();
+     echo $book->title();
 
     // (3) .. download its cover
     $book->downloadCover();
@@ -65,7 +65,7 @@ try {
     $books = $object->loadBooks($isbns);
 
     foreach ($books as $book) {
-        echo $book->getTitle();
+        echo $book->title();
     }
 } catch (\Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
@@ -101,8 +101,8 @@ $translations = json_decode($file, true);
 $object = new PHPCBIS();
 $object->setTranslations($translations);
 
-$book = $object->loadBook('some-isbn');
-echo $book->getTitle();  // Some Title
+$book = $object->load('some-isbn');
+echo $book->title();  // Some Title
 ```
 
 
