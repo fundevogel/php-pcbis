@@ -145,30 +145,13 @@ class PHPCBIS
      */
 
     /**
-     * Validates and formats given EAN/ISBN
-     * For more information, see https://github.com/biblys/isbn
+     * Checks compatibility of PHPCBIS & KNV's API
      *
-     * @param string $isbn - International Standard Book Number
-     * @throws \PHPCBIS\Exceptions\InvalidISBNException
-     * @return string
+     * @return bool
      */
-    private function validate(string $isbn): string
+    private function isCompatible(): bool
     {
-        if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
-            # Most likely non-convertable EAN
-            return $isbn;
-        }
-
-        $isbn = new ISBN($isbn);
-
-        try {
-            $isbn->validate();
-            $isbn = $isbn->format('ISBN-13');
-        } catch(Exception $e) {
-            throw new InvalidISBNException($e->getMessage());
-        }
-
-        return $isbn;
+        return $this->client->CheckVersion('2.0') !== '2';
     }
 
 
@@ -194,17 +177,6 @@ class PHPCBIS
 
 
     /**
-     * Checks compatibility of PHPCBIS & KNV's API
-     *
-     * @return bool
-     */
-    private function isCompatible(): bool
-    {
-        return $this->client->CheckVersion('2.0') !== '2';
-    }
-
-
-    /**
      * Uses sessionID to log out of KNV's API
      *
      * @return void
@@ -226,7 +198,7 @@ class PHPCBIS
      * @param string $isbn
      * @return array
      */
-    private function fetch(string $isbn)
+    private function query(string $isbn)
     {
         # For getting started with KNV's (surprisingly well documented) german API,
         # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
@@ -273,6 +245,58 @@ class PHPCBIS
 
 
     /**
+     * Fetches information from cache if they exist,
+     * otherwise loads them & saves to cache
+     *
+     * @param string $isbn - A given product's EAN/ISBN
+     * @return array
+     */
+    private function fetch(string $isbn): array
+    {
+        $driver = new FileCache($this->cachePath);
+        $fromCache = $driver->contains($isbn);
+
+        if (!$fromCache) {
+            $result = $this->query($isbn);
+            $driver->save($isbn, $result);
+        }
+
+        return [
+            'fromCache' => $fromCache,
+            'source'    => $driver->fetch($isbn),
+        ];
+    }
+
+
+    /**
+     * Validates and formats given EAN/ISBN
+     * For more information, see https://github.com/biblys/isbn
+     *
+     * @param string $isbn - International Standard Book Number
+     * @throws \PHPCBIS\Exceptions\InvalidISBNException
+     * @return string
+     */
+    private function validate(string $isbn): string
+    {
+        if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
+            # Most likely non-convertable EAN
+            return $isbn;
+        }
+
+        $isbn = new ISBN($isbn);
+
+        try {
+            $isbn->validate();
+            $isbn = $isbn->format('ISBN-13');
+        } catch(Exception $e) {
+            throw new InvalidISBNException($e->getMessage());
+        }
+
+        return $isbn;
+    }
+
+
+    /**
      * Checks if product is available for delivery via OLA query
      *
      * @param string $isbn - A given product's EAN/ISBN
@@ -302,31 +326,7 @@ class PHPCBIS
 
 
     /**
-     * Fetches information from cache if they exist,
-     * otherwise loads them & saves to cache
-     *
-     * @param string $isbn - A given product's EAN/ISBN
-     * @return array
-     */
-    private function fetchData(string $isbn): array
-    {
-        $driver = new FileCache($this->cachePath);
-        $fromCache = $driver->contains($isbn);
-
-        if (!$fromCache) {
-            $result = $this->fetch($isbn);
-            $driver->save($isbn, $result);
-        }
-
-        return [
-            'fromCache' => $fromCache,
-            'source'    => $driver->fetch($isbn),
-        ];
-    }
-
-
-    /**
-     * Validates ISBN & builds `Product` object
+     * Instantiates `Product` object from single EAN/ISBN
      *
      * @param string $isbn - A given product's EAN/ISBN
      * @return \PHPCBIS\Products\Product
@@ -334,7 +334,7 @@ class PHPCBIS
     public function load(string $isbn): \PHPCBIS\Products\Product
     {
         $isbn = $this->validate($isbn);
-        $data = $this->fetchData($isbn);
+        $data = $this->fetch($isbn);
 
         $props = [
             'isbn'         => $isbn,
@@ -347,7 +347,7 @@ class PHPCBIS
 
 
     /**
-     * Validates ISBNs & builds `Books` object
+     * Instantiates `Books` object from multiple EANs/ISBNs
      *
      * TODO: This needs to be re-evaluated / outsourced to a factory
      *
@@ -359,7 +359,15 @@ class PHPCBIS
         $books = [];
 
         foreach ($isbns as $isbn) {
-            $books[] = $this->load($isbn);
+            try {
+                $book = $this->load($isbn);
+
+                if ($book->isBook() || $book->isAudiobook()) {
+                    $books[] = $book;
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
         }
 
         return new Books($books);
