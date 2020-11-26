@@ -98,14 +98,25 @@ trait People
         # (2) Narrator
         # (3) Editor
         $delimiters = [
-            'Mit '               => 'participant',
-            'Gesprochen von '    => 'narrator',
             'Herausgegeben von ' => 'editor',
+            'Gesprochen von '    => 'narrator',
+            'Mit '               => 'participant',
+            # Edge case: 'Illustr. v.'
+            'Illustriert von '   => 'illustrator',
         ];
 
-        foreach (Butler::split($this->source['Mitarb'], '.') as $string) {
+        $data = $this->source['Mitarb'];
+
+        # Take care of delimiters with two dots
+        if (Butler::contains($data, 'Illustr. v. ')) {
+            $data = Butler::replace($data, 'Illustr. v. ', 'Illustriert von ');
+        }
+
+        foreach (Butler::split($data, '.') as $string) {
             # First, see if there's a colon
             if (!Butler::contains($string, ':')) {
+                var_dump($string);
+
                 # If not, the string is eligible for an alternative delimiter
                 foreach ($delimiters as $delimiter => $role) {
                     if (Butler::startsWith($string, $delimiter)) {
