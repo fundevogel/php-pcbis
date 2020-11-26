@@ -80,25 +80,6 @@ class Ebook extends Book {
      */
 
     /**
-     * Builds title
-     *
-     * @return string
-     */
-    protected function buildTitle(): string
-    {
-        if (!isset($this->source['Titel'])) {
-            if (isset($this->source['AutorSachtitel'])) {
-                return $this->source['AutorSachtitel'];
-            }
-
-            return '';
-        }
-
-        return $this->source['Titel'];
-    }
-
-
-    /**
      * Builds subtitle
      *
      * @return string

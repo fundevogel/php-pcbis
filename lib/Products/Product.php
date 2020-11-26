@@ -245,6 +245,10 @@ abstract class Product implements Sociable, Taggable
     protected function buildTitle(): string
     {
         if (!isset($this->source['Titel'])) {
+            if (isset($this->source['AutorSachtitel'])) {
+                return $this->source['AutorSachtitel'];
+            }
+
             return '';
         }
 
