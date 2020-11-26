@@ -4,7 +4,6 @@ namespace PHPCBIS\Products\Media;
 
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
-
 use PHPCBIS\Traits\DownloadCover;
 
 
@@ -26,14 +25,6 @@ class Medium extends Product
     /**
      * Properties
      */
-
-    /**
-     * Narrator
-     *
-     * @var array
-     */
-    protected $narrator;
-
 
     /**
      * Director
@@ -100,5 +91,42 @@ class Medium extends Product
     public function duration(): string
     {
         return $this->duration;
+    }
+
+
+    /**
+     * Exports all data
+     *
+     * @return array
+     */
+    public function export(bool $asArray = false): array {
+        # Build dataset
+        return [
+            # (1) Base
+            'Titel'               => $this->title(),
+            'Untertitel'          => $this->subtitle(),
+            'Inhaltsbeschreibung' => $this->description(),
+            'Preis'               => $this->retailPrice(),
+            'Erscheinungsjahr'    => $this->releaseYear(),
+            'Altersempfehlung'    => $this->age(),
+
+            # (2) Extension 'People'
+            'AutorIn'             => $this->author($asArray),
+            'IllustratorIn'       => $this->getRole('illustrator', $asArray),
+            'ZeichnerIn'          => $this->getRole('drawer', $asArray),
+            'PhotographIn'        => $this->getRole('photographer', $asArray),
+            'ÜbersetzerIn'        => $this->getRole('translator', $asArray),
+            'HerausgeberIn'       => $this->getRole('editor', $asArray),
+            'MitarbeiterIn'       => $this->getRole('participant', $asArray),
+
+            # (3) Extension 'Tags'
+            'Kategorien'          => $this->categories($asArray),
+            'Themen'              => $this->topics($asArray),
+
+            # (4) 'Media' specific data
+            'RegisseurIn'         => $this->getRole('director', $asArray),
+            'ProduzentIn'         => $this->getRole('producer', $asArray),
+            'Dauer'               => $this->duration(),
+        ];
     }
 }

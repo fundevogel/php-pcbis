@@ -5,6 +5,7 @@ namespace PHPCBIS\Products\Books;
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
 use PHPCBIS\Traits\DownloadCover;
+use PHPCBIS\Traits\Shared\Publisher;
 
 
 /**
@@ -20,19 +21,12 @@ class Book extends Product
      */
 
     use DownloadCover;
+    use Publisher;
 
 
     /**
      * Properties
      */
-
-    /**
-     * Publisher
-     *
-     * @var string
-     */
-    protected $publisher;
-
 
     /**
      * Binding
@@ -56,54 +50,6 @@ class Book extends Product
      * @var string
      */
     protected $dimensions;
-
-
-    /**
-     * Illustrator
-     *
-     * @var array
-     */
-    protected $illustrator;
-
-
-    /**
-     * Drawer
-     *
-     * @var array
-     */
-    protected $drawer;
-
-
-    /**
-     * Photographer
-     *
-     * @var array
-     */
-    protected $photographer;
-
-
-    /**
-     * Translator
-     *
-     * @var array
-     */
-    protected $translator;
-
-
-    /**
-     * Editor
-     *
-     * @var array
-     */
-    protected $editor;
-
-
-    /**
-     * Participant
-     *
-     * @var array
-     */
-    protected $participant;
 
 
     /**
@@ -167,15 +113,7 @@ class Book extends Product
      * Setters & getters
      */
 
-    public function setAntolin(string $antolin)
-    {
-        $this->antolin = $antolin;
-    }
-
-    public function getAntolin(): string
-    {
-        return $this->antolin;
-    }
+    # Nothing to see here
 
 
     /**
@@ -218,33 +156,6 @@ class Book extends Product
     /**
      * Methods
      */
-
-    /**
-     * Builds publisher
-     *
-     * @return string
-     */
-    protected function buildPublisher(): string
-    {
-        if (!isset($this->source['IndexVerlag'])) {
-            return '';
-        }
-
-        $publisher = $this->source['IndexVerlag'];
-
-        if (is_array($publisher)) {
-            $publisher = Butler::first($publisher);
-        }
-
-        return trim($publisher);
-    }
-
-
-    public function publisher(): string
-    {
-        return $this->publisher;
-    }
-
 
     /**
      * Builds binding
@@ -346,12 +257,7 @@ class Book extends Product
         return $width . ' x ' . $height;
     }
 
-    public function setDimensions(string $dimensions)
-    {
-        $this->dimensions = $dimensions;
-    }
-
-    public function getDimensions(): string
+    public function dimensions(): string
     {
         return $this->dimensions;
     }
@@ -412,5 +318,55 @@ class Book extends Product
         }, $tags);
 
         return array_filter($topics);
+    }
+
+
+    /**
+     * Returns `antolin` age rating
+     *
+     * @return string
+     */
+    public function antolin(): string
+    {
+        return $this->antolin;
+    }
+
+
+    /**
+     * Exports all data
+     *
+     * @return array
+     */
+    public function export(bool $asArray = false): array {
+        # Build dataset
+        return [
+            # (1) Base
+            'Titel'               => $this->title(),
+            'Untertitel'          => $this->subtitle(),
+            'Inhaltsbeschreibung' => $this->description(),
+            'Preis'               => $this->retailPrice(),
+            'Erscheinungsjahr'    => $this->releaseYear(),
+            'Altersempfehlung'    => $this->age(),
+
+            # (2) Extension 'People'
+            'AutorIn'             => $this->author($asArray),
+            'IllustratorIn'       => $this->getRole('illustrator', $asArray),
+            'ZeichnerIn'          => $this->getRole('drawer', $asArray),
+            'PhotographIn'        => $this->getRole('photographer', $asArray),
+            'ÜbersetzerIn'        => $this->getRole('translator', $asArray),
+            'HerausgeberIn'       => $this->getRole('editor', $asArray),
+            'MitarbeiterIn'       => $this->getRole('participant', $asArray),
+
+            # (3) Extension 'Tags'
+            'Kategorien'          => $this->categories($asArray),
+            'Themen'              => $this->topics($asArray),
+
+            # (4) 'Book' specific data
+            'Verlag'              => $this->publisher(),
+            'Einband'             => $this->binding(),
+            'Seitenzahl'          => $this->pageCount(),
+            'Abmessungen'         => $this->dimensions(),
+            'Antolin'             => $this->antolin(),
+        ];
     }
 }

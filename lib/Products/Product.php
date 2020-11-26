@@ -370,4 +370,10 @@ abstract class Product implements Sociable, Taggable
     {
         return $this->age;
     }
+
+
+    /**
+     * Forces all (sub)classes to provide an easy way to export a full dataset
+     */
+    abstract protected function export(bool $asArray);
 }
