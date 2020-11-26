@@ -115,8 +115,6 @@ trait People
         foreach (Butler::split($data, '.') as $string) {
             # First, see if there's a colon
             if (!Butler::contains($string, ':')) {
-                var_dump($string);
-
                 # If not, the string is eligible for an alternative delimiter
                 foreach ($delimiters as $delimiter => $role) {
                     if (Butler::startsWith($string, $delimiter)) {
