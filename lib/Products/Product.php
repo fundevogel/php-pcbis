@@ -2,6 +2,8 @@
 
 namespace PHPCBIS\Products;
 
+use PHPCBIS\Helpers\Butler;
+
 use PHPCBIS\Interfaces\Sociable;
 use PHPCBIS\Interfaces\Taggable;
 
@@ -26,7 +28,6 @@ abstract class Product implements Sociable, Taggable
      */
 
     use CheckType;
-    use DownloadCover;
     use People, Tags;
 
 
@@ -56,14 +57,6 @@ abstract class Product implements Sociable, Taggable
      * @var bool
      */
     protected $fromCache;
-
-
-    /**
-     * Path to downloaded book cover images
-     *
-     * @var string
-     */
-    protected $imagePath;
 
 
     /**
@@ -168,8 +161,7 @@ abstract class Product implements Sociable, Taggable
         $this->categories   = $this->buildCategories();
         $this->topics       = $this->buildTopics();
 
-        # Import image path & translations
-        $this->imagePath    = $props['imagePath'];
+        # Import translations
         $this->translations = $props['translations'];
     }
 

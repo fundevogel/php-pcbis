@@ -23,6 +23,14 @@ trait DownloadCover
      */
 
     /**
+     * Path to downloaded cover images
+     *
+     * @var string
+     */
+    protected $imagePath = null;
+
+
+    /**
      * User-Agent used when downloading cover images
      *
      * @var string
@@ -33,6 +41,16 @@ trait DownloadCover
     /**
      * Setters & getters
      */
+
+    public function setImagePath(string $imagePath)
+    {
+        $this->imagePath = $imagePath;
+    }
+
+    public function getImagePath()
+    {
+        return $this->imagePath;
+    }
 
     public function setUserAgent(string $userAgent)
     {
@@ -58,20 +76,31 @@ trait DownloadCover
      */
     public function downloadCover(string $fileName = null, bool $overwrite = false): bool
     {
-        if ($fileName == null) {
+        # Build path to file
+        # (1) Directory
+        if ($this->imagePath === null) {
+            $this->imagePath = dirname(__DIR__, 2) . '/images';
+        }
+
+        # (2) Filename
+        if ($fileName === null) {
             $fileName = $this->isbn;
         }
 
-        $file = realpath($this->imagePath . '/' . $fileName . '.jpg');
+        # (3) Complete path
+        $file = $this->imagePath . '/' . $fileName . '.jpg';
 
-        if (!file_exists(dirname($file))) {
-            mkdir(dirname($file), 0755, true);
-        }
-
+        # Skip if file exists & overwriting it is disabled
         if (file_exists($file) && !$overwrite) {
             return true;
         }
 
+        # Otherwise, create directory if necessary
+        if (!file_exists($this->imagePath)) {
+            mkdir(dirname($file), 0755, true);
+        }
+
+        # Download cover image
         $success = false;
 
         if ($handle = fopen($file, 'w')) {

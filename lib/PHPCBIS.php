@@ -60,14 +60,6 @@ class PHPCBIS
 
 
     /**
-     * Path to downloaded book cover images
-     *
-     * @var string
-     */
-    private $imagePath = './images';
-
-
-    /**
      * Session identifier retrieved when first connecting to KNV's API
      *
      * @var string
@@ -135,16 +127,6 @@ class PHPCBIS
     public function getCachePath()
     {
         return $this->cachePath;
-    }
-
-    public function setImagePath(string $imagePath)
-    {
-        $this->imagePath = $imagePath;
-    }
-
-    public function getImagePath()
-    {
-        return $this->imagePath;
     }
 
     public function setTranslations(array $translations)
@@ -360,7 +342,6 @@ class PHPCBIS
         $props = [
             'fromCache'    => $data['fromCache'],
             'isbn'         => $isbn,
-            'imagePath'    => $this->imagePath,
             'translations' => $this->translations,
         ];
 
