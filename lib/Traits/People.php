@@ -288,6 +288,11 @@ trait People
         return $this->getRole('translator', $asArray);
     }
 
+    public function editor(bool $asArray = false)
+    {
+        return $this->getRole('editor', $asArray);
+    }
+
     public function narrator(bool $asArray = false)
     {
         return $this->getRole('narrator', $asArray);
