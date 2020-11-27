@@ -23,18 +23,6 @@ class Audiobook extends Medium {
 
 
     /**
-     * Properties
-     */
-
-    /**
-     * Narrator
-     *
-     * @var array
-     */
-    protected $narrator;
-
-
-    /**
      * Constructor
      */
 

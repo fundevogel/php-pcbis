@@ -124,9 +124,9 @@ class Medium extends Product
             'Themen'              => $this->topics($asArray),
 
             # (4) 'Media' specific data
+            'Dauer'               => $this->duration(),
             'RegisseurIn'         => $this->getRole('director', $asArray),
             'ProduzentIn'         => $this->getRole('producer', $asArray),
-            'Dauer'               => $this->duration(),
         ];
     }
 }
