@@ -99,6 +99,26 @@ class Ebook extends Book {
 
 
     /**
+     * Exports all data
+     *
+     * @return array
+     */
+    public function export(bool $asArray = false): array {
+        # Build dataset
+        return array_merge(
+            # (1) 'Book' dataset
+            parent::export($asArray), [
+            # (2) 'Ebook' specific data
+            'Unterstützt'  => $this->devices(),
+            'Printausgabe' => $this->print(),
+            'Dateigröße'   => $this->fileSize(),
+            'Dateiformat'  => $this->fileFormat(),
+            'DRM'          => $this->drm(),
+        ]);
+    }
+
+
+    /**
      * Methods
      */
 
@@ -216,7 +236,6 @@ class Ebook extends Book {
      */
     protected function buildDRM(): string
     {
-
         if (!isset($this->source['DRMFlags'])) {
             return '';
         }
