@@ -72,7 +72,7 @@ class PHPCBIS
      *
      * @var string
      */
-    private $sessionID;
+    private $sessionID = null;
 
 
     /**
@@ -103,13 +103,12 @@ class PHPCBIS
             throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
         }
 
-        # Insert credentials for KNV's API
-        if ($credentials === null) {
-            throw new InvalidLoginException('Please provide valid login credentials.');
+        # If credentials are provided ..
+        if ($credentials !== null) {
+            # .. log in & store sessionID
+            $this->sessionID = $this->logIn($credentials);
+            // throw new InvalidLoginException('Please provide valid login credentials.');
         }
-
-        # Log in & store sessionID
-        $this->sessionID = $this->logIn($credentials);
 
         # Force refresh (or not)
         $this->forceRefresh = $forceRefresh;
@@ -122,7 +121,9 @@ class PHPCBIS
 
     public function __destruct()
     {
-        $this->logOut();
+        if ($this->sessionID !== null) {
+            $this->logOut();
+        }
     }
 
 
@@ -275,6 +276,7 @@ class PHPCBIS
     private function fetch(string $isbn): array
     {
         $driver = new FileCache($this->cachePath);
+        $fromCache = false;
 
         if ($driver->contains($isbn) && $this->forceRefresh) {
             $driver->delete($isbn);
@@ -283,6 +285,7 @@ class PHPCBIS
         if (!$driver->contains($isbn)) {
             $result = $this->query($isbn);
             $driver->save($isbn, $result);
+            $fromCache = true;
         }
 
         return [
