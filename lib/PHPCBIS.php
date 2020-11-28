@@ -40,7 +40,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '2.0.0-beta.4';
+    const VERSION = '2.0.0-beta.5';
 
 
     /**
