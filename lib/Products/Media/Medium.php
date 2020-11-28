@@ -59,11 +59,6 @@ class Medium extends Product
 
         # Extend dataset
         $this->duration = $this->buildDuration();
-
-        # Build involved people
-        $this->narrator = $this->getRole('narrator', true);
-        $this->director = $this->getRole('director', true);
-        $this->producer = $this->getRole('producer', true);
     }
 
 
@@ -111,7 +106,7 @@ class Medium extends Product
             'Altersempfehlung'    => $this->age(),
 
             # (2) Extension 'People'
-            'AutorIn'             => $this->author($asArray),
+            'AutorIn'             => $this->getRole('author', $asArray),
             'IllustratorIn'       => $this->getRole('illustrator', $asArray),
             'ZeichnerIn'          => $this->getRole('drawer', $asArray),
             'PhotographIn'        => $this->getRole('photographer', $asArray),

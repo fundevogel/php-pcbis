@@ -103,14 +103,7 @@ class Book extends Product
         $this->dimensions   = $this->buildDimensions();
         $this->series       = $this->buildSeries();
         $this->volume       = $this->buildVolume();
-
-        # Build involved people
-        $this->illustrator  = $this->getRole('illustrator', true);
-        $this->drawer       = $this->getRole('drawer', true);
-        $this->photographer = $this->getRole('photographer', true);
-        $this->translator   = $this->getRole('translator', true);
-        $this->editor       = $this->getRole('editor', true);
-        $this->participant  = $this->getRole('participant', true);
+        $this->antolin      = $this->buildAntolin();
     }
 
 
@@ -155,6 +148,66 @@ class Book extends Product
         }
 
         return array_unique($categories);
+    }
+
+
+    /**
+     * Builds topics
+     *
+     * @return array
+     */
+    protected function buildTopics(): array
+    {
+        $tags = parent::buildTopics();
+
+        $translations = [
+            'Auto / Personenwagen / Pkw' => 'Autos',
+            'Coming of Age / Erwachsenwerden' => 'Erwachsenwerden',
+            'Demenz / Alzheimersche Krankheit' => 'Demenz',
+            'Deutsche Demokratische Republik (DDR)' => 'DDR',
+            'Flucht / Flüchtling' => 'Flucht',
+            'IM (Staatssicherheitsdienst)' => 'Inoffizielle MitarbeiterInnen',
+            'Klassenfahrt / Schulfahrt' => 'Klassenfahrt',
+            'Klassiker (Literatur)' => 'Klassiker',
+            'Klimaschutz, Klimawandel / Klimaveränderung' => 'Klimaschutz',
+            'Klimawandel / Klimaveränderung' => 'Klimawandel',
+            'Krebs (Krankheit) / Karzinom' => 'Krebserkrankung',
+            'Leichte Sprache / Einfache Sprache' => 'Einfache Sprache',
+            'Migration / Migrant' => 'Migration',
+            'Regenwald / Dschungel' => 'Regenwald',
+            'Schulanfang / Schulbeginn' => 'Schulanfang',
+            'Selbstmord / Suizid / Freitod / Selbsttötung' => 'Selbsttötung',
+            'Ski / Schi' => 'Skifahren',
+            'Soziales Netzwerk (Internet) / Social Networking' => 'Social Media',
+            'Spionage / Agent / Agentin / Spion / Spionin' => 'GeheimagentIn',
+            'Staatssicherheitsdienst (Stasi)' => 'Stasi',
+            'Traum / Träumen / Traumdeutung / Traumanalyse' => 'Traum',
+            'Wolf / Wölfe (Tier)' => 'Wölfe',
+        ];
+
+        if (!empty($this->translations)) {
+            $translations = $this->translations;
+        }
+
+        $topics = array_map(function ($topic) use ($translations) {
+            # Skip blocklisted topics
+            if (in_array($topic, $this->blockList)) {
+                return '';
+            }
+
+            # Skip 'Antolin' rating
+            if (Butler::startsWith($topic, 'Antolin')) {
+                return '';
+            }
+
+            if (isset($translations[$topic])) {
+                return $translations[$topic];
+            }
+
+            return $topic;
+        }, $tags);
+
+        return array_filter($topics);
     }
 
 
@@ -287,60 +340,23 @@ class Book extends Product
 
 
     /**
-     * Builds topics
+     * Builds Antolin rating
      *
-     * @return array
+     * @return string
      */
-    protected function buildTopics(): array
+    protected function buildAntolin(): string
     {
-        $tags = parent::buildTopics();
-
-        $translations = [
-            'Auto / Personenwagen / Pkw' => 'Autos',
-            'Coming of Age / Erwachsenwerden' => 'Erwachsenwerden',
-            'Demenz / Alzheimersche Krankheit' => 'Demenz',
-            'Deutsche Demokratische Republik (DDR)' => 'DDR',
-            'Flucht / Flüchtling' => 'Flucht',
-            'IM (Staatssicherheitsdienst)' => 'Inoffizielle MitarbeiterInnen',
-            'Klassenfahrt / Schulfahrt' => 'Klassenfahrt',
-            'Klassiker (Literatur)' => 'Klassiker',
-            'Klimaschutz, Klimawandel / Klimaveränderung' => 'Klimaschutz',
-            'Klimawandel / Klimaveränderung' => 'Klimawandel',
-            'Krebs (Krankheit) / Karzinom' => 'Krebserkrankung',
-            'Leichte Sprache / Einfache Sprache' => 'Einfache Sprache',
-            'Migration / Migrant' => 'Migration',
-            'Regenwald / Dschungel' => 'Regenwald',
-            'Schulanfang / Schulbeginn' => 'Schulanfang',
-            'Selbstmord / Suizid / Freitod / Selbsttötung' => 'Selbsttötung',
-            'Ski / Schi' => 'Skifahren',
-            'Soziales Netzwerk (Internet) / Social Networking' => 'Social Media',
-            'Spionage / Agent / Agentin / Spion / Spionin' => 'GeheimagentIn',
-            'Staatssicherheitsdienst (Stasi)' => 'Stasi',
-            'Traum / Träumen / Traumdeutung / Traumanalyse' => 'Traum',
-            'Wolf / Wölfe (Tier)' => 'Wölfe',
-        ];
-
-        if (!empty($this->translations)) {
-            $translations = $this->translations;
+        if (empty($this->tags)) {
+            return '';
         }
 
-        $topics = array_map(function ($topic) use ($translations) {
-            # Add 'Antolin' rating if available ..
-            if (Butler::startsWith($topic, 'Antolin')) {
-                $string = Butler::replace($topic, ['(', ')'], '');
-
-                # .. but not as topic
-                $this->antolin = Butler::split($string, 'Antolin')[0];
-
-                return '';
+        foreach ($this->tags as $tag) {
+            if (Butler::startsWith($tag, 'Antolin')) {
+                return Butler::replace($tag, ['Antolin (', ')'], '');
             }
+        }
 
-            if (isset($translations[$topic])) {
-                return $translations[$topic];
-            }
-        }, $tags);
-
-        return array_filter($topics);
+        return '';
     }
 
 
@@ -372,7 +388,7 @@ class Book extends Product
             'Altersempfehlung'    => $this->age(),
 
             # (2) Extension 'People'
-            'AutorIn'             => $this->author($asArray),
+            'AutorIn'             => $this->getRole('author', $asArray),
             'IllustratorIn'       => $this->getRole('illustrator', $asArray),
             'ZeichnerIn'          => $this->getRole('drawer', $asArray),
             'PhotographIn'        => $this->getRole('photographer', $asArray),

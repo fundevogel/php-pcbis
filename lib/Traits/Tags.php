@@ -103,7 +103,7 @@ trait Tags
     }
 
 
-    protected function exportProperty(array $property, bool $asArray, string $delimiter)
+    private function exportProperty(array $property, bool $asArray, string $delimiter)
     {
         if ($asArray) {
             return $property;
