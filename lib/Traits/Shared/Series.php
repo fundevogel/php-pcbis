@@ -83,6 +83,17 @@ trait Series
 
 
     /**
+     * Whether product is part of a series
+     *
+     * @return string
+     */
+    public function isSeries(): string
+    {
+        return $this->series !== '';
+    }
+
+
+    /**
      * Returns series
      *
      * @return string
