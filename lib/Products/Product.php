@@ -12,6 +12,8 @@ use PHPCBIS\Traits\DownloadCover;
 use PHPCBIS\Traits\People;
 use PHPCBIS\Traits\Tags;
 
+use DOMDocument;
+
 
 /**
  * Class Product
@@ -184,16 +186,7 @@ abstract class Product implements Sociable, Taggable
      * Setters & getters
      */
 
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
+    # Nothing to see here
 
 
     /**
@@ -230,6 +223,17 @@ abstract class Product implements Sociable, Taggable
     public function isbn(): string
     {
         return $this->isbn;
+    }
+
+
+    /**
+     * Returns product type
+     *
+     * @return string
+     */
+    public function type(): string
+    {
+        return $this->type;
     }
 
 
@@ -284,37 +288,41 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Builds description
+     * Builds description(s)
      *
-     * @return string
+     * @return array
      */
-    protected function buildDescription(): string
+    protected function buildDescription(): array
     {
-        if (!isset($array['Text1'])) {
-            return '';
+        if (!isset($this->source['Text1'])) {
+            return [];
         }
 
-        $string = $array['Text1'];
-        $description = Butler::split($string, 'º');
+        # Convert source text to HTML
+        $html = htmlspecialchars_decode(utf8_decode($this->source['Text1']));
 
-        foreach ($description as $index => $text) {
-            $text = htmlspecialchars_decode($text);
-            $text = Butler::replace($text, '<br><br>', '. ');
-            $text = Butler::unhtml($text);
-            $description[$index] = $text;
+        # Create DOM document & load HTML
+        $dom = new DOMDocument();
+        $dom->loadHtml($html);
 
-            if (Butler::length($description[$index]) < 130 && count($description) > 1) {
-                unset($description[array_search($text, $description)]);
-            }
+        $description = [];
+
+        # Extract texts from DOMNodeList containing `<span>` elements
+        foreach ($dom->getElementsByTagName('span') as $node) {
+            $description[] = $node->nodeValue;
         }
 
-        return Butler::first($description);
+        return $description;
     }
 
 
-    public function description(): string
+    public function description(bool $asArray = false)
     {
-        return $this->description;
+        if ($asArray) {
+            return $this->description;
+        }
+
+        return Butler::first($this->description);
     }
 
 
