@@ -298,8 +298,12 @@ abstract class Product implements Sociable, Taggable
             return [];
         }
 
-        # Convert source text to HTML
-        $html = htmlspecialchars_decode(utf8_decode($this->source['Text1']));
+        # Convert source text to valid HTML
+        # (1) Avoid `htmlParseEntityRef: no name in Entity` warnings
+        # See https://stackoverflow.com/a/14832134
+        $html = Butler::replace($this->source['Text1'], '&', '&amp;');
+        # (2) Decode characters & convert HTML elements
+        $html = htmlspecialchars_decode(utf8_decode($html));
 
         # Create DOM document & load HTML
         $dom = new DOMDocument();
