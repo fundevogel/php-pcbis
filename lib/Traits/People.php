@@ -49,6 +49,7 @@ trait People
      * - `photographer`
      * - `translator`
      * - `narrator`
+     * - `composer`
      * - `director`
      * - `producer`
      * - `participant`
@@ -67,6 +68,7 @@ trait People
             'translator'   => [],
             'editor'       => [],
             'narrator'     => [],
+            'composer'     => [],
             'director'     => [],
             'producer'     => [],
             'participant'  => [],
@@ -83,6 +85,7 @@ trait People
             'Fotos'        => 'photographer',
             'Übersetzung'  => 'translator',
             'Gesprochen'   => 'narrator',
+            'Komposition'  => 'composer',
             'Regie'        => 'director',
             'Produktion'   => 'producer',
             'Mitarbeit'    => 'participant',
@@ -296,6 +299,11 @@ trait People
     public function narrator(bool $asArray = false)
     {
         return $this->getRole('narrator', $asArray);
+    }
+
+    public function composer(bool $asArray = false)
+    {
+        return $this->getRole('composer', $asArray);
     }
 
     public function director(bool $asArray = false)

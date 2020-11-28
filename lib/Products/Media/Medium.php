@@ -125,6 +125,7 @@ class Medium extends Product
 
             # (4) 'Media' specific data
             'Dauer'               => $this->duration(),
+            'KomponistIn'         => $this->getRole('composer', $asArray),
             'RegisseurIn'         => $this->getRole('director', $asArray),
             'ProduzentIn'         => $this->getRole('producer', $asArray),
         ];
