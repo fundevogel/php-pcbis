@@ -46,16 +46,15 @@ trait Series
      */
     protected function buildSeries(): string
     {
-        if (!isset($this->source['VerwieseneReihe1'])) {
-            return '';
+        if (isset($this->source['VerwieseneReihe2'])) {
+            return trim($this->source['VerwieseneReihe2']);
         }
 
-        return trim($this->source['VerwieseneReihe1']);
-        if((string)(int)$var == $var) {
-            echo 'var is an integer or a string representation of an integer';
+        if (isset($this->source['VerwieseneReihe1'])) {
+            return trim($this->source['VerwieseneReihe1']);
         }
 
-        return trim($publisher);
+        return '';
     }
 
 
@@ -66,16 +65,12 @@ trait Series
      */
     protected function buildVolume(): string
     {
-        if (!isset($this->source['Sammlg'])) {
-            return '';
+        if (isset($this->source['BandnrVerwieseneReihe2'])) {
+            return $this->source['BandnrVerwieseneReihe2'];
         }
 
-        # Split by whitespace & check if last element represents an integer value,
-        # since source string might be either 'Some Series' or 'Some Series VOLUME'
-        $data = Butler::last(Butler::split($this->source['Sammlg'], ' '));
-
-        if ((string) (int) $data == $data) {
-            return $data;
+        if (isset($this->source['BandnrVerwieseneReihe1'])) {
+            return $this->source['BandnrVerwieseneReihe1'];
         }
 
         return '';
