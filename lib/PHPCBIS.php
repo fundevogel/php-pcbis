@@ -44,6 +44,14 @@ class PHPCBIS
 
 
     /**
+     * Whether to work offline (cached books only)
+     *
+     * @var bool
+     */
+    private $offlineMode;
+
+
+    /**
      * Path to cached product information received from KNV's API
      *
      * @var string
@@ -87,30 +95,34 @@ class PHPCBIS
      * Constructor
      */
 
-    public function __construct(array $credentials = null, bool $forceRefresh = false)
+    public function __construct(array $credentials = null, bool $offlineMode = false, bool $forceRefresh = false)
     {
-        # Fire up SOAP client
-        $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
-            'soap_version' => SOAP_1_2,
-            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-            'cache_wsdl' => WSDL_CACHE_BOTH,
-            'trace' => true,
-            'exceptions' => true,
-        ]);
+        # Detect offline mode
+        $this->offlineMode = $offlineMode;
 
-        # Check compatibility
-        if (!$this->isCompatible()) {
-            throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
+        if (!$offlineMode) {
+            # Fire up SOAP client
+            $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
+                'soap_version' => SOAP_1_2,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
+                'cache_wsdl' => WSDL_CACHE_BOTH,
+                'trace' => true,
+                'exceptions' => true,
+            ]);
+
+            # Check compatibility
+            if (!$this->isCompatible()) {
+                throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
+            }
+
+            # If credentials are provided & offline mode is disabled ..
+            if ($credentials) {
+                # .. log in & store sessionID
+                $this->sessionID = $this->logIn($credentials);
+            }
         }
 
-        # If credentials are provided ..
-        if ($credentials !== null) {
-            # .. log in & store sessionID
-            $this->sessionID = $this->logIn($credentials);
-            // throw new InvalidLoginException('Please provide valid login credentials.');
-        }
-
-        # Force refresh (or not)
+        # Force cache refresh (or not)
         $this->forceRefresh = $forceRefresh;
     }
 
@@ -187,9 +199,7 @@ class PHPCBIS
     private function logIn(array $credentials): string
     {
         try {
-            $query = $this->client->WSCall([
-                'LoginInfo' => $credentials,
-            ]);
+            $query = $this->client->WSCall(['LoginInfo' => $credentials]);
         } catch (SoapFault $e) {
             throw new InvalidLoginException($e->getMessage());
         }
@@ -218,10 +228,15 @@ class PHPCBIS
      * .. if product for given EAN/ISBN exists
      *
      * @param string $isbn
+     * @throws \PHPCBIS\Exceptions\InvalidLoginException
      * @return array
      */
     private function query(string $isbn)
     {
+        if ($this->offlineMode) {
+            throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
+        }
+
         # For getting started with KNV's (surprisingly well documented) german API,
         # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
         $query = $this->client->WSCall([
