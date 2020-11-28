@@ -52,6 +52,14 @@ class PHPCBIS
 
 
     /**
+     * Whether cached data should be refreshed
+     *
+     * @var bool
+     */
+    private $forceRefresh;
+
+
+    /**
      * SOAP client used when connecting to KNV's API
      *
      * @var \SoapClient
@@ -79,7 +87,7 @@ class PHPCBIS
      * Constructor
      */
 
-    public function __construct(array $credentials = null)
+    public function __construct(array $credentials = null, bool $forceRefresh = false)
     {
         # Fire up SOAP client
         $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
@@ -102,6 +110,9 @@ class PHPCBIS
 
         # Log in & store sessionID
         $this->sessionID = $this->logIn($credentials);
+
+        # Force refresh (or not)
+        $this->forceRefresh = $forceRefresh;
     }
 
 
@@ -127,6 +138,16 @@ class PHPCBIS
     public function getCachePath()
     {
         return $this->cachePath;
+    }
+
+    public function setForceRefresh(bool $forceRefresh)
+    {
+        $this->forceRefresh = $forceRefresh;
+    }
+
+    public function getForceRefresh(): bool
+    {
+        return $this->forceRefresh;
     }
 
     public function setTranslations(array $translations)
@@ -254,9 +275,12 @@ class PHPCBIS
     private function fetch(string $isbn): array
     {
         $driver = new FileCache($this->cachePath);
-        $fromCache = $driver->contains($isbn);
 
-        if (!$fromCache) {
+        if ($driver->contains($isbn) && $this->forceRefresh) {
+            $driver->delete($isbn);
+        }
+
+        if (!$driver->contains($isbn)) {
             $result = $this->query($isbn);
             $driver->save($isbn, $result);
         }
