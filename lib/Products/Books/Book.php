@@ -5,7 +5,9 @@ namespace PHPCBIS\Products\Books;
 use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
 use PHPCBIS\Traits\DownloadCover;
+
 use PHPCBIS\Traits\Shared\Publisher;
+use PHPCBIS\Traits\Shared\Series;
 
 
 /**
@@ -22,6 +24,7 @@ class Book extends Product
 
     use DownloadCover;
     use Publisher;
+    use Series;
 
 
     /**
@@ -98,6 +101,8 @@ class Book extends Product
         $this->binding      = $this->buildBinding();
         $this->pageCount    = $this->buildPageCount();
         $this->dimensions   = $this->buildDimensions();
+        $this->series       = $this->buildSeries();
+        $this->volume       = $this->buildVolume();
 
         # Build involved people
         $this->illustrator  = $this->getRole('illustrator', true);
@@ -381,6 +386,8 @@ class Book extends Product
 
             # (4) 'Book' specific data
             'Verlag'              => $this->publisher(),
+            'Reihe'               => $this->series(),
+            'Band'                => $this->volume(),
             'Einband'             => $this->binding(),
             'Seitenzahl'          => $this->pageCount(),
             'Abmessungen'         => $this->dimensions(),

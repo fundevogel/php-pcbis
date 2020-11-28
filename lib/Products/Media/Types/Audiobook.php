@@ -3,7 +3,9 @@
 namespace PHPCBIS\Products\Media\Types;
 
 use PHPCBIS\Products\Media\Medium;
+
 use PHPCBIS\Traits\Shared\Publisher;
+use PHPCBIS\Traits\Shared\Series;
 
 
 /**
@@ -20,6 +22,7 @@ class Audiobook extends Medium {
      */
 
     use Publisher;
+    use Series;
 
 
     /**
@@ -31,6 +34,8 @@ class Audiobook extends Medium {
 
         # Extend dataset
         $this->publisher = $this->buildPublisher();
+        $this->series    = $this->buildSeries();
+        $this->volume    = $this->buildVolume();
     }
 
 
@@ -50,6 +55,8 @@ class Audiobook extends Medium {
             parent::export($asArray), [
             # (2) 'Audiobook' specific data
             'Verlag'     => $this->publisher(),
+            'Reihe'      => $this->series(),
+            'Band'       => $this->volume(),
             'ErzählerIn' => $this->getRole('narrator', $asArray),
         ]);
     }
