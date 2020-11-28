@@ -40,7 +40,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '2.0.0-beta.2';
+    const VERSION = '2.0.0-beta.3';
 
 
     /**
@@ -148,25 +148,30 @@ class PHPCBIS
         $this->cachePath = $cachePath;
     }
 
+
     public function getCachePath()
     {
         return $this->cachePath;
     }
+
 
     public function setForceRefresh(bool $forceRefresh)
     {
         $this->forceRefresh = $forceRefresh;
     }
 
+
     public function getForceRefresh(): bool
     {
         return $this->forceRefresh;
     }
 
+
     public function setTranslations(array $translations)
     {
         $this->translations = $translations;
     }
+
 
     public function getTranslations(): array
     {
