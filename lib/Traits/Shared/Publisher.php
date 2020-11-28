@@ -51,6 +51,7 @@ trait Publisher
         return trim($publisher);
     }
 
+
     /**
      * Returns publisher
      *

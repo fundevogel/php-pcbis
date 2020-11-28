@@ -271,50 +271,60 @@ trait People
         return $this->getRole('author', $asArray);
     }
 
+
     public function illustrator(bool $asArray = false)
     {
         return $this->getRole('illustrator', $asArray);
     }
+
 
     public function drawer(bool $asArray = false)
     {
         return $this->getRole('drawer', $asArray);
     }
 
+
     public function photographer(bool $asArray = false)
     {
         return $this->getRole('photographer', $asArray);
     }
+
 
     public function translator(bool $asArray = false)
     {
         return $this->getRole('translator', $asArray);
     }
 
+
     public function editor(bool $asArray = false)
     {
         return $this->getRole('editor', $asArray);
     }
+
 
     public function narrator(bool $asArray = false)
     {
         return $this->getRole('narrator', $asArray);
     }
 
+
     public function composer(bool $asArray = false)
     {
         return $this->getRole('composer', $asArray);
     }
+
 
     public function director(bool $asArray = false)
     {
         return $this->getRole('director', $asArray);
     }
 
+
     public function producer(bool $asArray = false)
     {
         return $this->getRole('producer', $asArray);
     }
+
 
     public function participant(bool $asArray = false)
     {

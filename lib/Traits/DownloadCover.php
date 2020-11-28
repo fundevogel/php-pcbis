@@ -47,15 +47,18 @@ trait DownloadCover
         $this->imagePath = $imagePath;
     }
 
+
     public function getImagePath()
     {
         return $this->imagePath;
     }
 
+
     public function setUserAgent(string $userAgent)
     {
         $this->userAgent = $userAgent;
     }
+
 
     public function getUserAgent(): string
     {

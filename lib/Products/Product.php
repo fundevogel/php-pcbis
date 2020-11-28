@@ -311,6 +311,7 @@ abstract class Product implements Sociable, Taggable
         return Butler::first($description);
     }
 
+
     public function description(): string
     {
         return $this->description;
@@ -335,6 +336,7 @@ abstract class Product implements Sociable, Taggable
         return number_format($retailPrice, 2, ',', '');
     }
 
+
     public function retailPrice(): string
     {
         return $this->retailPrice;
@@ -354,6 +356,7 @@ abstract class Product implements Sociable, Taggable
 
         return $this->source['Erschjahr'];
     }
+
 
     public function releaseYear(): string
     {
@@ -381,6 +384,7 @@ abstract class Product implements Sociable, Taggable
 
       	return 'ab ' . $age . ' Jahren';
     }
+
 
     public function age(): string
     {

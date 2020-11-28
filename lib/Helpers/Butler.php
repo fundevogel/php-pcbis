@@ -101,6 +101,7 @@ class Butler
         return MB ? mb_strlen($str, 'UTF-8') : strlen($str);
     }
 
+
     /**
      * Checks if a str contains another string
      *
@@ -166,6 +167,7 @@ class Butler
         return static::replaceReplacements($string, $replacements);
     }
 
+
     /**
      * Generates a replacement array out of dynamic input data
      * Used for Butler::replace()
@@ -216,6 +218,7 @@ class Butler
 
         return $replacements;
     }
+
 
     /**
      * Takes a replacement array and processes the replacements
