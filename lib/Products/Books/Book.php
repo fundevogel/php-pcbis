@@ -6,8 +6,10 @@ use PHPCBIS\Helpers\Butler;
 use PHPCBIS\Products\Product;
 use PHPCBIS\Traits\DownloadCover;
 
+use PHPCBIS\Traits\Shared\Categories;
 use PHPCBIS\Traits\Shared\Publisher;
 use PHPCBIS\Traits\Shared\Series;
+use PHPCBIS\Traits\Shared\Topics;
 
 
 /**
@@ -22,6 +24,7 @@ class Book extends Product
      * Traits
      */
 
+    use Categories, Topics;
     use DownloadCover;
     use Publisher;
     use Series;
@@ -64,32 +67,6 @@ class Book extends Product
 
 
     /**
-     * List of blocked topics
-     *
-     * @var array
-     */
-    protected $blockList = [
-        # Rather categories than tags
-        'Hörbuch',
-        'Papp-Bilderbuch',
-        'Umwelt-Bilderbuch',
-        'Vorlesebuch',
-
-        # Highly sophisticated ways to say 'book for kids'
-        # (1) Non-fiction for kids
-        'Kinder-/Jugendsachbuch',
-        'Kindersachbuch/Jugendsachbuch',
-        'Kindersachbuch/Jugendsachbuch.',
-        # (2) Literature for children & adolescents
-        'Kinderliteratur/Jugendliteratur',
-        'Kinder-/Jugendliteratur',
-        'Kinder/Jugendliteratur',
-        'Kinder-/Jugendlit.',
-        'Kinder/Jugendlit.',
-    ];
-
-
-    /**
      * Constructor
      */
 
@@ -104,110 +81,6 @@ class Book extends Product
         $this->series       = $this->buildSeries();
         $this->volume       = $this->buildVolume();
         $this->antolin      = $this->buildAntolin();
-    }
-
-
-    /**
-     * Setters & getters
-     */
-
-    # Nothing to see here
-
-
-    /**
-     * Overrides
-     */
-
-    /**
-     * Builds categories
-     *
-     * @return array
-     */
-    protected function buildCategories(): array
-    {
-        if (empty($this->tags)) {
-            return [];
-        }
-
-        $categories = [];
-
-        foreach ($this->tags as $tag) {
-            $lowercase = Butler::lower($tag);
-
-            if (Butler::contains($lowercase, 'bilderbuch')) {
-                $categories[] = 'Bilderbuch';
-            }
-
-            if (Butler::contains($lowercase, 'vorlesebuch')) {
-                $categories[] = 'Vorlesebuch';
-            }
-
-            if (Butler::contains($lowercase, 'sachbuch')) {
-                $categories[] = 'Sachbuch';
-            }
-        }
-
-        return array_unique($categories);
-    }
-
-
-    /**
-     * Builds topics
-     *
-     * @return array
-     */
-    protected function buildTopics(): array
-    {
-        $tags = parent::buildTopics();
-
-        $translations = [
-            'Auto / Personenwagen / Pkw' => 'Autos',
-            'Coming of Age / Erwachsenwerden' => 'Erwachsenwerden',
-            'Demenz / Alzheimersche Krankheit' => 'Demenz',
-            'Deutsche Demokratische Republik (DDR)' => 'DDR',
-            'Flucht / Flüchtling' => 'Flucht',
-            'IM (Staatssicherheitsdienst)' => 'Inoffizielle MitarbeiterInnen',
-            'Klassenfahrt / Schulfahrt' => 'Klassenfahrt',
-            'Klassiker (Literatur)' => 'Klassiker',
-            'Klimaschutz, Klimawandel / Klimaveränderung' => 'Klimaschutz',
-            'Klimawandel / Klimaveränderung' => 'Klimawandel',
-            'Krebs (Krankheit) / Karzinom' => 'Krebserkrankung',
-            'Leichte Sprache / Einfache Sprache' => 'Einfache Sprache',
-            'Migration / Migrant' => 'Migration',
-            'Regenwald / Dschungel' => 'Regenwald',
-            'Schulanfang / Schulbeginn' => 'Schulanfang',
-            'Selbstmord / Suizid / Freitod / Selbsttötung' => 'Selbsttötung',
-            'Ski / Schi' => 'Skifahren',
-            'Soziales Netzwerk (Internet) / Social Networking' => 'Social Media',
-            'Spionage / Agent / Agentin / Spion / Spionin' => 'GeheimagentIn',
-            'Staatssicherheitsdienst (Stasi)' => 'Stasi',
-            'Traum / Träumen / Traumdeutung / Traumanalyse' => 'Traum',
-            'Wolf / Wölfe (Tier)' => 'Wölfe',
-        ];
-
-        if (!empty($this->translations)) {
-            $translations = $this->translations;
-        }
-
-        $topics = array_map(function ($topic) use ($translations) {
-            # Skip blocklisted topics
-            if (in_array($topic, $this->blockList)) {
-                return '';
-            }
-
-            # Skip 'Antolin' rating
-            if (Butler::startsWith($topic, 'Antolin')) {
-                return '';
-            }
-
-            if (isset($translations[$topic])) {
-                return $translations[$topic];
-            }
-
-            return $topic;
-        }, $tags);
-
-        return array_filter($topics);
     }
 
 

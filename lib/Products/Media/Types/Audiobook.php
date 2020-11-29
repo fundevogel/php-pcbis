@@ -4,8 +4,10 @@ namespace PHPCBIS\Products\Media\Types;
 
 use PHPCBIS\Products\Media\Medium;
 
+use PHPCBIS\Traits\Shared\Categories;
 use PHPCBIS\Traits\Shared\Publisher;
 use PHPCBIS\Traits\Shared\Series;
+use PHPCBIS\Traits\Shared\Topics;
 
 
 /**
@@ -21,6 +23,7 @@ class Audiobook extends Medium {
      * Traits
      */
 
+    use Categories, Topics;
     use Publisher;
     use Series;
 
