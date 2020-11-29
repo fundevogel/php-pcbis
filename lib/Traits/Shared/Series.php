@@ -8,7 +8,7 @@ use PHPCBIS\Helpers\Butler;
 /**
  * Trait Series
  *
- * Provides ability to extract series
+ * Provides ability to extract series (book/audiobook)
  *
  * @package PHPCBIS
  */
