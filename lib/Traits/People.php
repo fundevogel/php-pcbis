@@ -115,7 +115,23 @@ trait People
             $data = Butler::replace($data, 'Illustr. v. ', 'Illustriert von ');
         }
 
+        # Check for names with two dots
+        preg_match('/[A-Z]\.\s[A-Z]\./', $data, $matches);
+
+        if (count($matches) > 0) {
+            # Create replacements for each match, replacing the dots with sharps
+            # For example, 'Tripp, F. J.' becomes 'Tripp, F# J#'
+            $replacements = array_map(function ($string) {
+                return Butler::replace(trim($string), ['. ', '.;', '.'], ['# ', '#;', '#.']);
+            }, $matches);
+
+            $data = Butler::replace($data, $matches, $replacements);
+        }
+
         foreach (Butler::split($data, '.') as $string) {
+            # If dots were replaced, change them back
+            $string = Butler::replace($string, '#', '.');
+
             # First, see if there's a colon
             if (!Butler::contains($string, ':')) {
                 # If not, the string is eligible for an alternative delimiter
