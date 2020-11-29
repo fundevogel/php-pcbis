@@ -100,7 +100,7 @@ abstract class Product implements Sociable, Taggable
     /**
      * Description
      *
-     * @var string
+     * @var array
      */
     protected $description;
 
@@ -299,11 +299,11 @@ abstract class Product implements Sociable, Taggable
         }
 
         # Convert source text to valid HTML
-        # (1) Avoid `htmlParseEntityRef: no name in Entity` warnings
+        # (1) Decode HTML characters
+        $html = html_entity_decode($this->source['Text1']);
+        # (2) Avoid `htmlParseEntityRef: no name in Entity` warnings
         # See https://stackoverflow.com/a/14832134
-        $html = Butler::replace($this->source['Text1'], '&', '&amp;');
-        # (2) Decode characters & convert HTML elements
-        $html = htmlspecialchars_decode(utf8_decode($html));
+        $html = Butler::replace($html, '&', '&amp;');
 
         # Create DOM document & load HTML
         $dom = new DOMDocument();
@@ -313,7 +313,7 @@ abstract class Product implements Sociable, Taggable
 
         # Extract texts from DOMNodeList containing `<span>` elements
         foreach ($dom->getElementsByTagName('span') as $node) {
-            $description[] = $node->nodeValue;
+            $description[] = utf8_decode($node->nodeValue);
         }
 
         return $description;
