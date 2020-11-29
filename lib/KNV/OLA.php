@@ -396,7 +396,7 @@ class OLA
     public function isAvailable(): bool
     {
         if ($this->hasStatusCode()) {
-            return array_key_exists($this->statusCode, $this->available);
+            return in_array($this->statusCode, $this->available);
         }
 
         return $this->success && $this->quantityOrdered <= $this->quantityAvailable;
