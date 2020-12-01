@@ -38,6 +38,14 @@ abstract class Product implements Sociable, Taggable
      */
 
     /**
+     * Object granting access to KNV's API
+     *
+     * @var \PHPCBIS\KNV\Api
+     */
+    private $api = null;
+
+
+    /**
      * International Standard Book Number
      *
      * @var string
@@ -141,6 +149,9 @@ abstract class Product implements Sociable, Taggable
         # .. or from cache?
         $this->fromCache = $props['fromCache'];
 
+        # Store API proxy
+        $this->api = $props['api'];
+
         # Store valid ISBN
         $this->isbn = $props['isbn'];
 
@@ -212,6 +223,17 @@ abstract class Product implements Sociable, Taggable
     public function fromCache(): bool
     {
         return $this->fromCache;
+    }
+
+
+    /**
+     * Returns OLA record
+     *
+     * @return \PHPCBIS\KNV\Responses\OLA
+     */
+    public function ola(int $quantity = 1): \PHPCBIS\KNV\Responses\OLA
+    {
+        return $this->api->ola($this->isbn, $quantity);
     }
 
 

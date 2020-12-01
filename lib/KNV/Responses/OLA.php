@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS\KNV;
+namespace PHPCBIS\KNV\Responses;
 
 use PHPCBIS\Helpers\Butler;
 
@@ -8,7 +8,7 @@ use PHPCBIS\Helpers\Butler;
 /**
  * Class OLA
  *
- * Processes information about books being available for delivery - or not
+ * Processes information about products being available for delivery - or not
  *
  * @package PHPCBIS
  */
@@ -48,7 +48,7 @@ class OLA
 
 
     /**
-     * Status codes of available books
+     * Status codes of available products
      *
      * Preorder always:
      *
@@ -82,7 +82,7 @@ class OLA
 
 
     /**
-     * Status codes of unavailable books
+     * Status codes of unavailable products
      *
      * 07 Vergriffen, keine Neuauflage, Bestellung abgelegt
      * 17 Führen wir nicht bzw. nicht mehr
@@ -229,8 +229,8 @@ class OLA
     {
         $this->data = $data;
 
-        # Whether OLA query for given book was successfull
-        # Note: This doesn't convern given book's availability!
+        # Whether OLA query for given product was successfull
+        # Note: This doesn't convern given product's availability!
         $this->success = $data->StatusPosition === 'OK' ? true : false;
 
         # Number of items ordered & available for order
@@ -389,7 +389,7 @@ class OLA
 
 
     /**
-     * Checks if book is available / may be purchased
+     * Checks if product is available / may be purchased
      *
      * @return bool
      */
