@@ -227,6 +227,7 @@ class PHPCBIS
         $data = $this->fetch($isbn);
 
         $props = [
+            'api'          => $this->api,
             'isbn'         => $isbn,
             'fromCache'    => $data['fromCache'],
             'translations' => $this->translations,
