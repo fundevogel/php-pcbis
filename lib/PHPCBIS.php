@@ -9,22 +9,15 @@
 
 namespace PHPCBIS;
 
-use PHPCBIS\Exceptions\IncompatibleClientException;
-use PHPCBIS\Exceptions\InvalidLoginException;
 use PHPCBIS\Exceptions\InvalidISBNException;
-
 use PHPCBIS\Helpers\Butler;
-use PHPCBIS\KNV\Responses\OLA;
+use PHPCBIS\KNV\Api;
 
 use PHPCBIS\Products\Factory;
 use PHPCBIS\Products\Books\Books;
 
 use Biblys\Isbn\Isbn as ISBN;
 use Doctrine\Common\Cache\FilesystemCache as FileCache;
-
-use Exception;
-use SoapClient;
-use SoapFault;
 
 
 /**
@@ -44,11 +37,11 @@ class PHPCBIS
 
 
     /**
-     * Whether to work offline (cached books only)
+     * Object granting access to KNV's API
      *
-     * @var bool
+     * @var \PHPCBIS\KNV\Api
      */
-    private $offlineMode = false;
+    private $api = null;
 
 
     /**
@@ -56,7 +49,7 @@ class PHPCBIS
      *
      * @var \Doctrine\Common\Cache\FilesystemCache
      */
-    private $cache;
+    private $cache = null;
 
 
     /**
@@ -76,22 +69,6 @@ class PHPCBIS
 
 
     /**
-     * SOAP client used when connecting to KNV's API
-     *
-     * @var \SoapClient
-     */
-    private $client = null;
-
-
-    /**
-     * Session identifier retrieved when first connecting to KNV's API
-     *
-     * @var string
-     */
-    private $sessionID = null;
-
-
-    /**
      * Translatable strings
      *
      * @var array
@@ -105,50 +82,14 @@ class PHPCBIS
 
     public function __construct(array $credentials = null, bool $forceRefresh = false)
     {
-        try {
-            # Fire up SOAP client
-            $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
-                'soap_version' => SOAP_1_2,
-                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-                'cache_wsdl' => WSDL_CACHE_BOTH,
-                'trace' => true,
-                'exceptions' => true,
-            ]);
-        } catch (SoapFault $e) {
-            # Activate offline mode on network error
-            $this->offlineMode = true;
-        }
-
-        if (!$this->offlineMode) {
-            # Check compatibility
-            if ($this->client->CheckVersion('2.0') === '2') {
-                throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
-            }
-
-            # If credentials are provided & offline mode is disabled ..
-            if ($credentials !== null) {
-                # .. log in & store sessionID
-                $this->sessionID = $this->logIn($credentials);
-            }
-        }
+        # Connect with API
+        $this->api = new Api($credentials);
 
         # Initialise cache
         $this->cache = new FileCache($this->cachePath);
 
         # Force cache refresh (or not)
         $this->forceRefresh = $forceRefresh;
-    }
-
-
-    /**
-     * Destructor
-     */
-
-    public function __destruct()
-    {
-        if ($this->sessionID !== null) {
-            $this->logOut();
-        }
     }
 
 
@@ -201,98 +142,6 @@ class PHPCBIS
      */
 
     /**
-     * Uses credentials to log into KNV's API & generates a sessionID
-     *
-     * @param array $credentials
-     * @throws \PHPCBIS\Exceptions\InvalidLoginException
-     * @return string
-     */
-    private function logIn(array $credentials): string
-    {
-        try {
-            $query = $this->client->WSCall(['LoginInfo' => $credentials]);
-        } catch (SoapFault $e) {
-            throw new InvalidLoginException($e->getMessage());
-        }
-
-        return $query->SessionID;
-    }
-
-
-    /**
-     * Uses sessionID to log out of KNV's API
-     *
-     * @return void
-     */
-    private function logOut(): void
-    {
-        $this->client->WSCall([
-            'SessionID' => $this->sessionID,
-            'Logout' => true,
-        ]);
-    }
-
-
-    /**
-     * Fetches raw product data from KNV
-     *
-     * .. if product for given EAN/ISBN exists
-     *
-     * @param string $isbn
-     * @throws \PHPCBIS\Exceptions\InvalidLoginException
-     * @return array
-     */
-    private function query(string $isbn)
-    {
-        if ($this->offlineMode) {
-            throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
-        }
-
-        # For getting started with KNV's (surprisingly well documented) german API,
-        # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
-        $query = $this->client->WSCall([
-            # Log in using sessionID
-            'SessionID' => $this->sessionID,
-
-            # Start new database query
-            'Suchen' => [
-                # Search across all databases
-                'Datenbank' => [
-                    'KNV',
-                    'KNVBG',
-                    'BakerTaylor',
-                    'Gardners',
-                ],
-                'Suche' => [
-                    'SimpleTerm' => [
-                        # Simple search suffices for querying single ISBN
-                        'Suchfeld' => 'ISBN',
-                        'Suchwert' => $isbn,
-                        'Schwert2' => '',
-                        'Suchart' => 'Genau',
-                    ],
-                ],
-            ],
-            # Read results of the query & return first result
-            'Lesen' => [
-                'SatzVon' => 1,
-                'SatzBis' => 1,
-                'Format' => 'KNVXMLLangText',
-            ],
-        ]);
-
-        if ($query->Suchergebnis->TrefferGesamt > 0) {
-            $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
-            $array = Butler::loadXML($result);
-
-            return Butler::last($array);
-        }
-
-        return [];
-    }
-
-
-    /**
      * Fetches information from cache if they exist,
      * otherwise loads them & saves to cache
      *
@@ -309,7 +158,7 @@ class PHPCBIS
         $fromCache = true;
 
         if (!$this->cache->contains($isbn)) {
-            $result = $this->query($isbn);
+            $result = $this->api->query($isbn);
             $this->cache->save($isbn, $result);
 
             # .. turns out, it was not
@@ -343,7 +192,7 @@ class PHPCBIS
         try {
             $isbn->validate();
             $isbn = $isbn->format('ISBN-13');
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             throw new InvalidISBNException($e->getMessage());
         }
 
@@ -362,21 +211,7 @@ class PHPCBIS
     {
         $isbn = $this->validate($isbn);
 
-        $query = $this->client->WSCall([
-            # Log in using sessionID
-            'SessionID' => $this->sessionID,
-            'OLA' => [
-                'Art' => 'Abfrage',
-                'OLAItem' => [
-                    'Bestellnummer' => [
-                        'ISBN' => $isbn,
-                    ],
-                    'Menge' => $quantity,
-                ],
-            ],
-        ]);
-
-        return new OLA($query->OLAResponse->OLAResponseRecord);
+        return $this->api->ola($isbn, $quantity);
     }
 
 
