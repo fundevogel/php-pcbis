@@ -48,7 +48,7 @@ class PHPCBIS
      *
      * @var bool
      */
-    private $offlineMode;
+    private $offlineMode = false;
 
 
     /**
@@ -95,12 +95,9 @@ class PHPCBIS
      * Constructor
      */
 
-    public function __construct(array $credentials = null, bool $offlineMode = false, bool $forceRefresh = false)
+    public function __construct(array $credentials = null, bool $forceRefresh = false)
     {
-        # Detect offline mode
-        $this->offlineMode = $offlineMode;
-
-        if (!$offlineMode) {
+        try {
             # Fire up SOAP client
             $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
                 'soap_version' => SOAP_1_2,
@@ -109,14 +106,19 @@ class PHPCBIS
                 'trace' => true,
                 'exceptions' => true,
             ]);
+        } catch (SoapFault $e) {
+            # Activate offline mode on network error
+            $this->offlineMode = true;
+        }
 
+        if (!$this->offlineMode) {
             # Check compatibility
-            if (!$this->isCompatible()) {
+            if ($this->client->CheckVersion('2.0') === '2') {
                 throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
             }
 
             # If credentials are provided & offline mode is disabled ..
-            if ($credentials) {
+            if ($credentials !== null) {
                 # .. log in & store sessionID
                 $this->sessionID = $this->logIn($credentials);
             }
@@ -182,17 +184,6 @@ class PHPCBIS
     /**
      * Methods
      */
-
-    /**
-     * Checks compatibility of PHPCBIS & KNV's API
-     *
-     * @return bool
-     */
-    private function isCompatible(): bool
-    {
-        return $this->client->CheckVersion('2.0') !== '2';
-    }
-
 
     /**
      * Uses credentials to log into KNV's API & generates a sessionID
