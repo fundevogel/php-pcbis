@@ -52,7 +52,15 @@ class PHPCBIS
 
 
     /**
-     * Path to cached product information received from KNV's API
+     * Cache object storing product data fetched from KNV's API
+     *
+     * @var \Doctrine\Common\Cache\FilesystemCache
+     */
+    private $cache;
+
+
+    /**
+     * Path to cached product data fetched from KNV's API
      *
      * @var string
      */
@@ -124,6 +132,9 @@ class PHPCBIS
             }
         }
 
+        # Initialise cache
+        $this->cache = new FileCache($this->cachePath);
+
         # Force cache refresh (or not)
         $this->forceRefresh = $forceRefresh;
     }
@@ -147,6 +158,10 @@ class PHPCBIS
 
     public function setCachePath(string $cachePath)
     {
+        # Reinitialise cache object
+        $this->cache = new FileCache($cachePath);
+
+        # Set path to product data
         $this->cachePath = $cachePath;
     }
 
@@ -286,22 +301,24 @@ class PHPCBIS
      */
     private function fetch(string $isbn): array
     {
-        $driver = new FileCache($this->cachePath);
-        $fromCache = false;
-
-        if ($driver->contains($isbn) && $this->forceRefresh) {
-            $driver->delete($isbn);
+        if ($this->cache->contains($isbn) && $this->forceRefresh) {
+            $this->cache->delete($isbn);
         }
 
-        if (!$driver->contains($isbn)) {
+        # Data might be cached already ..
+        $fromCache = true;
+
+        if (!$this->cache->contains($isbn)) {
             $result = $this->query($isbn);
-            $driver->save($isbn, $result);
-            $fromCache = true;
+            $this->cache->save($isbn, $result);
+
+            # .. turns out, it was not
+            $fromCache = false;
         }
 
         return [
             'fromCache' => $fromCache,
-            'source'    => $driver->fetch($isbn),
+            'source'    => $this->cache->fetch($isbn),
         ];
     }
 
