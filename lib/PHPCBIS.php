@@ -14,7 +14,7 @@ use PHPCBIS\Exceptions\InvalidLoginException;
 use PHPCBIS\Exceptions\InvalidISBNException;
 
 use PHPCBIS\Helpers\Butler;
-use PHPCBIS\KNV\OLA;
+use PHPCBIS\KNV\Responses\OLA;
 
 use PHPCBIS\Products\Factory;
 use PHPCBIS\Products\Books\Books;
@@ -40,7 +40,7 @@ class PHPCBIS
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '2.0.0-rc.1';
+    const VERSION = '2.0.0-rc.3';
 
 
     /**
@@ -348,7 +348,7 @@ class PHPCBIS
      *
      * @param string $isbn - A given product's EAN/ISBN
      * @param int $quantity - Number of products to be delivered
-     * @return \PHPCBIS\KNV\OLA
+     * @return \PHPCBIS\KNV\Responses\OLA
      */
     public function ola(string $isbn, int $quantity = 1)
     {
