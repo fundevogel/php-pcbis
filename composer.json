@@ -28,12 +28,12 @@
     },
     "autoload": {
         "psr-4": {
-            "PHPCBIS\\": "lib/"
+            "Pcbis\\": "lib/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "PHPpcbis\\Tests\\": "tests/"
+            "Pcbis\\Tests\\": "tests/"
         }
     }
 }

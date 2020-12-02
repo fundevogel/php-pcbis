@@ -1,6 +1,6 @@
 <?php
 
-namespace Pcbis\KNV\Responses;
+namespace Pcbis\Api;
 
 use Pcbis\Helpers\Butler;
 

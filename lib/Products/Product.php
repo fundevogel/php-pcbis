@@ -40,7 +40,7 @@ abstract class Product implements Sociable, Taggable
     /**
      * Object granting access to KNV's API
      *
-     * @var \Pcbis\KNV\Api
+     * @var \Pcbis\Webservice
      */
     private $api = null;
 

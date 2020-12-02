@@ -3,14 +3,18 @@
 /**
  * PHPCBIS - pcbis.de helper library
  *
- * @link https://github.com/Fundevogel/pcbis2pdf
+ * @link https://github.com/Fundevogel/php-pcbis
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace PHPCBIS;
+namespace Pcbis;
 
+use PHPCBIS\Exceptions\IncompatibleClientException;
 use Pcbis\Exceptions\InvalidISBNException;
+use PHPCBIS\Exceptions\InvalidLoginException;
+
 use Pcbis\Helpers\Butler;
+use Pcbis\Api\Ola;
 
 use Pcbis\Products\Factory;
 use Pcbis\Products\Books\Books;
@@ -18,16 +22,19 @@ use Pcbis\Products\Books\Books;
 use Biblys\Isbn\Isbn as ISBN;
 use Doctrine\Common\Cache\FilesystemCache as FileCache;
 
+use SoapClient;
+use SoapFault;
+
 
 /**
- * Class PHPCBIS
+ * Class Webservice
  *
  * Retrieves information from KNV's API & caches the resulting data
  *
  * @package PHPCBIS
  */
 
-class PHPCBIS
+class Webservice
 {
     /**
      * Current version number of PHPCBIS
@@ -36,19 +43,35 @@ class PHPCBIS
 
 
     /**
+     * Whether to work offline (cached books only)
+     *
+     * @var bool
+     */
+    private $offlineMode = false;
+
+
+    /**
+     * Session identifier retrieved when first connecting to KNV's API
+     *
+     * @var string
+     */
+    private $sessionID = null;
+
+
+    /**
+     * SOAP client used when connecting to KNV's API
+     *
+     * @var \SoapClient
+     */
+    private $client = null;
+
+
+    /**
      * Cache object storing product data fetched from KNV's API
      *
      * @var \Doctrine\Common\Cache\FilesystemCache
      */
     private $cache = null;
-
-
-    /**
-     * Path to cached product data fetched from KNV's API
-     *
-     * @var string
-     */
-    private $cachePath = './.cache';
 
 
     /**
@@ -71,50 +94,54 @@ class PHPCBIS
      * Constructor
      */
 
-    public function __construct(array $credentials = null, bool $forceRefresh = false)
+    public function __construct(array $credentials = null, string $cachePath = './.cache')
     {
-        # Connect with API
-        $this->api = new Api($credentials);
+        try {
+            # Fire up SOAP client
+            $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
+                'soap_version' => SOAP_1_2,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
+                'cache_wsdl' => WSDL_CACHE_BOTH,
+                'trace' => true,
+                'exceptions' => true,
+            ]);
+        } catch (SoapFault $e) {
+            # Activate offline mode on network error
+            $this->offlineMode = true;
+        }
 
-        # Initialise cache
-        $this->cache = new FileCache($this->cachePath);
+        if (!$this->offlineMode) {
+            # Check compatibility
+            if ($this->client->CheckVersion('2.0') === '2') {
+                throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
+            }
 
-        # Force cache refresh (or not)
-        $this->forceRefresh = $forceRefresh;
+            # Initialise API driver
+            if ($credentials !== null) {
+                $this->sessionID = $this->logIn($credentials);
+            }
+        }
+
+        # Initialize cache
+        $this->cache = new FileCache($cachePath);
+    }
+
+
+    /**
+     * Destructor
+     */
+
+    public function __destruct()
+    {
+        if (!$this->offlineMode) {
+            $this->logOut();
+        }
     }
 
 
     /**
      * Setters & getters
      */
-
-    public function setCachePath(string $cachePath)
-    {
-        # Reinitialise cache object
-        $this->cache = new FileCache($cachePath);
-
-        # Set path to product data
-        $this->cachePath = $cachePath;
-    }
-
-
-    public function getCachePath()
-    {
-        return $this->cachePath;
-    }
-
-
-    public function setForceRefresh(bool $forceRefresh)
-    {
-        $this->forceRefresh = $forceRefresh;
-    }
-
-
-    public function getForceRefresh(): bool
-    {
-        return $this->forceRefresh;
-    }
-
 
     public function setTranslations(array $translations)
     {
@@ -131,6 +158,98 @@ class PHPCBIS
     /**
      * Methods
      */
+
+    /**
+     * Uses credentials to log into KNV's API & generates a sessionID
+     *
+     * @param array $credentials
+     * @throws \PHPCBIS\Exceptions\InvalidLoginException
+     * @return string
+     */
+    private function logIn(array $credentials): string
+    {
+        try {
+            $query = $this->client->WSCall(['LoginInfo' => $credentials]);
+        } catch (SoapFault $e) {
+            throw new InvalidLoginException($e->getMessage());
+        }
+
+        return $query->SessionID;
+    }
+
+
+    /**
+     * Uses sessionID to log out of KNV's API
+     *
+     * @return void
+     */
+    private function logOut(): void
+    {
+        $this->client->WSCall([
+            'SessionID' => $this->sessionID,
+            'Logout' => true,
+        ]);
+    }
+
+
+    /**
+     * Fetches raw product data from KNV
+     *
+     * .. if product for given EAN/ISBN exists
+     *
+     * @param string $isbn
+     * @throws \PHPCBIS\Exceptions\InvalidLoginException
+     * @return array
+     */
+    private function query(string $isbn)
+    {
+        if ($this->offlineMode) {
+            throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
+        }
+
+        # For getting started with KNV's (surprisingly well documented) german API,
+        # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
+        $query = $this->client->WSCall([
+            # Log in using sessionID
+            'SessionID' => $this->sessionID,
+
+            # Start new database query
+            'Suchen' => [
+                # Search across all databases
+                'Datenbank' => [
+                    'KNV',
+                    'KNVBG',
+                    'BakerTaylor',
+                    'Gardners',
+                ],
+                'Suche' => [
+                    'SimpleTerm' => [
+                        # Simple search suffices for querying single ISBN
+                        'Suchfeld' => 'ISBN',
+                        'Suchwert' => $isbn,
+                        'Schwert2' => '',
+                        'Suchart' => 'Genau',
+                    ],
+                ],
+            ],
+            # Read results of the query & return first result
+            'Lesen' => [
+                'SatzVon' => 1,
+                'SatzBis' => 1,
+                'Format' => 'KNVXMLLangText',
+            ],
+        ]);
+
+        if ($query->Suchergebnis->TrefferGesamt > 0) {
+            $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
+            $array = Butler::loadXML($result);
+
+            return Butler::last($array);
+        }
+
+        return [];
+    }
+
 
     /**
      * Fetches information from cache if they exist,
@@ -198,11 +317,23 @@ class PHPCBIS
      * @param int $quantity - Number of products to be delivered
      * @return \Pcbis\Api\Ola
      */
-    public function ola(string $isbn, int $quantity = 1)
+    public function ola(string $isbn, int $quantity = 1): \Pcbis\Api\Ola
     {
-        $isbn = $this->validate($isbn);
+        $ola = $this->client->WSCall([
+            # Log in using sessionID
+            'SessionID' => $this->sessionID,
+            'OLA' => [
+                'Art' => 'Abfrage',
+                'OLAItem' => [
+                    'Bestellnummer' => [
+                        'ISBN' => $isbn,
+                    ],
+                    'Menge' => $quantity,
+                ],
+            ],
+        ]);
 
-        return $this->api->ola($isbn, $quantity);
+        return new OLA($ola->OLAResponse->OLAResponseRecord);
     }
 
 
@@ -218,7 +349,7 @@ class PHPCBIS
         $data = $this->fetch($isbn);
 
         $props = [
-            'api'          => $this->api,
+            'api'          => $this,
             'isbn'         => $isbn,
             'fromCache'    => $data['fromCache'],
             'translations' => $this->translations,
