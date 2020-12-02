@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\Traits;
+namespace Pcbis\Traits;
 
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Helpers\Butler;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException as GuzzleException;

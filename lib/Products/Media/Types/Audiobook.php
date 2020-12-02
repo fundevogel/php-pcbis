@@ -1,13 +1,13 @@
 <?php
 
-namespace PHPCBIS\Products\Media\Types;
+namespace Pcbis\Products\Media\Types;
 
-use PHPCBIS\Products\Media\Medium;
+use Pcbis\Products\Media\Medium;
 
-use PHPCBIS\Traits\Shared\Categories;
-use PHPCBIS\Traits\Shared\Publisher;
-use PHPCBIS\Traits\Shared\Series;
-use PHPCBIS\Traits\Shared\Topics;
+use Pcbis\Traits\Shared\Categories;
+use Pcbis\Traits\Shared\Publisher;
+use Pcbis\Traits\Shared\Series;
+use Pcbis\Traits\Shared\Topics;
 
 
 /**

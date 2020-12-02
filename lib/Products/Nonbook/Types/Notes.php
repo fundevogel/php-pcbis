@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\Products\Nonbook\Types;
+namespace Pcbis\Products\Nonbook\Types;
 
-use PHPCBIS\Products\Nonbook\Item;
+use Pcbis\Products\Nonbook\Item;
 
 
 /**

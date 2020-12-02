@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS\Traits;
+namespace Pcbis\Traits;
 
 
 /**

@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPCBIS\Traits;
+namespace Pcbis\Traits;
 
-use PHPCBIS\Exceptions\UnknownRoleException;
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Exceptions\UnknownRoleException;
+use Pcbis\Helpers\Butler;
 
 
 /**
@@ -216,7 +216,7 @@ trait People
      *
      * @param string $role - Individual role
      * @param bool $asArray - Whether to export an array (rather than a string)
-     * @throws \PHPCBIS\Exceptions\UnknownRoleException
+     * @throws \Pcbis\Exceptions\UnknownRoleException
      * @return string|array
      */
     public function getRole(string $role, bool $asArray = false)

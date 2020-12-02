@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\Products\Media\Types;
+namespace Pcbis\Products\Media\Types;
 
-use PHPCBIS\Products\Media\Medium;
+use Pcbis\Products\Media\Medium;
 
 
 /**

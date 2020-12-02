@@ -1,10 +1,10 @@
 <?php
 
-namespace PHPCBIS\Products\Media;
+namespace Pcbis\Products\Media;
 
-use PHPCBIS\Helpers\Butler;
-use PHPCBIS\Products\Product;
-use PHPCBIS\Traits\DownloadCover;
+use Pcbis\Helpers\Butler;
+use Pcbis\Products\Product;
+use Pcbis\Traits\DownloadCover;
 
 
 /**

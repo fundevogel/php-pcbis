@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS\Products;
+namespace Pcbis\Products;
 
 use Countable;
 use Iterator;
@@ -21,7 +21,7 @@ abstract class ProductList implements Countable, Iterator
      */
 
     /**
-     * Group of `PHPCBIS\Products\Product` objects
+     * Group of `Pcbis\Products\Product` objects
      *
      * @var array
      */
@@ -68,7 +68,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Returns the current object
      *
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function current()
     {
@@ -90,7 +90,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Moves the cursor to the next object and returns it
      *
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function next()
     {
@@ -101,7 +101,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Moves the cursor to the previous object and returns it
      *
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function prev()
     {
@@ -141,7 +141,7 @@ abstract class ProductList implements Countable, Iterator
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Products\ProductList
+     * @return \Pcbis\Products\ProductList
      */
     public function prepend(...$args)
     {
@@ -164,7 +164,7 @@ abstract class ProductList implements Countable, Iterator
      * @param mixed $key
      * @param mixed $item
      * @param mixed ...$args
-     * @return \PHPCBIS\Products\ProductList
+     * @return \Pcbis\Products\ProductList
      */
     public function append(...$args)
     {
@@ -181,7 +181,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Returns the objects in reverse order
      *
-     * @return \PHPCBIS\Products\ProductList
+     * @return \Pcbis\Products\ProductList
      */
     public function flip()
     {
@@ -195,7 +195,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Returns the first object
      *
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function first()
     {
@@ -206,7 +206,7 @@ abstract class ProductList implements Countable, Iterator
     /**
      * Returns the last object
      *
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function last()
     {
@@ -218,7 +218,7 @@ abstract class ProductList implements Countable, Iterator
      * Returns the nth object from the collection
      *
      * @param int $n
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
     public function nth(int $n)
     {
@@ -230,7 +230,7 @@ abstract class ProductList implements Countable, Iterator
      * Returns a Collection without the given object(s)
      *
      * @param string ...$keys any number of keys, passed as individual arguments
-     * @return \PHPCBIS\Products\ProductList
+     * @return \Pcbis\Products\ProductList
      */
     public function not(...$keys)
     {
@@ -292,7 +292,7 @@ abstract class ProductList implements Countable, Iterator
      * Map a function to each object
      *
      * @param callable $callback
-     * @return \PHPCBIS\Products\ProductList
+     * @return \Pcbis\Products\ProductList
      */
     public function map(callable $callback)
     {

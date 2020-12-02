@@ -1,15 +1,7 @@
 <?php
 
-namespace PHPCBIS\KNV;
+namespace Pcbis\KNV;
 
-use PHPCBIS\Exceptions\IncompatibleClientException;
-use PHPCBIS\Exceptions\InvalidLoginException;
-
-use PHPCBIS\KNV\Responses\OLA;
-use PHPCBIS\Helpers\Butler;
-
-use SoapClient;
-use SoapFault;
 
 
 /**
@@ -104,7 +96,7 @@ class Api
      * Uses credentials to log into KNV's API & generates a sessionID
      *
      * @param array $credentials
-     * @throws \PHPCBIS\Exceptions\InvalidLoginException
+     * @throws \Pcbis\Exceptions\InvalidLoginException
      * @return string
      */
     private function logIn(array $credentials): string
@@ -139,7 +131,7 @@ class Api
      * .. if product for given EAN/ISBN exists
      *
      * @param string $isbn
-     * @throws \PHPCBIS\Exceptions\InvalidLoginException
+     * @throws \Pcbis\Exceptions\InvalidLoginException
      * @return array
      */
     private function query(string $isbn)

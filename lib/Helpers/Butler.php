@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPCBIS\Helpers;
+namespace Pcbis\Helpers;
 
 if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 

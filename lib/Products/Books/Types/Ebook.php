@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPCBIS\Products\Books\Types;
+namespace Pcbis\Products\Books\Types;
 
-use PHPCBIS\Helpers\Butler;
-use PHPCBIS\Products\Books\Book;
+use Pcbis\Helpers\Butler;
+use Pcbis\Products\Books\Book;
 
 
 /**

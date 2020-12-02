@@ -9,12 +9,11 @@
 
 namespace PHPCBIS;
 
-use PHPCBIS\Exceptions\InvalidISBNException;
-use PHPCBIS\Helpers\Butler;
-use PHPCBIS\KNV\Api;
+use Pcbis\Exceptions\InvalidISBNException;
+use Pcbis\Helpers\Butler;
 
-use PHPCBIS\Products\Factory;
-use PHPCBIS\Products\Books\Books;
+use Pcbis\Products\Factory;
+use Pcbis\Products\Books\Books;
 
 use Biblys\Isbn\Isbn as ISBN;
 use Doctrine\Common\Cache\FilesystemCache as FileCache;
@@ -34,14 +33,6 @@ class PHPCBIS
      * Current version number of PHPCBIS
      */
     const VERSION = '2.0.0-rc.3';
-
-
-    /**
-     * Object granting access to KNV's API
-     *
-     * @var \PHPCBIS\KNV\Api
-     */
-    private $api = null;
 
 
     /**
@@ -177,7 +168,7 @@ class PHPCBIS
      * For more information, see https://github.com/biblys/isbn
      *
      * @param string $isbn - International Standard Book Number
-     * @throws \PHPCBIS\Exceptions\InvalidISBNException
+     * @throws \Pcbis\Exceptions\InvalidISBNException
      * @return string
      */
     private function validate(string $isbn): string
@@ -205,7 +196,7 @@ class PHPCBIS
      *
      * @param string $isbn - A given product's EAN/ISBN
      * @param int $quantity - Number of products to be delivered
-     * @return \PHPCBIS\KNV\Responses\OLA
+     * @return \Pcbis\Api\Ola
      */
     public function ola(string $isbn, int $quantity = 1)
     {
@@ -219,9 +210,9 @@ class PHPCBIS
      * Instantiates `Product` object from single EAN/ISBN
      *
      * @param string $isbn - A given product's EAN/ISBN
-     * @return \PHPCBIS\Products\Product
+     * @return \Pcbis\Products\Product
      */
-    public function load(string $isbn): \PHPCBIS\Products\Product
+    public function load(string $isbn): \Pcbis\Products\Product
     {
         $isbn = $this->validate($isbn);
         $data = $this->fetch($isbn);
@@ -243,9 +234,9 @@ class PHPCBIS
      * TODO: This needs to be re-evaluated / outsourced to a factory
      *
      * @param array $isbns - A group of books' ISBNs
-     * @return \PHPCBIS\Products\Books\Books
+     * @return \Pcbis\Products\Books\Books
      */
-    public function loadBooks(array $isbns): \PHPCBIS\Products\Books\Books
+    public function loadBooks(array $isbns): \Pcbis\Products\Books\Books
     {
         $books = [];
 

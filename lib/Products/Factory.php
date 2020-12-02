@@ -1,28 +1,28 @@
 <?php
 
-namespace PHPCBIS\Products;
+namespace Pcbis\Products;
 
-use PHPCBIS\Exceptions\UnknownTypeException;
+use Pcbis\Exceptions\UnknownTypeException;
 
-use PHPCBIS\Products\Books\Types\Ebook;
-use PHPCBIS\Products\Books\Types\Hardcover;
-use PHPCBIS\Products\Books\Types\Schoolbook;
-use PHPCBIS\Products\Books\Types\Softcover;
+use Pcbis\Products\Books\Types\Ebook;
+use Pcbis\Products\Books\Types\Hardcover;
+use Pcbis\Products\Books\Types\Schoolbook;
+use Pcbis\Products\Books\Types\Softcover;
 
-use PHPCBIS\Products\Media\Types\Audiobook;
-use PHPCBIS\Products\Media\Types\Movie;
-use PHPCBIS\Products\Media\Types\Music;
-use PHPCBIS\Products\Media\Types\Sound;
+use Pcbis\Products\Media\Types\Audiobook;
+use Pcbis\Products\Media\Types\Movie;
+use Pcbis\Products\Media\Types\Music;
+use Pcbis\Products\Media\Types\Sound;
 
-use PHPCBIS\Products\Nonbook\Types\Boardgame;
-use PHPCBIS\Products\Nonbook\Types\Calendar;
-use PHPCBIS\Products\Nonbook\Types\Map;
-use PHPCBIS\Products\Nonbook\Types\Nonbook;
-use PHPCBIS\Products\Nonbook\Types\Notes;
-use PHPCBIS\Products\Nonbook\Types\Software;
-use PHPCBIS\Products\Nonbook\Types\Stationery;
-use PHPCBIS\Products\Nonbook\Types\Toy;
-use PHPCBIS\Products\Nonbook\Types\Videogame;
+use Pcbis\Products\Nonbook\Types\Boardgame;
+use Pcbis\Products\Nonbook\Types\Calendar;
+use Pcbis\Products\Nonbook\Types\Map;
+use Pcbis\Products\Nonbook\Types\Nonbook;
+use Pcbis\Products\Nonbook\Types\Notes;
+use Pcbis\Products\Nonbook\Types\Software;
+use Pcbis\Products\Nonbook\Types\Stationery;
+use Pcbis\Products\Nonbook\Types\Toy;
+use Pcbis\Products\Nonbook\Types\Videogame;
 
 
 /**
@@ -40,8 +40,8 @@ final class Factory
      *
      * @param array $source - Source data fetched from KNV's API
      * @param array $props - Properties being passed to product
-     * @throws \PHPCBIS\Exceptions\UnknownTypeException
-     * @return \PHPCBIS\Product
+     * @throws \Pcbis\Exceptions\UnknownTypeException
+     * @return \Pcbis\Product
      */
     public static function factory(array $source, array $props): Product
     {

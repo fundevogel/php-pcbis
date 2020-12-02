@@ -1,16 +1,16 @@
 <?php
 
-namespace PHPCBIS\Products;
+namespace Pcbis\Products;
 
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Helpers\Butler;
 
-use PHPCBIS\Interfaces\Sociable;
-use PHPCBIS\Interfaces\Taggable;
+use Pcbis\Interfaces\Sociable;
+use Pcbis\Interfaces\Taggable;
 
-use PHPCBIS\Traits\CheckType;
-use PHPCBIS\Traits\DownloadCover;
-use PHPCBIS\Traits\People;
-use PHPCBIS\Traits\Tags;
+use Pcbis\Traits\CheckType;
+use Pcbis\Traits\DownloadCover;
+use Pcbis\Traits\People;
+use Pcbis\Traits\Tags;
 
 use DOMDocument;
 
@@ -40,7 +40,7 @@ abstract class Product implements Sociable, Taggable
     /**
      * Object granting access to KNV's API
      *
-     * @var \PHPCBIS\KNV\Api
+     * @var \Pcbis\KNV\Api
      */
     private $api = null;
 
@@ -229,9 +229,9 @@ abstract class Product implements Sociable, Taggable
     /**
      * Returns OLA record
      *
-     * @return \PHPCBIS\KNV\Responses\OLA
+     * @return \Pcbis\Api\Ola
      */
-    public function ola(int $quantity = 1): \PHPCBIS\KNV\Responses\OLA
+    public function ola(int $quantity = 1): \Pcbis\Api\Ola
     {
         return $this->api->ola($this->isbn, $quantity);
     }

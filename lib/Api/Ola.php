@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\KNV\Responses;
+namespace Pcbis\KNV\Responses;
 
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Helpers\Butler;
 
 
 /**

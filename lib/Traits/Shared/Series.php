@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\Traits\Shared;
+namespace Pcbis\Traits\Shared;
 
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Helpers\Butler;
 
 
 /**

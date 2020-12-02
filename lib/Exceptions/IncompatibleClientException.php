@@ -1,5 +1,5 @@
 <?php
 
-namespace PHPCBIS\Exceptions;
+namespace Pcbis\Exceptions;
 
 class IncompatibleClientException extends KNVException {}

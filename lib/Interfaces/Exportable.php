@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPCBIS\Interfaces;
+namespace Pcbis\Interfaces;
 
-use PHPCBIS\Helpers\Butler;
+use Pcbis\Helpers\Butler;
 
 
 /**

@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPCBIS\Products\Books;
+namespace Pcbis\Products\Books;
 
-use PHPCBIS\Helpers\Butler;
-use PHPCBIS\Products\Product;
-use PHPCBIS\Traits\DownloadCover;
+use Pcbis\Helpers\Butler;
+use Pcbis\Products\Product;
+use Pcbis\Traits\DownloadCover;
 
-use PHPCBIS\Traits\Shared\Categories;
-use PHPCBIS\Traits\Shared\Publisher;
-use PHPCBIS\Traits\Shared\Series;
-use PHPCBIS\Traits\Shared\Topics;
+use Pcbis\Traits\Shared\Categories;
+use Pcbis\Traits\Shared\Publisher;
+use Pcbis\Traits\Shared\Series;
+use Pcbis\Traits\Shared\Topics;
 
 
 /**
