@@ -48,7 +48,7 @@ trait DownloadCover
     }
 
 
-    public function getImagePath()
+    public function getImagePath(): string
     {
         return $this->imagePath;
     }
