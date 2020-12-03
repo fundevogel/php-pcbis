@@ -6,14 +6,14 @@ use Pcbis\Helpers\Butler;
 
 
 /**
- * Class OLA
+ * Class Ola
  *
  * Processes information about products being available for delivery - or not
  *
  * @package PHPCBIS
  */
 
-class OLA
+class Ola
 {
     /**
      * OLAResponseRecord (as returned by an OLA call)
@@ -400,6 +400,21 @@ class OLA
         }
 
         return $this->success && $this->quantityOrdered <= $this->quantityAvailable;
+    }
+
+
+    /**
+     * Checks if product is permanently unavailable
+     *
+     * @return bool
+     */
+    public function isUnavailable(): bool
+    {
+        if ($this->hasStatusCode()) {
+            return in_array($this->statusCode, $this->unavailable);
+        }
+
+        return !$this->isAvailable();
     }
 
 
