@@ -276,9 +276,9 @@ class OLA
     /**
      * Shows original OLA query fetched from KNV's API
      *
-     * @return \stdObject
+     * @return \stdClass
      */
-    public function showSource(): \stdObject
+    public function showSource(): \stdClass
     {
         return $this->data;
     }
