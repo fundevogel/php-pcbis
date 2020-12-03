@@ -334,7 +334,7 @@ class Webservice
             ],
         ]);
 
-        return new OLA($ola->OLAResponse->OLAResponseRecord);
+        return new Ola($ola->OLAResponse->OLAResponseRecord);
     }
 
 

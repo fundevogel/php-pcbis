@@ -302,7 +302,7 @@ class Ola
      */
     public function statusCode(): string
     {
-        if (hasStatusCode()) {
+        if ($this->hasStatusCode()) {
             return $this->statusCode;
         }
 
@@ -328,7 +328,7 @@ class Ola
      */
     public function statusMessage(): string
     {
-        if (hasStatusMessage()) {
+        if ($this->hasStatusMessage()) {
             return $this->statusMessage;
         }
 
@@ -354,7 +354,7 @@ class Ola
      */
     public function errorCode(): string
     {
-        if (hasErrorCode()) {
+        if ($this->hasErrorCode()) {
             return $this->errorCode;
         }
 
