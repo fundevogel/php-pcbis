@@ -256,11 +256,12 @@ class Webservice
      * otherwise loads them & saves to cache
      *
      * @param string $isbn - A given product's EAN/ISBN
+     * @param bool $forceRefresh - Whether to update cached data
      * @return array
      */
-    private function fetch(string $isbn): array
+    private function fetch(string $isbn, bool $forceRefresh): array
     {
-        if ($this->cache->contains($isbn) && $this->forceRefresh) {
+        if ($this->cache->contains($isbn) && $forceRefresh) {
             $this->cache->delete($isbn);
         }
 
@@ -268,7 +269,7 @@ class Webservice
         $fromCache = true;
 
         if (!$this->cache->contains($isbn)) {
-            $result = $this->api->query($isbn);
+            $result = $this->query($isbn);
             $this->cache->save($isbn, $result);
 
             # .. turns out, it was not
@@ -341,12 +342,13 @@ class Webservice
      * Instantiates `Product` object from single EAN/ISBN
      *
      * @param string $isbn - A given product's EAN/ISBN
+     * @param bool $forceRefresh - Whether to update cached data
      * @return \Pcbis\Products\Product
      */
-    public function load(string $isbn): \Pcbis\Products\Product
+    public function load(string $isbn, bool $forceRefresh = false): \Pcbis\Products\Product
     {
         $isbn = $this->validate($isbn);
-        $data = $this->fetch($isbn);
+        $data = $this->fetch($isbn, $forceRefresh);
 
         $props = [
             'api'          => $this,
