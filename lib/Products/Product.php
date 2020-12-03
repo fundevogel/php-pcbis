@@ -227,6 +227,58 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Checks whether product has a predecessor
+     *
+     * @return bool
+     */
+    public function hasDowngrade(): bool
+    {
+        return isset($this->source['VorherigeAuflageGtin']);
+    }
+
+
+    /**
+     * Loads & returns predecessor
+     *
+     * @return bool
+     */
+    public function downgrade(): \Pcbis\Products\Product
+    {
+        if (!isset($this->source['VorherigeAuflageGtin'])) {
+            return $this;
+        }
+
+        return $this->api->load($this->source['VorherigeAuflageGtin']);
+    }
+
+
+    /**
+     * Checks whether product has a successor
+     *
+     * @return bool
+     */
+    public function hasUpgrade(): bool
+    {
+        return isset($this->source['NeueAuflageGtin']);
+    }
+
+
+    /**
+     * Loads & returns successor
+     *
+     * @return bool
+     */
+    public function upgrade(): \Pcbis\Products\Product
+    {
+        if (!isset($this->source['NeueAuflageGtin'])) {
+            return $this;
+        }
+
+        return $this->api->load($this->source['NeueAuflageGtin']);
+    }
+
+
+    /**
      * Returns OLA record
      *
      * @return \Pcbis\Api\Ola
