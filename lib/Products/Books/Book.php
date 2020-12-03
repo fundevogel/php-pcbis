@@ -184,7 +184,7 @@ class Book extends Product
             $delimiter = ' cm';
 
             # If they aren't though, check 'Abb' for further hints on dimensions
-            if (Butler::contains($this->source['Abb'], $delimiter)) {
+            if (isset($this->source['Abb']) && Butler::contains($this->source['Abb'], $delimiter)) {
                 $string = Butler::replace($this->source['Abb'], $delimiter, '');
                 $array = Butler::split($string, ' ');
 
