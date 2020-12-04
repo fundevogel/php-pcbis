@@ -9,6 +9,7 @@ use Pcbis\Interfaces\Taggable;
 
 use Pcbis\Traits\CheckType;
 use Pcbis\Traits\DownloadCover;
+use Pcbis\Traits\OlaStatus;
 use Pcbis\Traits\People;
 use Pcbis\Traits\Tags;
 
@@ -30,6 +31,7 @@ abstract class Product implements Sociable, Taggable
      */
 
     use CheckType;
+    use OlaStatus;
     use People, Tags;
 
 
@@ -173,6 +175,10 @@ abstract class Product implements Sociable, Taggable
         # Build categories & topics from tags
         $this->categories   = $this->buildCategories();
         $this->topics       = $this->buildTopics();
+
+        # Set status code & status message
+        $this->statusCode    = $this->buildStatusCode();
+        $this->statusMessage = $this->buildStatusMessage();
 
         # Import translations
         $this->translations = $props['translations'];
@@ -475,6 +481,66 @@ abstract class Product implements Sociable, Taggable
     public function age(): string
     {
         return $this->age;
+    }
+
+
+    /**
+     * Builds OLA status code
+     *
+     * @return string
+     */
+    protected function buildStatusCode(): string
+    {
+        if (isset($this->source['Mnr'])) {
+            return $this->source['Mnr'];
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Builds OLA status message
+     *
+     * @return string
+     */
+    protected function buildStatusMessage(): string
+    {
+        if (array_key_exists($this->statusCode, $this->statusMessages)) {
+            return $this->statusMessages[$this->statusCode];
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Checks if product is available / may be purchased
+     *
+     * @return bool
+     */
+    public function isAvailable(): bool
+    {
+        if ($this->hasStatusCode()) {
+            return in_array($this->statusCode, $this->available);
+        }
+
+        return $this->ola()->isAvailable();
+    }
+
+
+    /**
+     * Checks if product is permanently unavailable
+     *
+     * @return bool
+     */
+    public function isUnavailable(): bool
+    {
+        if ($this->hasStatusCode()) {
+            return in_array($this->statusCode, $this->unavailable);
+        }
+
+        return !$this->isAvailable();
     }
 
 
