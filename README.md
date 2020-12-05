@@ -38,6 +38,9 @@ try {
 
     // (3) .. download its cover
     $book->downloadCover();
+
+    // (4) .. query its OLA status
+    $book->ola()->isAvailable();
 } catch (\Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
 }
