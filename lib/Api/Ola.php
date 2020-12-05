@@ -122,13 +122,13 @@ class Ola
         $this->quantityOrdered = $data->Bestellmenge;
         $this->quantityAvailable = $data->Lieferbaremenge;
 
-        # Set status code & status message
+        # Set OLA code & message
         if (isset($data->Meldenummer)) {
-            $this->statusCode = (string) $data->Meldenummer;
+            $this->olaCode = (string) $data->Meldenummer;
         }
 
-        if (array_key_exists($this->statusCode, $this->statusMessages)) {
-            $this->statusMessage = $this->statusMessages[$this->statusCode];
+        if (array_key_exists($this->olaCode, $this->olaMessages)) {
+            $this->olaMessage = $this->olaMessages[$this->olaCode];
         }
 
         # Set error code & error message
@@ -228,8 +228,8 @@ class Ola
      */
     public function isAvailable(): bool
     {
-        if ($this->hasStatusCode()) {
-            return in_array($this->statusCode, $this->available);
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode, $this->available);
         }
 
         return $this->success && $this->quantityOrdered <= $this->quantityAvailable;
@@ -243,8 +243,8 @@ class Ola
      */
     public function isUnavailable(): bool
     {
-        if ($this->hasStatusCode()) {
-            return in_array($this->statusCode, $this->unavailable);
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode, $this->unavailable);
         }
 
         return !$this->isAvailable();
@@ -252,7 +252,7 @@ class Ola
 
 
     /**
-     * TODO: Include remaining status codes:
+     * TODO: Include remaining OLA codes:
      *
      * 22 Terminauftrag, vorgemerkt
      * 27 Vormerkung storniert

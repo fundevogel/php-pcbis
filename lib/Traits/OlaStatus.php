@@ -8,7 +8,7 @@ use Pcbis\Helpers\Butler;
 /**
  * Trait OlaStatus
  *
- * Provides ability to work with OLA status codes & messages
+ * Provides ability to work with OLA codes & messages
  *
  * @package PHPCBIS
  */
@@ -94,7 +94,7 @@ trait OlaStatus
      *
      * @var array
      */
-    protected $statusMessages = [
+    protected $olaMessages = [
         '7' => 'Vergriffen, keine Neuauflage, Bestellung abgelegt',
        '11' => 'Erscheint laut Verlag/Lieferant .../... in neuer Auflage/als Nachfolgeprodukt',
        '12' => 'Nachdruck/wird nachproduziert. Folgt laut Verlag/Lieferant .../...',
@@ -131,7 +131,7 @@ trait OlaStatus
      *
      * @var string
      */
-    protected $statusCode = null;
+    protected $olaCode = null;
 
 
     /**
@@ -139,7 +139,7 @@ trait OlaStatus
      *
      * @var string
      */
-    protected $statusMessage = null;
+    protected $olaMessage = null;
 
 
     /**
@@ -151,9 +151,9 @@ trait OlaStatus
      *
      * @return bool
      */
-    public function hasStatusCode(): bool
+    public function hasOlaCode(): bool
     {
-        return $this->statusCode !== null;
+        return $this->olaCode !== null;
     }
 
 
@@ -162,10 +162,10 @@ trait OlaStatus
      *
      * @return string
      */
-    public function statusCode(): string
+    public function olaCode(): string
     {
-        if ($this->hasStatusCode()) {
-            return $this->statusCode;
+        if ($this->hasOlaCode()) {
+            return $this->olaCode;
         }
 
         return '';
@@ -177,9 +177,9 @@ trait OlaStatus
      *
      * @return bool
      */
-    public function hasStatusMessage(): bool
+    public function hasOlaMessage(): bool
     {
-        return $this->statusMessage !== null;
+        return $this->olaMessage !== null;
     }
 
 
@@ -188,10 +188,10 @@ trait OlaStatus
      *
      * @return string
      */
-    public function statusMessage(): string
+    public function olaMessage(): string
     {
-        if ($this->hasStatusMessage()) {
-            return $this->statusMessage;
+        if ($this->hasOlaMessage()) {
+            return $this->olaMessage;
         }
 
         return '';

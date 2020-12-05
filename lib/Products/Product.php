@@ -176,9 +176,9 @@ abstract class Product implements Sociable, Taggable
         $this->categories   = $this->buildCategories();
         $this->topics       = $this->buildTopics();
 
-        # Set status code & status message
-        $this->statusCode    = $this->buildStatusCode();
-        $this->statusMessage = $this->buildStatusMessage();
+        # Set OLA code & message
+        $this->olaCode    = $this->buildOlaCode();
+        $this->olaMessage = $this->buildOlaMessage();
 
         # Import translations
         $this->translations = $props['translations'];
@@ -485,11 +485,11 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Builds OLA status code
+     * Builds OLA code
      *
      * @return string
      */
-    protected function buildStatusCode(): string
+    protected function buildOlaCode(): string
     {
         if (isset($this->source['Mnr'])) {
             return $this->source['Mnr'];
@@ -500,14 +500,14 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Builds OLA status message
+     * Builds OLA message
      *
      * @return string
      */
-    protected function buildStatusMessage(): string
+    protected function buildOlaMessage(): string
     {
-        if (array_key_exists($this->statusCode, $this->statusMessages)) {
-            return $this->statusMessages[$this->statusCode];
+        if (array_key_exists($this->olaCode, $this->olaMessages)) {
+            return $this->olaMessages[$this->olaCode];
         }
 
         return '';
@@ -521,8 +521,8 @@ abstract class Product implements Sociable, Taggable
      */
     public function isAvailable(): bool
     {
-        if ($this->hasStatusCode()) {
-            return in_array($this->statusCode, $this->available);
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode, $this->available);
         }
 
         return $this->ola()->isAvailable();
@@ -536,8 +536,8 @@ abstract class Product implements Sociable, Taggable
      */
     public function isUnavailable(): bool
     {
-        if ($this->hasStatusCode()) {
-            return in_array($this->statusCode, $this->unavailable);
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode, $this->unavailable);
         }
 
         return !$this->isAvailable();
