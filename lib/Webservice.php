@@ -320,19 +320,29 @@ class Webservice
      */
     public function ola(string $isbn, int $quantity = 1): \Pcbis\Api\Ola
     {
-        $ola = $this->client->WSCall([
-            # Log in using sessionID
-            'SessionID' => $this->sessionID,
-            'OLA' => [
-                'Art' => 'Abfrage',
-                'OLAItem' => [
-                    'Bestellnummer' => [
-                        'ISBN' => $isbn,
+        $id = 'ola-' . $isbn;
+
+        # Check cache for OLA request
+        if (!$this->cache->contains($id)) {
+            $result = $this->client->WSCall([
+                # Log in using sessionID
+                'SessionID' => $this->sessionID,
+                'OLA' => [
+                    'Art' => 'Abfrage',
+                    'OLAItem' => [
+                        'Bestellnummer' => [
+                            'ISBN' => $isbn,
+                        ],
+                        'Menge' => $quantity,
                     ],
-                    'Menge' => $quantity,
                 ],
-            ],
-        ]);
+            ]);
+
+            # Store result for an hour
+            $this->cache->save($id, $result, 3600);
+        }
+
+        $ola = $this->cache->fetch($id);
 
         return new Ola($ola->OLAResponse->OLAResponseRecord);
     }
