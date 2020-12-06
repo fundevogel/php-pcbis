@@ -12,6 +12,7 @@ namespace Pcbis;
 use PHPCBIS\Exceptions\IncompatibleClientException;
 use Pcbis\Exceptions\InvalidISBNException;
 use PHPCBIS\Exceptions\InvalidLoginException;
+use PHPCBIS\Exceptions\NoRecordFoundException;
 
 use Pcbis\Helpers\Butler;
 use Pcbis\Api\Ola;
@@ -247,7 +248,7 @@ class Webservice
             return Butler::last($array);
         }
 
-        return [];
+        throw new NoRecordFoundException('No database record found for ISBN ' . $isbn);
     }
 
 
