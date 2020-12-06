@@ -101,18 +101,35 @@ trait People
         # (2) Narrator
         # (3) Editor
         $delimiters = [
+            # Includes edge case: 'Hrsg. v.'
             'Herausgegeben von ' => 'editor',
             'Gesprochen von '    => 'narrator',
             'Mit '               => 'participant',
-            # Edge case: 'Illustr. v.'
+            # Includes edge case: 'Illustr. v.'
             'Illustriert von '   => 'illustrator',
+
+            # Edge cases: 'Aus d. Engl. v.', 'Aus d. Amerik. v.'
+            'Aus dem Amerikanischen von ' => 'translator',
+            'Aus dem Englischen von '     => 'illustrator',
         ];
 
         $data = $this->source['Mitarb'];
 
-        # Take care of delimiters with two dots
+        # Take care of delimiters with two or more dots
         if (Butler::contains($data, 'Illustr. v. ')) {
             $data = Butler::replace($data, 'Illustr. v. ', 'Illustriert von ');
+        }
+
+        if (Butler::contains($data, 'Hrsg. v. ')) {
+            $data = Butler::replace($data, 'Hrsg. v. ', 'Herausgegeben von ');
+        }
+
+        if (Butler::contains($data, 'Aus d. Amerik. v. ')) {
+            $data = Butler::replace($data, 'Aus d. Amerik. v. ', 'Aus dem Amerikanischen von ');
+        }
+
+        if (Butler::contains($data, 'Aus d. Engl. v. ')) {
+            $data = Butler::replace($data, 'Aus d. Engl. v. ', 'Aus dem Englischen von ');
         }
 
         # Check for names with two dots
