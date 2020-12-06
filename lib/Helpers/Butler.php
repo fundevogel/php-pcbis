@@ -56,8 +56,15 @@ class Butler
      */
     public static function convertMM(string $string): string
     {
+        # TODO: Messing up some other values, needs fixing
+        # Edge case: string already contains width/height in centimeters
+        # See 978-3-7891-2946-9
+        if (static::contains($string, ',')) {
+            return $string . 'cm';
+        }
+
         $number = $string / 10;
-        $number = static::replace($string, '.', ',');
+        $number = static::replace($number, '.', ',');
 
         return $number . 'cm';
     }
