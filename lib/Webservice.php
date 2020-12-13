@@ -20,8 +20,8 @@ use Pcbis\Api\Ola;
 use Pcbis\Products\Factory;
 use Pcbis\Products\Books\Books;
 
-use Biblys\Isbn\Isbn as ISBN;
-use Doctrine\Common\Cache\FilesystemCache as FileCache;
+use Biblys\Isbn\Isbn;
+use Doctrine\Common\Cache\FilesystemCache;
 
 use SoapClient;
 use SoapFault;
@@ -124,7 +124,7 @@ class Webservice
         }
 
         # Initialize cache
-        $this->cache = new FileCache($cachePath);
+        $this->cache = new FilesystemCache($cachePath);
     }
 
 
@@ -299,7 +299,7 @@ class Webservice
             return $isbn;
         }
 
-        $isbn = new ISBN($isbn);
+        $isbn = new Isbn($isbn);
 
         try {
             $isbn->validate();
