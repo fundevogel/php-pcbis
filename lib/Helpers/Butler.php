@@ -4,6 +4,7 @@ namespace Pcbis\Helpers;
 
 if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 
+
 /**
  * Class Butler
  *
@@ -14,6 +15,82 @@ if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 
 class Butler
 {
+    /**
+     * Turns CSV data into a PHP array
+     *
+     * @param string $input - Source CSV file to read data from
+     * @param string $delimiter - Delimiting character
+     * @return array
+     */
+    public static function csv2array(string $input, string $delimiter = ',')
+    {
+        if (!file_exists($input) || !is_readable($input)) {
+            return false;
+        }
+
+        $data = [];
+
+        if (($handle = fopen($input, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                $row = array_map('utf8_encode', $row);
+                $data[] = array_combine($this->headers, $row);
+            }
+            fclose($handle);
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Turns a PHP array into CSV file
+     *
+     * @param array $data - Source PHP array to read data from
+     * @param string $output - Destination CSV file to write data to
+     * @param string $delimiter - Delimiting character
+     * @return Stream
+     */
+    public static function array2csv(array $dataInput = null, string $output, string $delimiter = ',')
+    {
+        if ($dataInput === null) {
+            throw new \InvalidArgumentException('No data given to process.');
+        }
+
+        $header = null;
+
+        if (($handle = fopen($output, 'w')) !== false) {
+            foreach ($dataInput as $row) {
+                $headerArray = array_keys($row);
+
+                // Optionally prefix all headers
+                if ($this->headerPrefix !== null) {
+                    foreach ($headerArray as $key => $value) {
+                        $headerArray[$key] = $this->headerPrefix . $value;
+                    }
+                }
+
+                // Optionally suffix all headers
+                if ($this->headerSuffix !== null) {
+                    foreach ($headerArray as $key => $value) {
+                        $headerArray[$key] = $value . $this->headerSuffix;
+                    }
+                }
+
+                if (!$header) {
+                    fputcsv($handle, $headerArray, $delimiter);
+                    $header = true;
+                }
+
+                fputcsv($handle, $row, $delimiter);
+            }
+
+            fclose($handle);
+        }
+
+        return true;
+    }
+
+
     /**
      * Converts XML to PHP array
      *
