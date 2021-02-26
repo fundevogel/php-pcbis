@@ -8,7 +8,6 @@ use Pcbis\Interfaces\Sociable;
 use Pcbis\Interfaces\Taggable;
 
 use Pcbis\Traits\CheckType;
-use Pcbis\Traits\DownloadCover;
 use Pcbis\Traits\OlaStatus;
 use Pcbis\Traits\People;
 use Pcbis\Traits\Tags;

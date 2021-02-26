@@ -2,8 +2,6 @@
 
 namespace Pcbis\Traits;
 
-use Pcbis\Helpers\Butler;
-
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException as GuzzleException;
 
