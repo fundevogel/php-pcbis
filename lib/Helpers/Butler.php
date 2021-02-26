@@ -28,13 +28,30 @@ class Butler
             return false;
         }
 
+        # Headers as exported via 'Titelexport'
+        $headers = [
+            'AutorIn',
+            'Titel',
+            'Verlag',
+            'ISBN',
+            'Einband',
+            'Preis',
+            'Meldenummer',
+            'SortRabatt',
+            'Gewicht',
+            'Informationen',
+            'Zusatz',
+            'Kommentar'
+        ];
+
         $data = [];
 
         if (($handle = fopen($input, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
                 $row = array_map('utf8_encode', $row);
-                $data[] = array_combine($this->headers, $row);
+                $data[] = array_combine($headers, $row);
             }
+
             fclose($handle);
         }
 
@@ -61,20 +78,6 @@ class Butler
         if (($handle = fopen($output, 'w')) !== false) {
             foreach ($dataInput as $row) {
                 $headerArray = array_keys($row);
-
-                // Optionally prefix all headers
-                if ($this->headerPrefix !== null) {
-                    foreach ($headerArray as $key => $value) {
-                        $headerArray[$key] = $this->headerPrefix . $value;
-                    }
-                }
-
-                // Optionally suffix all headers
-                if ($this->headerSuffix !== null) {
-                    foreach ($headerArray as $key => $value) {
-                        $headerArray[$key] = $value . $this->headerSuffix;
-                    }
-                }
 
                 if (!$header) {
                     fputcsv($handle, $headerArray, $delimiter);
