@@ -110,7 +110,7 @@ trait People
 
             # Edge cases: 'Aus d. Engl. v.', 'Aus d. Amerik. v.'
             'Aus dem Amerikanischen von ' => 'translator',
-            'Aus dem Englischen von '     => 'illustrator',
+            'Aus dem Englischen von '     => 'translator',
         ];
 
         $data = $this->source['Mitarb'];
