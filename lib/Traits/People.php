@@ -21,6 +21,26 @@ trait People
      */
 
     /**
+     * Available roles
+     *
+     * @var array
+     */
+    protected $roles = [
+        'Illustration' => 'illustrator',
+        'Zeichnungen'  => 'drawer',
+        'Fotos'        => 'photographer',
+        'Übersetzung'  => 'translator',
+        'Gesprochen'   => 'narrator',
+        'Komposition'  => 'composer',
+        'Regie'        => 'director',
+        'Produktion'   => 'producer',
+        'Mitarbeit'    => 'participant',
+        # Edge case: author of original works
+        'Vorlage'      => 'original',
+    ];
+
+
+    /**
      * Involved people (all roles)
      *
      * @var array
@@ -77,21 +97,6 @@ trait People
         if (!isset($this->source['Mitarb'])) {
             return $people;
         }
-
-        # Available roles
-        $roles = [
-            'Illustration' => 'illustrator',
-            'Zeichnungen'  => 'drawer',
-            'Fotos'        => 'photographer',
-            'Übersetzung'  => 'translator',
-            'Gesprochen'   => 'narrator',
-            'Komposition'  => 'composer',
-            'Regie'        => 'director',
-            'Produktion'   => 'producer',
-            'Mitarbeit'    => 'participant',
-            # Edge case: author of original works
-            'Vorlage'      => 'original',
-        ];
 
         # Default role
         $role = 'participant';
@@ -165,8 +170,8 @@ trait People
                 # Otherwise, split role & people as usual
                 $array = Butler::split($string, ':');
 
-                if (isset($roles[$array[0]])) {
-                    $role = $roles[$array[0]];
+                if (isset($this->roles[$array[0]])) {
+                    $role = $this->roles[$array[0]];
                 }
 
                 $group = $array[1];
@@ -292,6 +297,47 @@ trait People
         $authors = $this->organizePeople($string);
 
         return $authors;
+    }
+
+
+    /**
+     * Exports all involved people as string (or array)
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
+     */
+
+    public function people(bool $asArray = false)
+    {
+        if ($asArray) {
+            return $this->people;
+        }
+
+        $all = $this->people;
+
+        # Available role identifiers
+        $roles = array_flip($this->roles);
+
+        # Remove author
+        unset($all['author']);
+
+        $result = [];
+
+        foreach ($all as $role => $people) {
+            if ($people === []) {
+                continue;
+            }
+
+            $array = [];
+
+            foreach ($people as $person) {
+                $array[] = Butler::join($person, ' ');
+            }
+
+            $result[] = $roles[$role] . ': ' . Butler::join($array, $this->delimiter);
+        }
+
+        return Butler::join($result, '. ');
     }
 
 
