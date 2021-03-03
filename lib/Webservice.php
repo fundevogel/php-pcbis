@@ -9,10 +9,10 @@
 
 namespace Pcbis;
 
-use PHPCBIS\Exceptions\IncompatibleClientException;
+use Pcbis\Exceptions\IncompatibleClientException;
 use Pcbis\Exceptions\InvalidISBNException;
-use PHPCBIS\Exceptions\InvalidLoginException;
-use PHPCBIS\Exceptions\NoRecordFoundException;
+use Pcbis\Exceptions\InvalidLoginException;
+use Pcbis\Exceptions\NoRecordFoundException;
 
 use Pcbis\Helpers\Butler;
 use Pcbis\Api\Ola;
