@@ -303,11 +303,8 @@ class Webservice
             return $isbn;
         }
 
-        $isbn = new Isbn($isbn);
-
         try {
-            $isbn->validate();
-            $isbn = $isbn->format('ISBN-13');
+            $isbn = Isbn::convertToIsbn13($isbn);
         } catch(\Exception $e) {
             throw new InvalidISBNException($e->getMessage());
         }
