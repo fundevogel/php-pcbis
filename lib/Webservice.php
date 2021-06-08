@@ -121,7 +121,7 @@ class Webservice
                 throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
             }
 
-            # Initialise API driver
+            # Initialize API driver
             if ($credentials !== null) {
                 $this->sessionID = $this->logIn($credentials);
             }
