@@ -150,7 +150,7 @@ class Ola
 
     public function __toString(): string
     {
-        return $this->success ? 'Verfügbar' : 'Nicht verfügbar';
+        return $this->isAvailable() ? 'Verfügbar' : 'Nicht verfügbar';
     }
 
 
