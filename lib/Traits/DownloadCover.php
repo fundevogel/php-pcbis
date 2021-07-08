@@ -106,7 +106,7 @@ trait DownloadCover
 
         if ($handle = fopen($file, 'w')) {
             $client = new GuzzleClient();
-            $url = 'https://portal.dnb.de/opac/mvb/cover.htm?isbn=' . $this->isbn;
+            $url = 'https://portal.dnb.de/opac/mvb/cover?isbn=' . $this->isbn;
 
             try {
                 $response = $client->get($url, ['sink' => $handle]);
