@@ -3,6 +3,7 @@
 namespace Pcbis\Products\Nonbook;
 
 use Pcbis\Products\Product;
+use Pcbis\Traits\DownloadCover;
 
 
 /**
@@ -12,6 +13,13 @@ use Pcbis\Products\Product;
  */
 
 class Item extends Product {
+    /**
+     * Traits
+     */
+
+    use DownloadCover;
+
+
     /**
      * Overrides
      */
