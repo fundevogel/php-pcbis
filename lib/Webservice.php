@@ -9,13 +9,14 @@
 
 namespace Pcbis;
 
+use Pcbis\Api\Ola;
+
 use Pcbis\Exceptions\IncompatibleClientException;
 use Pcbis\Exceptions\InvalidISBNException;
 use Pcbis\Exceptions\InvalidLoginException;
 use Pcbis\Exceptions\NoRecordFoundException;
 
 use Pcbis\Helpers\Butler;
-use Pcbis\Api\Ola;
 
 use Pcbis\Products\Factory;
 use Pcbis\Products\Books\Books;
@@ -40,7 +41,7 @@ class Webservice
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '2.0.2';
+    const VERSION = '2.1.0';
 
 
     /**
