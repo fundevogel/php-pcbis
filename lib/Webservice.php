@@ -111,6 +111,7 @@ class Webservice
                 'trace' => true,
                 'exceptions' => true,
             ]);
+
         } catch (SoapFault $e) {
             # Activate offline mode on network error
             $this->offlineMode = true;
@@ -176,6 +177,7 @@ class Webservice
     {
         try {
             $query = $this->client->WSCall(['LoginInfo' => $credentials]);
+
         } catch (SoapFault $e) {
             throw new InvalidLoginException($e->getMessage());
         }
@@ -306,6 +308,7 @@ class Webservice
 
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
+
         } catch(\Exception $e) {
             throw new InvalidISBNException($e->getMessage());
         }
@@ -393,6 +396,7 @@ class Webservice
                 if ($book->isBook() || $book->isAudiobook()) {
                     $books[] = $book;
                 }
+
             } catch (\Exception $e) {
                 continue;
             }
