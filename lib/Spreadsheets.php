@@ -24,128 +24,22 @@ use Pcbis\Helpers\Butler;
 class Spreadsheets
 {
     /**
-     * Properties
-     */
-
-    /**
-     * Raw data
-     *
-     * @var array
-     */
-    private $data = null;
-
-
-    /**
-     * Sort order for CSV output file headers
-     *
-     * @var array
-     */
-    private $sortOrder = [
-        'AutorIn',
-        'Titel',
-        'Untertitel',
-        'Verlag',
-        'Mitwirkende',
-        'Preis',
-        'Erscheinungsjahr',
-        'ISBN',
-        'Altersempfehlung',
-        'Inhaltsbeschreibung',
-        'Informationen',
-        'Einband',
-        'Seitenzahl',
-        'Abmessungen',
-        '@Cover',
-        'Cover DNB',
-        'Cover KNV',
-    ];
-
-
-    /**
-     * Translations for various CSV values
-     *
-     * @var array
-     */
-    private $translations = null;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $translations = null)
-    {
-        # If not provided, load default translations
-        if ($translations === null) {
-            $this->translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
-        }
-    }
-
-
-    /**
-     * Setters & getters
-     */
-
-    public function setSortOrder(array $sortOrder)
-    {
-        $this->sortOrder = $sortOrder;
-    }
-
-
-    public function getSortOrder()
-    {
-        return $this->sortOrder;
-    }
-
-
-    public function setTranslations(array $translations)
-    {
-        $this->translations = $translations;
-    }
-
-
-    public function getTranslations()
-    {
-        return $this->translations;
-    }
-
-
-    /**
      * Methods
      */
 
     /**
-     * Turns CSV data into a PHP array
+     * Turns data from a single CSV file into a PHP array
      *
-     * @param string $input - Source CSV file to read data from
+     * @param string $file - Source CSV file to read data from
+     * @param array $headers - Header names for CSV data rows
      * @param string $delimiter - Delimiting character
      * @return array
      */
-    public static function csv2array(string $input, string $delimiter = ';')
+    public static function csvOpen(string $file, array $headers, string $delimiter = ';')
     {
-        if (!file_exists($input) || !is_readable($input)) {
-            return false;
-        }
-
-        # Headers as exported via 'Titelexport'
-        $headers = [
-            'AutorIn',
-            'Titel',
-            'Verlag',
-            'ISBN',
-            'Einband',
-            'Preis',
-            'Meldenummer',
-            'SortRabatt',
-            'Gewicht',
-            'Informationen',
-            'Zusatz',
-            'Kommentar'
-        ];
-
         $data = [];
 
-        if (($handle = fopen($input, 'r')) !== false) {
+        if (($handle = fopen($file, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
                 if (count($row) === 1) {
                     continue;
@@ -163,23 +57,92 @@ class Spreadsheets
 
 
     /**
-     * Turns a PHP array into CSV file
+     * Extracts data from a single CSV file & processes it
      *
-     * @param array $data - Source PHP array to read data from
-     * @param string $output - Destination CSV file to write data to
+     * @param string $file - Source CSV file to read data from
      * @param string $delimiter - Delimiting character
-     * @return Stream
+     * @param array $headers - Header names for CSV data rows
+     * @return array|bool
      */
-    public static function array2csv(array $dataInput = null, string $output, string $delimiter = ',')
+    public static function csv2array(string $file, string $delimiter = ';', array $headers = null)
     {
-        if ($dataInput === null) {
-            throw new \InvalidArgumentException('No data given to process.');
+        if (!file_exists($file) || !is_readable($file)) {
+            return false;
         }
 
+        # Headers as exported via 'Titelexport'
+        $headers = $headers ?? [
+            'AutorIn',
+            'Titel',
+            'Verlag',
+            'ISBN',
+            'Einband',
+            'Preis',
+            'Meldenummer',
+            'SortRabatt',
+            'Gewicht',
+            'Informationen',
+            'Zusatz',
+            'Kommentar'
+        ];
+
+        $raw = self::csvOpen($file, $headers, $delimiter);
+
+        $data = [];
+
+        foreach ($raw as $array) {
+            # Gathering & processing generic book information
+            $infoString = $array['Informationen'];
+            $infoArray = Butler::split($infoString, ';');
+
+            if (count($infoArray) === 1) {
+                $infoArray = Butler::split($infoString, '.');
+            }
+
+            # Extracting variables from information string
+            list(
+                $info,
+                $year,
+                $age,
+                $pageCount
+            ) = self::generateInfo($infoArray);
+
+            $array = Butler::update($array, [
+                # Updating existing entries + adding blanks to prevent columns from shifting
+                'Titel' => self::convertTitle($array['Titel']),
+                'Untertitel' => '',
+                'Mitwirkende' => '',
+                'Preis' => self::convertPrice($array['Preis']),
+                'Erscheinungsjahr' => $year,
+                'Altersempfehlung' => $age,
+                'Inhaltsbeschreibung' => '',
+                'Informationen' => $info,
+                'Einband' => self::convertBinding($array['Einband']),
+                'Seitenzahl' => $pageCount,
+                'Abmessungen' => '',
+            ]);
+
+            $data[] = self::sortArray($array);
+        }
+
+        return Butler::sort($data, 'AutorIn', 'asc');
+    }
+
+
+    /**
+     * Turns a PHP array into CSV file
+     *
+     * @param array $array - Source PHP array to read data from
+     * @param string $file - Destination CSV file to write data to
+     * @param string $delimiter - Separator character
+     * @return bool
+     */
+    public static function array2csv(array $array, string $file, string $delimiter = ','): bool
+    {
         $header = null;
 
-        if (($handle = fopen($output, 'w')) !== false) {
-            foreach ($dataInput as $row) {
+        if (($handle = fopen($file, 'w')) !== false) {
+            foreach ($array as $row) {
                 $headerArray = array_keys($row);
 
                 if (!$header) {
@@ -198,22 +161,8 @@ class Spreadsheets
 
 
     /**
-     * Loads data from CSV file
-     *
-     * @param string $csvFile - Path to CSV source file
-     * @return bool
+     * Utilities
      */
-    public function load(string $csvFile): bool
-    {
-        if (file_exists($csvFile)) {
-            $this->data = self::csv2array($csvFile);
-
-            return true;
-        }
-
-        return false;
-    }
-
 
     /**
      * Processes array containing general information,
@@ -222,7 +171,7 @@ class Spreadsheets
      * @param array $array - Source PHP array to read data from
      * @return array
      */
-    protected function generateInfo(array $array)
+    protected static function generateInfo(array $array)
     {
         $age = 'Keine Altersangabe';
         $pageCount = '';
@@ -236,13 +185,13 @@ class Spreadsheets
 
             # Filtering age
             if (Butler::contains($entry, ' J.') || Butler::contains($entry, ' Mon.')) {
-                $age = $this->convertAge($entry);
+                $age = self::convertAge($entry);
                 unset($array[array_search($entry, $array)]);
             }
 
             # Filtering page count
             if (Butler::contains($entry, ' S.')) {
-                $pageCount = $this->convertPageCount($entry);
+                $pageCount = self::convertPageCount($entry);
                 unset($array[array_search($entry, $array)]);
             }
 
@@ -253,7 +202,9 @@ class Spreadsheets
             }
         }
 
-        $strings = $this->translations['information'];
+        $translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
+
+        $strings = $translations['information'];
         $array = Butler::replace($array,
             array_keys($strings),
             array_values($strings)
@@ -280,7 +231,7 @@ class Spreadsheets
      * @param string $string - Title string
      * @return string
      */
-    protected function convertTitle($string)
+    protected static function convertTitle($string)
     {
         # Input: Book title.
         # Output: Book title
@@ -294,7 +245,7 @@ class Spreadsheets
      * @param string $string - Altersangabe string
      * @return string
      */
-    protected function convertAge($string)
+    protected static function convertAge($string)
     {
       	$string = Butler::replace($string, 'J.', 'Jahren');
       	$string = Butler::replace($string, 'Mon.', 'Monaten');
@@ -311,7 +262,7 @@ class Spreadsheets
      * @param string $string - Seitenzahl string
      * @return string
      */
-    protected function convertPageCount($string)
+    protected static function convertPageCount($string)
     {
         return (int) $string;
     }
@@ -323,12 +274,11 @@ class Spreadsheets
      * @param string $string - Einband string
      * @return string
      */
-    protected function convertBinding($string)
+    protected static function convertBinding($string)
     {
-        $translations = $this->translations['binding'];
-        $string = $translations[$string];
+        $translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
 
-        return $string;
+        return $translations['binding'][$string];
     }
 
 
@@ -338,7 +288,7 @@ class Spreadsheets
      * @param string $string - Preis string
      * @return string
      */
-    protected function convertPrice($string)
+    protected static function convertPrice($string)
     {
         # Input: XX.YY EUR
         # Output: XX,YY €
@@ -358,8 +308,6 @@ class Spreadsheets
      */
     protected static function sortArray(array $array)
     {
-        $sortedArray = [];
-
         $sortOrder = [
             'AutorIn',
             'Titel',
@@ -377,67 +325,12 @@ class Spreadsheets
             'Abmessungen',
         ];
 
+        $sortedArray = [];
+
         foreach ($sortOrder as $entry) {
             $sortedArray[$entry] = $array[$entry];
         }
 
         return $sortedArray;
-    }
-
-
-    /**
-     * Exports data being extracted from CSV data
-     *
-     * @param array $raw - Input that should be processed
-     * @return array|InvalidArgumentException
-     */
-    public function export(array $raw = null)
-    {
-        if ($raw === null) {
-            if ($this->data === null) {
-                throw new \InvalidArgumentException('No data given to process.');
-            }
-
-            $raw = $this->data;
-        }
-
-        $data = [];
-
-        foreach ($raw as $array) {
-            # Gathering & processing generic book information
-            $infoString = $array['Informationen'];
-            $infoArray = Butler::split($infoString, ';');
-
-            if (count($infoArray) === 1) {
-                $infoArray = Butler::split($infoString, '.');
-            }
-
-            # Extracting variables from information string
-            list(
-                $info,
-                $year,
-                $age,
-                $pageCount
-            ) = $this->generateInfo($infoArray);
-
-            $array = Butler::update($array, [
-                # Updating existing entries + adding blanks to prevent columns from shifting
-                'Titel' => $this->convertTitle($array['Titel']),
-                'Untertitel' => '',
-                'Mitwirkende' => '',
-                'Preis' => $this->convertPrice($array['Preis']),
-                'Erscheinungsjahr' => $year,
-                'Altersempfehlung' => $age,
-                'Inhaltsbeschreibung' => '',
-                'Informationen' => $info,
-                'Einband' => $this->convertBinding($array['Einband']),
-                'Seitenzahl' => $pageCount,
-                'Abmessungen' => '',
-            ]);
-
-            $data[] = $this->sortArray($array);
-        }
-
-        return Butler::sort($data, 'AutorIn', 'asc');
     }
 }
