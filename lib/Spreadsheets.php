@@ -146,6 +146,7 @@ class Spreadsheets
                 $headerArray = array_keys($row);
 
                 if (!$header) {
+                    fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
                     fputcsv($handle, $headerArray, $delimiter);
                     $header = true;
                 }
