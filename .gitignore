@@ -8,4 +8,5 @@
 /dist
 
 # Tests
-/tests/Resources/*_actual.jpg
+/tests/fixtures/**/test_*.csv
+/tests/fixtures/**/test_*.jpg
