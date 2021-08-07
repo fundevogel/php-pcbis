@@ -62,15 +62,21 @@ class Spreadsheets
      * @param string $file - Source CSV file to read data from
      * @param string $delimiter - Delimiting character
      * @param array $headers - Header names for CSV data rows
-     * @return array|bool
+     * @param array $translations - Translatable strings
+     * @return array
      */
-    public static function csv2array(string $file, string $delimiter = ';', array $headers = null)
+    public static function csv2array(string $file, string $delimiter = ';', array $headers = null, array $translations = null): array
     {
+        $data = [];
+
         if (!file_exists($file) || !is_readable($file)) {
-            return false;
+            return $data;
         }
 
-        # Headers as exported via 'Titelexport'
+        # Load translations
+        $translations = $translations ?? json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
+
+        # Define headers as exported via pcbis.de
         $headers = $headers ?? [
             'AutorIn',
             'Titel',
@@ -88,27 +94,22 @@ class Spreadsheets
 
         $raw = self::csvOpen($file, $headers, $delimiter);
 
-        $data = [];
-
         foreach ($raw as $array) {
             # Gathering & processing generic book information
-            $infoString = $array['Informationen'];
-            $infoArray = Butler::split($infoString, ';');
+            $string = $array['Informationen'];
 
-            if (count($infoArray) === 1) {
-                $infoArray = Butler::split($infoString, '.');
+            # Determine separator
+            $infos = Butler::split($string, ';');
+
+            if (count($infos) === 1) {
+                $infos = Butler::split($string, '.');
             }
 
-            # Extracting variables from information string
-            list(
-                $info,
-                $year,
-                $age,
-                $pageCount
-            ) = self::generateInfo($infoArray);
+            # Extract variables from info string
+            list($info, $year, $age, $pageCount) = self::generateInfo($infos, $translations);
 
             $array = Butler::update($array, [
-                # Updating existing entries + adding blanks to prevent columns from shifting
+                # Add blanks to prevent column shifts
                 'Titel' => self::convertTitle($array['Titel']),
                 'Untertitel' => '',
                 'Mitwirkende' => '',
@@ -117,7 +118,7 @@ class Spreadsheets
                 'Altersempfehlung' => $age,
                 'Inhaltsbeschreibung' => '',
                 'Informationen' => $info,
-                'Einband' => self::convertBinding($array['Einband']),
+                'Einband' => $translations['binding'][$array['Einband']],
                 'Seitenzahl' => $pageCount,
                 'Abmessungen' => '',
             ]);
@@ -170,9 +171,10 @@ class Spreadsheets
      * applying functions to convert wanted data
      *
      * @param array $array - Source PHP array to read data from
+     * @param array $translations - Translatable strings
      * @return array
      */
-    protected static function generateInfo(array $array)
+    protected static function generateInfo(array $array, array $translations)
     {
         $age = 'Keine Altersangabe';
         $pageCount = '';
@@ -184,31 +186,28 @@ class Spreadsheets
                 unset($array[array_search($entry, $array)]);
             }
 
-            # Filtering age
+            # Filter age
             if (Butler::contains($entry, ' J.') || Butler::contains($entry, ' Mon.')) {
                 $age = self::convertAge($entry);
                 unset($array[array_search($entry, $array)]);
             }
 
-            # Filtering page count
+            # Filter page count
             if (Butler::contains($entry, ' S.')) {
                 $pageCount = self::convertPageCount($entry);
                 unset($array[array_search($entry, $array)]);
             }
 
-            # Filtering year (almost always right at this point)
+            # Filter year (almost always right at this point)
             if (Butler::length($entry) == 4) {
                 $year = $entry;
                 unset($array[array_search($entry, $array)]);
             }
         }
 
-        $translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
-
-        $strings = $translations['information'];
         $array = Butler::replace($array,
-            array_keys($strings),
-            array_values($strings)
+            array_keys($translations['information']),
+            array_values($translations['information'])
         );
 
         $info = ucfirst(implode(', ', $array));
@@ -266,20 +265,6 @@ class Spreadsheets
     protected static function convertPageCount($string)
     {
         return (int) $string;
-    }
-
-
-    /**
-     * Builds 'Einband' attribute as exported with pcbis.de
-     *
-     * @param string $string - Einband string
-     * @return string
-     */
-    protected static function convertBinding($string)
-    {
-        $translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
-
-        return $translations['binding'][$string];
     }
 
 
