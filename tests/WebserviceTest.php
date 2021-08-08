@@ -10,8 +10,9 @@
 namespace Pcbis\Tests;
 
 use Pcbis\Webservice;
-use Pcbis\Exceptions\NoRecordFoundException;
+use Pcbis\Exceptions\InvalidISBNException;
 use Pcbis\Exceptions\InvalidLoginException;
+use Pcbis\Exceptions\NoRecordFoundException;
 
 use PHPUnit\Framework\TestCase;
 
@@ -87,6 +88,41 @@ class WebserviceTest extends TestCase
 
         # Run function
         $result = new Webservice($array);
+    }
+
+
+    public function testValidate(): void
+    {
+        foreach (self::$available as $isbn) {
+            # Run function
+            $result = self::$object->validate($isbn);
+
+            # Assert result
+            # TODO: Migrate to `assertInstanceOf`
+            $this->assertEquals($isbn, $result);
+            $this->assertIsString($result);
+        }
+    }
+
+
+    public function testValidateInvalid(): void
+    {
+        # Setup
+        # (1) Invalid ISBNs
+        $invalid = [
+            '123-4545-67888-9',  # invalid start of string
+            'invalidisbn',       # letters instead of numbers
+            '1122334455667788',  # too long
+            '1234567890',        # too short
+        ];
+
+        # Assert exception
+        $this->expectException(InvalidISBNException::class);
+
+        # Run function
+        foreach ($invalid as $isbn) {
+            $result = self::$object->validate($isbn);
+        }
     }
 
 

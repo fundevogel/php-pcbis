@@ -267,7 +267,7 @@ class Webservice
      * @param bool $forceRefresh - Whether to update cached data
      * @return array
      */
-    public function fetch(string $isbn, bool $forceRefresh): array
+    public function fetch(string $isbn, bool $forceRefresh = false): array
     {
         if ($this->cache->contains($isbn) && $forceRefresh) {
             $this->cache->delete($isbn);
@@ -299,7 +299,7 @@ class Webservice
      * @throws \Pcbis\Exceptions\InvalidISBNException
      * @return string
      */
-    private function validate(string $isbn): string
+    public function validate(string $isbn): string
     {
         if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
             # Most likely non-convertable EAN
