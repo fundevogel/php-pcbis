@@ -103,6 +103,38 @@ class WebserviceTest extends TestCase
     }
 
 
+    public function testFetch(): void
+    {
+        foreach (self::$available as $isbn) {
+            # Run function
+            $result = self::$object->fetch($isbn, true);
+
+            # Assert result
+            $this->assertIsArray($result);
+            $this->assertCount(2, $result);
+
+            $this->assertArrayHasKey('fromCache', $result);
+            $this->assertFalse($result['fromCache']);
+
+            $this->assertArrayHasKey('source', $result);
+            $this->assertIsArray($result['source']);
+
+            # Run function
+            $result = self::$object->fetch($isbn, false);
+
+            # Assert result
+            $this->assertIsArray($result);
+            $this->assertCount(2, $result);
+
+            $this->assertArrayHasKey('fromCache', $result);
+            $this->assertTrue($result['fromCache']);
+
+            $this->assertArrayHasKey('source', $result);
+            $this->assertIsArray($result['source']);
+        }
+    }
+
+
     public function testLoad(): void
     {
         foreach (self::$available as $isbn) {

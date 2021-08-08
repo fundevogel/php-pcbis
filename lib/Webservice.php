@@ -267,7 +267,7 @@ class Webservice
      * @param bool $forceRefresh - Whether to update cached data
      * @return array
      */
-    private function fetch(string $isbn, bool $forceRefresh): array
+    public function fetch(string $isbn, bool $forceRefresh): array
     {
         if ($this->cache->contains($isbn) && $forceRefresh) {
             $this->cache->delete($isbn);
