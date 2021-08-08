@@ -386,21 +386,36 @@ abstract class Product implements Sociable, Taggable
             return [];
         }
 
-        # Convert source text to valid HTML
-        # (1) Decode HTML characters
-        $html = html_entity_decode($this->source['Text1']);
-        # (2) Avoid `htmlParseEntityRef: no name in Entity` warnings
+        # Prepare text for HTML processing
+        # (1) Avoid `htmlParseStartTag: invalid element name in Entity` warnings
+        # Sometimes, KNV uses '>>' & '<<' instead of quotation marks, leading to broken texts
+        # See 978-3-8373-9003-2
+        $text = Butler::replace($this->source['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
+
+        # (2) Convert HTML elements
+        $text = html_entity_decode($text);
+
+        # (3) Avoid `htmlParseEntityRef: no name in Entity` warnings
         # See https://stackoverflow.com/a/14832134
-        $html = Butler::replace($html, '&', '&amp;');
+        # TODO: Should be deprecated
+        $text = Butler::replace($text, '&', '&amp;');
 
         # Create DOM document & load HTML
         $dom = new DOMDocument();
-        $dom->loadHtml($html);
 
+        # Suppress warnings when encountering invalid HTML
+        # See https://stackoverflow.com/a/41845049
+        libxml_use_internal_errors(true);
+
+        # Load prepared HTML text
+        $dom->loadHtml($text);
+
+        # Extract individual texts by ..
         $description = [];
 
-        # Extract texts from DOMNodeList containing `<span>` elements
+        # (1) .. iterating over `<span>` elements and ..
         foreach ($dom->getElementsByTagName('span') as $node) {
+            # (2) .. storing their content
             $description[] = utf8_decode($node->nodeValue);
         }
 
