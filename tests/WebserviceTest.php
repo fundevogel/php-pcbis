@@ -11,6 +11,7 @@ namespace Pcbis\Tests;
 
 use Pcbis\Webservice;
 use Pcbis\Exceptions\NoRecordFoundException;
+use Pcbis\Exceptions\InvalidLoginException;
 
 use PHPUnit\Framework\TestCase;
 
@@ -70,6 +71,24 @@ class WebserviceTest extends TestCase
     /**
      * Tests
      */
+
+    public function testLoginInvalid(): void
+    {
+        # Setup
+        # (1) Invalid login credentials
+        $array = [
+            'VKN'      => '123',
+            'Benutzer' => '123',
+            'Passwort' => '123',
+        ];
+
+        # Assert exception
+        $this->expectException(InvalidLoginException::class);
+
+        # Run function
+        $result = new Webservice($array);
+    }
+
 
     public function testOla(): void
     {
