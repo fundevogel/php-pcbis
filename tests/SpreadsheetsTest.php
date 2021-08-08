@@ -21,6 +21,8 @@ class SpreadsheetsTest extends TestCase
      */
 
     /**
+     * Path to specific fixtures
+     *
      * @var string
      */
     private static $filePath;
@@ -175,18 +177,6 @@ class SpreadsheetsTest extends TestCase
      * Utilities
      */
 
-
-    /**
-     * Deletes generated files in test directory
-     *
-     * @return void
-     */
-    private static function cleanUp(): void
-    {
-        array_map('unlink', glob(self::$filePath . '/test_*.{csv,jpg}', GLOB_BRACE));
-    }
-
-
     /**
      * Detects character encoding of a file
      *
@@ -204,5 +194,16 @@ class SpreadsheetsTest extends TestCase
         }
 
         return '';
+    }
+
+
+    /**
+     * Deletes generated files in test directory
+     *
+     * @return void
+     */
+    private static function cleanUp(): void
+    {
+        array_map('unlink', glob(self::$filePath . '/test_*.{csv,jpg}', GLOB_BRACE));
     }
 }
