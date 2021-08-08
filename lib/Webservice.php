@@ -41,7 +41,7 @@ class Webservice
     /**
      * Current version number of PHPCBIS
      */
-    const VERSION = '2.1.3';
+    const VERSION = '2.1.4';
 
 
     /**
