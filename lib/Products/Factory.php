@@ -118,6 +118,6 @@ final class Factory
             }
         }
 
-        throw new UnknownTypeException('Unknown type: "' . $groups[$group] . '"');
+        throw new UnknownTypeException('Unknown type: "' . $group . '"');
     }
 }

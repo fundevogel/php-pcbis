@@ -13,4 +13,4 @@ use Pcbis\Products\Media\Medium;
  * @package PHPCBIS
  */
 
-class Movie extends Media {}
+class Movie extends Medium {}
