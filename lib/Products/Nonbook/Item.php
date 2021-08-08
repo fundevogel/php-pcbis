@@ -29,7 +29,8 @@ class Item extends Product {
      *
      * @return array
      */
-    public function export(bool $asArray = false): array {
+    public function export(bool $asArray = false): array
+    {
         # Build dataset
         return [
             'Titel'               => $this->title(),

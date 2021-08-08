@@ -63,7 +63,8 @@ class Ebook extends Book {
      * Constructor
      */
 
-    public function __construct(array $source, array $props) {
+    public function __construct(array $source, array $props)
+    {
         parent::__construct($source, $props);
 
         # Extend dataset
@@ -103,7 +104,8 @@ class Ebook extends Book {
      *
      * @return array
      */
-    public function export(bool $asArray = false): array {
+    public function export(bool $asArray = false): array
+    {
         # Build dataset
         return array_merge(
             # (1) 'Book' dataset
@@ -122,7 +124,8 @@ class Ebook extends Book {
      * Methods
      */
 
-    protected function buildDevices() {
+    protected function buildDevices()
+    {
         if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
             return '';
         }

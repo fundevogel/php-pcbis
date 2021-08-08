@@ -70,7 +70,8 @@ class Book extends Product
      * Constructor
      */
 
-    public function __construct(array $source, array $props) {
+    public function __construct(array $source, array $props)
+    {
         parent::__construct($source, $props);
 
         # Extend dataset
@@ -249,7 +250,8 @@ class Book extends Product
      *
      * @return array
      */
-    public function export(bool $asArray = false): array {
+    public function export(bool $asArray = false): array
+    {
         # Build dataset
         return [
             # (1) Base

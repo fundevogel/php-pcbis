@@ -32,7 +32,8 @@ abstract class ProductList implements Countable, Iterator
      * Constructor
      */
 
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         # Store objects
         $this->data = $data;
     }

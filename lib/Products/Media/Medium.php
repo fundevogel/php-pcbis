@@ -54,7 +54,8 @@ class Medium extends Product
      * Constructor
      */
 
-    public function __construct(array $source, array $props) {
+    public function __construct(array $source, array $props)
+    {
         parent::__construct($source, $props);
 
         # Extend dataset
