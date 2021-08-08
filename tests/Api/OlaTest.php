@@ -77,6 +77,7 @@ class OlaTest extends TestCase
             $result = self::$object->ola($isbn)->showSource();
 
             # Assert result
+            # TODO: Migrate to `assertInstanceOf`
             $this->assertTrue(is_a($result, '\stdClass'));
         }
     }

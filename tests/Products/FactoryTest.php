@@ -81,6 +81,7 @@ class FactoryTest extends TestCase
             ]);
 
             # Assert result
+            # TODO: Migrate to `assertInstanceOf`
             $this->assertTrue(is_a($result, $type));
         }
     }
@@ -96,6 +97,7 @@ class FactoryTest extends TestCase
         ]);
 
         # Assert result
+        # TODO: Migrate to `assertInstanceOf`
         $this->assertTrue(is_a($result, '\Pcbis\Products\Books\Types\Hardcover'));
     }
 

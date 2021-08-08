@@ -188,6 +188,12 @@ abstract class Product implements Sociable, Taggable
      * Magic methods
      */
 
+
+    /**
+     * Export author & title when echoing object
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         if (empty($this->author)) {
@@ -196,13 +202,6 @@ abstract class Product implements Sociable, Taggable
 
         return $this->author(true) . ': ' . $this->title();
     }
-
-
-    /**
-     * Setters & getters
-     */
-
-    # Nothing to see here
 
 
     /**
@@ -339,6 +338,11 @@ abstract class Product implements Sociable, Taggable
     }
 
 
+    /**
+     * Exports title
+     *
+     * @return string
+     */
     public function title(): string
     {
         return $this->title;
@@ -360,6 +364,11 @@ abstract class Product implements Sociable, Taggable
     }
 
 
+    /**
+     * Exports subtitle
+     *
+     * @return string
+     */
     public function subtitle(): string
     {
         return $this->subtitle;
@@ -399,6 +408,12 @@ abstract class Product implements Sociable, Taggable
     }
 
 
+    /**
+     * Exports description
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
+     */
     public function description(bool $asArray = false)
     {
         if ($asArray) {
@@ -428,6 +443,11 @@ abstract class Product implements Sociable, Taggable
     }
 
 
+    /**
+     * Exports retail price
+     *
+     * @return string
+     */
     public function retailPrice(): string
     {
         return $this->retailPrice;
@@ -477,6 +497,11 @@ abstract class Product implements Sociable, Taggable
     }
 
 
+    /**
+     * Exports age recommendation
+     *
+     * @return string
+     */
     public function age(): string
     {
         return $this->age;
@@ -545,6 +570,8 @@ abstract class Product implements Sociable, Taggable
 
     /**
      * Forces all (sub)classes to provide an easy way to export a full dataset
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
      */
     abstract protected function export(bool $asArray);
 }

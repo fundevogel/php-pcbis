@@ -248,6 +248,7 @@ class Book extends Product
     /**
      * Exports all data
      *
+     * @param bool $asArray - Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array
