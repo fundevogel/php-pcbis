@@ -144,7 +144,7 @@ class Ebook extends Book {
      */
     public function devices(bool $asArray = false)
     {
-        if ($isArray) {
+        if ($asArray) {
             return $this->devices;
         }
 
