@@ -111,6 +111,7 @@ trait DownloadCover
             try {
                 $response = $client->get($url, ['sink' => $handle]);
                 $success = true;
+
             } catch (GuzzleException $e) {}
         }
 
