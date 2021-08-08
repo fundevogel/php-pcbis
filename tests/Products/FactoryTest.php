@@ -7,7 +7,7 @@
  * @license GPL v3
  */
 
-namespace Pcbis\Tests\Api;
+namespace Pcbis\Tests\Products;
 
 use Pcbis\Webservice;
 use Pcbis\Exceptions\UnknownTypeException;
@@ -26,31 +26,6 @@ class FactoryTest extends TestCase
      * @var \Pcbis\Webservice
      */
     private static $object;
-
-
-    // /**
-    //  * Available ISBNs
-    //  *
-    //  * @var array
-    //  */
-    // private static $available = [
-    //     '978-3-95854-151-1',  # Der Stein und das Meer
-    //     '978-3-314-10561-6',  # Die Tode meiner Mutter
-    //     '978-3-407-75554-4',  # Helsin Apelsin und der Spinner
-    //     '978-3-95640-221-0',  # Die Hundebande in Paris
-    //     '978-3-95640-223-4',  # Q-R-T: Nächste Stunde: Außerirdisch
-    // ];
-
-
-    // /**
-    //  * Unavailable ISBNs
-    //  *
-    //  * @var array
-    //  */
-    // private static $unavailable = [
-    //     '978-3-596-80479-5',  # Ein Haufen Ärger
-    //     '978-3-570-40342-6',  # We All Looked Up
-    // ];
 
 
     /**

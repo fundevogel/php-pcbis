@@ -7,7 +7,7 @@
  * @license GPL v3
  */
 
-namespace Pcbis\Tests;
+namespace Pcbis\Tests\Products\Books\Types;
 
 use Pcbis\Webservice;
 
