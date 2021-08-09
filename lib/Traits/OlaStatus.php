@@ -158,7 +158,7 @@ trait OlaStatus
 
 
     /**
-     * Returns current KNV 'Meldenummer'
+     * Exports current KNV 'Meldenummer'
      *
      * @return string
      */
@@ -184,7 +184,7 @@ trait OlaStatus
 
 
     /**
-     * Returns current KNV 'Meldenummer' description
+     * Exports current KNV 'Meldenummer' description
      *
      * @return string
      */

@@ -67,7 +67,7 @@ abstract class ProductList implements Countable, Iterator
      */
 
     /**
-     * Returns the current object
+     * Exports the current object
      *
      * @return \Pcbis\Products\Product
      */
@@ -78,7 +78,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns the current key
+     * Exports the current key
      *
      * @return string
      */
@@ -148,6 +148,7 @@ abstract class ProductList implements Countable, Iterator
     {
         if (count($args) === 1) {
             array_unshift($this->data, $args[0]);
+
         } elseif (count($args) > 1) {
             $data = $this->data;
             $this->data = [];
@@ -171,6 +172,7 @@ abstract class ProductList implements Countable, Iterator
     {
         if (count($args) === 1) {
             $this->data[] = $args[0];
+
         } elseif (count($args) > 1) {
             $this->set($args[0], $args[1]);
         }
@@ -180,7 +182,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns the objects in reverse order
+     * Exports the objects in reverse order
      *
      * @return \Pcbis\Products\ProductList
      */
@@ -194,7 +196,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns the first object
+     * Exports the first object
      *
      * @return \Pcbis\Products\Product
      */
@@ -205,7 +207,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns the last object
+     * Exports the last object
      *
      * @return \Pcbis\Products\Product
      */
@@ -216,7 +218,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns the nth object from the collection
+     * Exports the nth object from the collection
      *
      * @param int $n
      * @return \Pcbis\Products\Product
@@ -228,7 +230,7 @@ abstract class ProductList implements Countable, Iterator
 
 
     /**
-     * Returns a Collection without the given object(s)
+     * Exports a Collection without the given object(s)
      *
      * @param string ...$keys any number of keys, passed as individual arguments
      * @return \Pcbis\Products\ProductList
@@ -320,6 +322,7 @@ abstract class ProductList implements Countable, Iterator
 
             if ($split !== null) {
                 $result = array_merge($result, Str::split($row, $split));
+
             } else {
                 $result[] = $row;
             }

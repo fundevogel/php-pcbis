@@ -89,7 +89,7 @@ trait Series
 
 
     /**
-     * Returns series
+     * Exports series
      *
      * @return string
      */
@@ -100,7 +100,7 @@ trait Series
 
 
     /**
-     * Returns volume
+     * Exports volume
      *
      * @return string
      */

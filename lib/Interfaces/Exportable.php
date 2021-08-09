@@ -16,7 +16,7 @@ use Pcbis\Helpers\Butler;
 Interface Exportable
 {
     /**
-     * Returns dataset
+     * Exports dataset
      */
     public function export(bool $asArray = false);
 }

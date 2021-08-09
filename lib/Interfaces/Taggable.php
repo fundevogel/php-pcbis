@@ -16,13 +16,13 @@ use Pcbis\Helpers\Butler;
 Interface Taggable
 {
     /**
-     * Returns categories
+     * Exports categories
      */
     public function categories();
 
 
     /**
-     * Returns topics
+     * Exports topics
      */
     public function topics();
 }

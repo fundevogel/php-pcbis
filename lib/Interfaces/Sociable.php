@@ -16,7 +16,7 @@ use Pcbis\Helpers\Butler;
 Interface Sociable
 {
     /**
-     * Returns people of given role
+     * Exports people of given role
      */
     public function getRole(string $role, bool $asArray = false);
 

@@ -61,7 +61,7 @@ trait Dimensions
 
 
     /**
-     * Returns dimensions
+     * Exports dimensions
      *
      * @return string
      */

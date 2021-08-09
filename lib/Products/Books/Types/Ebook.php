@@ -138,7 +138,7 @@ class Ebook extends Book {
 
 
     /**
-     * Returns supported devices
+     * Exports supported devices
      *
      * @param bool $asArray - Whether to export an array (rather than a string)
      * @return string|array
@@ -169,7 +169,7 @@ class Ebook extends Book {
 
 
     /**
-     * Returns ISBN of print edition
+     * Exports ISBN of print edition
      *
      * @return string
      */
@@ -197,7 +197,7 @@ class Ebook extends Book {
 
 
     /**
-     * Returns file size
+     * Exports file size
      *
      * @return string
      */
@@ -223,7 +223,7 @@ class Ebook extends Book {
 
 
     /**
-     * Returns file format
+     * Exports file format
      *
      * @return string
      */
@@ -256,7 +256,7 @@ class Ebook extends Book {
 
 
     /**
-     * Returns DRM descriptor
+     * Exports DRM descriptor
      *
      * @return string
      */
