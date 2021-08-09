@@ -65,6 +65,7 @@ class EbookTest extends TestCase
         $keys = [
             'Titel',
             'Untertitel',
+            'Verlag',
             'Inhaltsbeschreibung',
             'Preis',
             'Erscheinungsjahr',
@@ -78,7 +79,6 @@ class EbookTest extends TestCase
             'MitarbeiterIn',
             'Kategorien',
             'Themen',
-            'Verlag',
             'Reihe',
             'Band',
             'Einband',

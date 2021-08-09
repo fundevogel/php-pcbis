@@ -119,6 +119,7 @@ class BookTest extends TestCase
         $keys = [
             'Titel',
             'Untertitel',
+            'Verlag',
             'Inhaltsbeschreibung',
             'Preis',
             'Erscheinungsjahr',
@@ -132,7 +133,6 @@ class BookTest extends TestCase
             'MitarbeiterIn',
             'Kategorien',
             'Themen',
-            'Verlag',
             'Reihe',
             'Band',
             'Einband',

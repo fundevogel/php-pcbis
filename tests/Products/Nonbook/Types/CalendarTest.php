@@ -71,11 +71,11 @@ class CalendarTest extends TestCase
         $keys = [
             'Titel',
             'Untertitel',
+            'Verlag',
             'Inhaltsbeschreibung',
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
-            'Verlag',
             'Abmessungen',
         ];
 

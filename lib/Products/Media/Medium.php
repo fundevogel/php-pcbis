@@ -102,6 +102,7 @@ class Medium extends Product
             # (1) Base
             'Titel'               => $this->title(),
             'Untertitel'          => $this->subtitle(),
+            'Verlag'              => $this->publisher(),
             'Inhaltsbeschreibung' => $this->description($asArray),
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),

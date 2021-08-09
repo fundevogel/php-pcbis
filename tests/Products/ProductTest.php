@@ -101,7 +101,12 @@ class ProductTest extends TestCase
 
             $this->assertIsString($result->title());
             $this->assertIsString($result->subtitle());
+            $this->assertIsString($result->publisher());
+            $this->assertIsArray($result->publisher(true));
+            $this->assertIsString($result->publisher(false));
+            $this->assertIsString($result->description());
             $this->assertIsArray($result->description(true));
+            $this->assertIsString($result->description(false));
             $this->assertIsString($result->retailPrice());
             $this->assertIsString($result->releaseYear());
             $this->assertIsString($result->age());

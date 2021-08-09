@@ -8,7 +8,6 @@ use Pcbis\Traits\DownloadCover;
 
 use Pcbis\Traits\Shared\Categories;
 use Pcbis\Traits\Shared\Dimensions;
-use Pcbis\Traits\Shared\Publisher;
 use Pcbis\Traits\Shared\Series;
 use Pcbis\Traits\Shared\Topics;
 
@@ -28,7 +27,6 @@ class Book extends Product
     use Categories, Topics;
     use DownloadCover;
     use Dimensions;
-    use Publisher;
     use Series;
 
 
@@ -122,7 +120,7 @@ class Book extends Product
 
 
     /**
-     * Returns binding
+     * Exports binding
      *
      * @return string
      */
@@ -157,7 +155,7 @@ class Book extends Product
 
 
     /**
-     * Returns page count
+     * Exports page count
      *
      * @return string
      */
@@ -189,7 +187,7 @@ class Book extends Product
 
 
     /**
-     * Returns Antolin rating
+     * Exports Antolin rating
      *
      * @return string
      */
@@ -212,6 +210,7 @@ class Book extends Product
             # (1) Base
             'Titel'               => $this->title(),
             'Untertitel'          => $this->subtitle(),
+            'Verlag'              => $this->publisher(),
             'Inhaltsbeschreibung' => $this->description($asArray),
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
@@ -231,7 +230,6 @@ class Book extends Product
             'Themen'              => $this->topics($asArray),
 
             # (4) 'Book' specific data
-            'Verlag'              => $this->publisher(),
             'Reihe'               => $this->series(),
             'Band'                => $this->volume(),
             'Einband'             => $this->binding(),

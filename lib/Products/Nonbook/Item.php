@@ -36,6 +36,7 @@ class Item extends Product {
         return [
             'Titel'               => $this->title(),
             'Untertitel'          => $this->subtitle(),
+            'Verlag'              => $this->publisher(),
             'Inhaltsbeschreibung' => $this->description($asArray),
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),

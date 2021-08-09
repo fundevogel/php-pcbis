@@ -87,6 +87,7 @@ class AudiobookTest extends TestCase
         $keys = [
             'Titel',
             'Untertitel',
+            'Verlag',
             'Inhaltsbeschreibung',
             'Preis',
             'Erscheinungsjahr',
@@ -104,7 +105,6 @@ class AudiobookTest extends TestCase
             'KomponistIn',
             'RegisseurIn',
             'ProduzentIn',
-            'Verlag',
             'Reihe',
             'Band',
             'ErzählerIn',

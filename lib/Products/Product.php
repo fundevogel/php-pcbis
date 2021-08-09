@@ -107,6 +107,14 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Publisher
+     *
+     * @var array
+     */
+    protected $publisher;
+
+
+    /**
      * Description
      *
      * @var array
@@ -166,6 +174,7 @@ abstract class Product implements Sociable, Taggable
         # Build basic dataset
         $this->title        = $this->buildTitle();
         $this->subtitle     = $this->buildSubtitle();
+        $this->publisher    = $this->buildPublisher();
         $this->description  = $this->buildDescription();
         $this->retailPrice  = $this->buildretailPrice();
         $this->releaseYear  = $this->buildreleaseYear();
@@ -283,7 +292,7 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Returns OLA record
+     * Exports OLA record
      *
      * @return \Pcbis\Api\Ola
      */
@@ -294,7 +303,7 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Returns ISBN
+     * Exports ISBN
      *
      * @return string
      */
@@ -305,7 +314,7 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Returns product type
+     * Exports product type
      *
      * @return string
      */
@@ -376,6 +385,56 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Builds publisher
+     *
+     * @return array
+     */
+    protected function buildPublisher(): array
+    {
+        if (!isset($this->source['IndexVerlag'])) {
+            return [];
+        }
+
+        if (is_array($this->source['IndexVerlag'])) {
+            $publisher = [];
+
+            foreach ($this->source['IndexVerlag'] as $string) {
+                # Skip variations
+                if (Butler::contains($string, ' # ')) {
+                    continue;
+                }
+
+                $publisher[] = trim($string);
+            }
+
+            return $publisher;
+        }
+
+        return (array)trim($this->source['IndexVerlag']);
+    }
+
+
+    /**
+     * Exports publisher(s)
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
+     */
+    public function publisher(bool $asArray = false)
+    {
+        if (empty($this->publisher)) {
+            return $asArray ? [] : '';
+        }
+
+        if ($asArray) {
+            return $this->publisher;
+        }
+
+        return Butler::first($this->publisher);
+    }
+
+
+    /**
      * Builds description(s)
      *
      * @return array
@@ -431,6 +490,10 @@ abstract class Product implements Sociable, Taggable
      */
     public function description(bool $asArray = false)
     {
+        if (empty($this->description)) {
+            return $asArray ? [] : '';
+        }
+
         if ($asArray) {
             return $this->description;
         }

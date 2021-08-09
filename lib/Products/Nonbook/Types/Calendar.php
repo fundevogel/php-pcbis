@@ -5,7 +5,6 @@ namespace Pcbis\Products\Nonbook\Types;
 use Pcbis\Products\Nonbook\Item;
 
 use Pcbis\Traits\Shared\Dimensions;
-use Pcbis\Traits\Shared\Publisher;
 
 
 /**
@@ -22,7 +21,6 @@ class Calendar extends Item {
      */
 
     use Dimensions;
-    use Publisher;
 
 
     /**
@@ -34,7 +32,6 @@ class Calendar extends Item {
         parent::__construct($source, $props);
 
         # Extend dataset
-        $this->publisher  = $this->buildPublisher();
         $this->dimensions = $this->buildDimensions();
     }
 
@@ -53,10 +50,9 @@ class Calendar extends Item {
     {
         # Build dataset
         return array_merge(
-            # (1) 'Media' dataset
+            # (1) 'Item' dataset
             parent::export($asArray), [
             # (2) 'Calendar' specific data
-            'Verlag'      => $this->publisher(),
             'Abmessungen' => $this->dimensions(),
         ]);
     }
