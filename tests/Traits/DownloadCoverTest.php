@@ -110,7 +110,8 @@ class DownloadCoverTest extends TestCase
         $this->assertEquals($expected, $result);
 
         # Run function
-        $result = $object->setUserAgent($changed);
+        $object->setUserAgent($changed);
+        $result = $object->getUserAgent();
 
         # Assert result
         $this->assertEquals($changed, $result);
