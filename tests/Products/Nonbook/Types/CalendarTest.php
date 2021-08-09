@@ -7,14 +7,14 @@
  * @license GPL v3
  */
 
-namespace Pcbis\Tests\Products\Nonbook;
+namespace Pcbis\Tests\Products\Nonbook\Types;
 
 use Pcbis\Webservice;
 
 use PHPUnit\Framework\TestCase;
 
 
-class ItemTest extends TestCase
+class CalendarTest extends TestCase
 {
     /**
      * Properties
@@ -32,7 +32,7 @@ class ItemTest extends TestCase
      * @var array
      */
     private static $isbns = [
-        # 2021/22
+        # 2021-02
         '978-3-7795-0660-7',
         '978-3-7795-0659-1',
         '4250809647876',
@@ -53,7 +53,7 @@ class ItemTest extends TestCase
     {
         # Setup
         # (1) Login credentials
-        $credentials = json_decode(file_get_contents(__DIR__ . '/../../../login.json'), true);
+        $credentials = json_decode(file_get_contents(__DIR__ . '/../../../../login.json'), true);
 
         # (2) Global object
         self::$object = new Webservice($credentials);
@@ -75,6 +75,8 @@ class ItemTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Verlag',
+            'Abmessungen',
         ];
 
         foreach (self::$isbns as $isbn) {
@@ -88,7 +90,7 @@ class ItemTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(6, $result);
+            $this->assertCount(8, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

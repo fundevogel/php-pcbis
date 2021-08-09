@@ -7,6 +7,7 @@ use Pcbis\Products\Product;
 use Pcbis\Traits\DownloadCover;
 
 use Pcbis\Traits\Shared\Categories;
+use Pcbis\Traits\Shared\Dimensions;
 use Pcbis\Traits\Shared\Publisher;
 use Pcbis\Traits\Shared\Series;
 use Pcbis\Traits\Shared\Topics;
@@ -26,6 +27,7 @@ class Book extends Product
 
     use Categories, Topics;
     use DownloadCover;
+    use Dimensions;
     use Publisher;
     use Series;
 
@@ -48,14 +50,6 @@ class Book extends Product
      * @var string
      */
     protected $pageCount;
-
-
-    /**
-     * Dimensions (width x height in centimeters)
-     *
-     * @var string
-     */
-    protected $dimensions;
 
 
     /**
@@ -170,46 +164,6 @@ class Book extends Product
     public function pageCount(): string
     {
         return $this->pageCount;
-    }
-
-
-    /**
-     * Builds dimensions (width x height)
-     *
-     * @return string
-     */
-    protected function buildDimensions(): string
-    {
-        # Width & height are either both present, or not at all
-        if (!isset($this->source['Breite'])) {
-            $delimiter = ' cm';
-
-            # If they aren't though, check 'Abb' for further hints on dimensions
-            if (isset($this->source['Abb']) && Butler::contains($this->source['Abb'], $delimiter)) {
-                $string = Butler::replace($this->source['Abb'], $delimiter, '');
-                $array = Butler::split($string, ' ');
-
-                return Butler::convertMM(Butler::last($array));
-            }
-
-            return '';
-        }
-
-        $width = Butler::convertMM($this->source['Breite']);
-        $height = Butler::convertMM($this->source['Hoehe']);
-
-        return $width . ' x ' . $height;
-    }
-
-
-    /**
-     * Returns dimensions
-     *
-     * @return string
-     */
-    public function dimensions(): string
-    {
-        return $this->dimensions;
     }
 
 

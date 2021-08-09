@@ -8,7 +8,7 @@ use Pcbis\Helpers\Butler;
 /**
  * Trait Publisher
  *
- * Provides ability to extract publisher (book/audiobook)
+ * Provides ability to extract publisher (book/audiobook/calendar)
  *
  * @package PHPCBIS
  */
