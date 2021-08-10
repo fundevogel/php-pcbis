@@ -45,7 +45,11 @@ class Spreadsheets
                     continue;
                 }
 
-                $row = array_map('utf8_encode', $row);
+                # Encode CSV data as UTF-8 (if necessary)
+                if (Butler::encoding($row[0]) !== 'UTF-8') {
+                    $row = array_map('utf8_encode', $row);
+                }
+
                 $data[] = array_combine($headers, $row);
             }
 

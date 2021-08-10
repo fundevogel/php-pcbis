@@ -72,6 +72,18 @@ class Butler
 
 
     /**
+     * Tries to detect the string encoding
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function encoding(string $string): string
+    {
+        return mb_detect_encoding($string, 'UTF-8, ISO-8859-1, windows-1251', true);
+    }
+
+
+    /**
      * An UTF-8 safe version of substr()
      *
      * @param  string  $str
