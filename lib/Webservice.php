@@ -112,21 +112,19 @@ class Webservice
                 'exceptions' => true,
             ]);
 
-        } catch (SoapFault $e) {
-            # Activate offline mode on network error
-            $this->offlineMode = true;
-        }
-
-        if (!$this->offlineMode) {
-            # Check compatibility
+            # Check API compatibility
             if ($this->client->CheckVersion('2.0') === '2') {
                 throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
             }
 
-            # Initialize API driver
+            # Authenticate with API (if necessary)
             if ($credentials !== null) {
                 $this->sessionID = $this->logIn($credentials);
             }
+
+        } catch (SoapFault $e) {
+            # Activate offline mode on network error
+            $this->offlineMode = true;
         }
 
         # Initialize cache
