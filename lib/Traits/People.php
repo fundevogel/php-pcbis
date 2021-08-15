@@ -166,6 +166,7 @@ trait People
                         break;
                     }
                 }
+
             } else {
                 # Otherwise, split role & people as usual
                 $array = Butler::split($string, ':');
@@ -203,14 +204,19 @@ trait People
      *   ],
      * ]
      *
-     * @param string $string - Involved people
+     * @param string|array $data - Involved people
      * @param string $groupDelimiter - Character between people
      * @param string $nameDelimiter - Character between first & last name
      * @return array
      */
-    protected function organizePeople(string $string, string $groupDelimiter = ';', string $nameDelimiter = ','): array
+    protected function organizePeople($data, string $groupDelimiter = ';', string $nameDelimiter = ','): array
     {
-        $group = Butler::split($string, $groupDelimiter);
+        $group = $data;
+
+        if (is_string($data)) {
+            $group = Butler::split($data, $groupDelimiter);
+        }
+
         $people = [];
 
         foreach ($group as $member) {
@@ -287,8 +293,19 @@ trait People
                 return $this->people['original'];
             }
 
-            if (isset($this->source['IndexAutor']) && is_string($this->source['IndexAutor'])) {
-                $string = trim($this->source['IndexAutor']);
+            if (isset($this->source['IndexAutor'])) {
+                if (is_array($this->source['IndexAutor'])) {
+                    return array_map(function($string) {
+                        return trim($string);
+                    }, $this->source['IndexAutor']);
+
+                } elseif (is_string($this->source['IndexAutor'])) {
+                    $string = trim($this->source['IndexAutor']);
+
+                } else {
+                    return [];
+                }
+
             } else {
                 return [];
             }
