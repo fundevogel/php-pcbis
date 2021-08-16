@@ -5,6 +5,7 @@
  *
  * @link https://github.com/Fundevogel/php-pcbis
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
+ * @version 2.2.2
  */
 
 namespace Pcbis;
@@ -38,12 +39,6 @@ use SoapFault;
 
 class Webservice
 {
-    /**
-     * Current version number of PHPCBIS
-     */
-    const VERSION = '2.2.2';
-
-
     /**
      * Properties
      */
