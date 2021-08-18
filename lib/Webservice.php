@@ -290,15 +290,10 @@ class Webservice
      *
      * @param string $isbn - International Standard Book Number
      * @throws \Pcbis\Exceptions\InvalidISBNException
-     * @return string
+     * @return string Valid & formatted ISBN
      */
     public function validate(string $isbn): string
     {
-        if (Butler::length($isbn) === 13 && (Butler::startsWith($isbn, '4') || Butler::startsWith($isbn, '5'))) {
-            # Most likely non-convertable EAN
-            return $isbn;
-        }
-
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
 
@@ -356,7 +351,12 @@ class Webservice
      */
     public function load(string $isbn, bool $forceRefresh = false): \Pcbis\Products\Product
     {
-        $isbn = $this->validate($isbn);
+        # Convert given number to ISBN-13 (if possible)
+        try {
+            $isbn = Isbn::convertToIsbn13($isbn);
+
+        } catch(\Exception $e) {}
+
         $data = $this->fetch($isbn, $forceRefresh);
 
         $props = [
