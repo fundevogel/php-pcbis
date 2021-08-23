@@ -7,14 +7,14 @@
  * @license GPL v3
  */
 
-namespace Pcbis\Tests\Products\Media;
+namespace Pcbis\Tests\Products\Media\Types;
 
 use Pcbis\Webservice;
 
 use PHPUnit\Framework\TestCase;
 
 
-class MediumTest extends TestCase
+class MovieTest extends TestCase
 {
     /**
      * Properties
@@ -27,13 +27,13 @@ class MediumTest extends TestCase
 
 
     /**
-     * Media EANs/ISBNs
+     * Audiobook EANs/ISBNs
      *
      * @var array
      */
     private static $isbns = [
-        '4006680067889',  # Momo, 1 DVD
-        '4006680067872',  # Momo, 1 BluRay
+        '5051890318947',  # Die Verurteilten (DVD)
+        '5051890318930',  # Die Verurteilten (Blu-ray)
     ];
 
 
@@ -45,7 +45,7 @@ class MediumTest extends TestCase
     {
         # Setup
         # (1) Login credentials
-        $credentials = json_decode(file_get_contents(__DIR__ . '/../../../login.json'), true);
+        $credentials = json_decode(file_get_contents(__DIR__ . '/../../../../login.json'), true);
 
         # (2) Global object
         self::$object = new Webservice($credentials);
@@ -81,6 +81,9 @@ class MediumTest extends TestCase
             'KomponistIn',
             'RegisseurIn',
             'ProduzentIn',
+            'Reihe',
+            'Band',
+            'SchauspielerIn',
         ];
 
         foreach (self::$isbns as $isbn) {
@@ -89,7 +92,7 @@ class MediumTest extends TestCase
 
             # Assert result
             # TODO: Migrate to `assertInstanceOf`
-            $this->assertTrue(is_a($result, '\Pcbis\Products\Media\Medium'));
+            $this->assertTrue(is_a($result, '\Pcbis\Products\Media\Types\Movie'));
 
             $result = $result->export();
 
