@@ -34,6 +34,7 @@ trait People
         'Komposition'  => 'composer',
         'Regie'        => 'director',
         'Produktion'   => 'producer',
+        'Besetzung'    => 'actor',
         'Mitarbeit'    => 'participant',
         # Edge case: author of original works
         'Vorlage'      => 'original',
@@ -72,6 +73,7 @@ trait People
      * - `composer`
      * - `director`
      * - `producer`
+     * - `actor`
      * - `participant`
      *
      * @return array
@@ -91,6 +93,7 @@ trait People
             'composer'     => [],
             'director'     => [],
             'producer'     => [],
+            'actor'        => [],
             'participant'  => [],
         ];
 
@@ -415,6 +418,12 @@ trait People
     public function producer(bool $asArray = false)
     {
         return $this->getRole('producer', $asArray);
+    }
+
+
+    public function actor(bool $asArray = false)
+    {
+        return $this->getRole('actor', $asArray);
     }
 
 
