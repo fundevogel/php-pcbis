@@ -111,6 +111,9 @@ class ProductTest extends TestCase
             $this->assertIsString($result->releaseYear());
             $this->assertIsString($result->age());
             $this->assertIsString($result->dimensions());
+            $this->assertIsString($result->languages());
+            $this->assertIsArray($result->languages(true));
+            $this->assertIsString($result->languages(false));
 
             $this->assertIsBool($result->isAvailable());
             $this->assertIsBool($result->isUnavailable());

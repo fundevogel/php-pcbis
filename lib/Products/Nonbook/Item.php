@@ -42,6 +42,7 @@ class Item extends Product {
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
             'Abmessungen'         => $this->dimensions(),
+            'Sprachen'            => $this->languages($asArray),
         ];
     }
 }

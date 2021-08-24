@@ -93,6 +93,7 @@ class AudiobookTest extends TestCase
             'Erscheinungsjahr',
             'Altersempfehlung',
             'Abmessungen',
+            'Sprachen',
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -123,7 +124,7 @@ class AudiobookTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(25, $result);
+            $this->assertCount(26, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

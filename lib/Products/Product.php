@@ -155,6 +155,14 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Available languages
+     *
+     * @var array
+     */
+    protected $languages;
+
+
+    /**
      * Constructor
      */
 
@@ -188,6 +196,7 @@ abstract class Product implements Sociable, Taggable
         $this->releaseYear  = $this->buildreleaseYear();
         $this->age          = $this->buildAge();
         $this->dimensions   = $this->buildDimensions();
+        $this->languages    = $this->buildLanguages();
 
         # Build categories & topics from tags
         $this->categories   = $this->buildCategories();
@@ -632,6 +641,97 @@ abstract class Product implements Sociable, Taggable
     public function dimensions(): string
     {
         return $this->dimensions;
+    }
+
+
+    /**
+     * Builds languages
+     *
+     * @return array
+     */
+    protected function buildLanguages(): array
+    {
+        if (!isset($this->source['Sprachschl'])) {
+            return [];
+        }
+
+        $languageCodes = [
+            '00' => 'Undefiniert',
+            '01' => 'Deutsch',
+            '02' => 'Englisch',
+            '03' => 'Niederländisch/Flämisch',
+            '05' => 'Dänisch',
+            '06' => 'Norwegisch',
+            '07' => 'Schwedisch',
+            '08' => 'Isländisch',
+            '09' => 'Andere Germanische',
+            '10' => 'Französisch',
+            '12' => 'Italienisch',
+            '13' => 'Katalanisch',
+            '14' => 'Spanisch',
+            '16' => 'Portugiesisch',
+            '17' => 'Rumänisch',
+            '18' => 'Latein',
+            '19' => 'Andere Romanische',
+            '20' => 'Griechisch',
+            '22' => 'Altgriechisch',
+            '30' => 'Russisch',
+            '31' => 'Bulgarisch',
+            '32' => 'Serbisch/Kroatisch',
+            '34' => 'Polnisch',
+            '36' => 'Tschechisch',
+            '37' => 'Slowakisch',
+            '38' => 'Sorbisch',
+            '39' => 'Andere Slawische',
+            '41' => 'Finnisch',
+            '42' => 'Ungarisch',
+            '43' => 'Baltisch',
+            '45' => 'Keltisch',
+            '49' => 'Andere europäische',
+            '50' => 'Hebräisch',
+            '52' => 'Arabisch',
+            '59' => 'Andere hamitosemitische',
+            '60' => 'Türkisch',
+            '62' => 'Iranische Sprachen',
+            '65' => 'Japanisch',
+            '66' => 'Chinesisch',
+            '67' => 'Indoarische Sprachen',
+            '69' => 'Sonstige asiatische',
+            '90' => 'Afrikanische Sprachen',
+            '94' => 'Indianersprachen',
+            '97' => 'Australische/Ozeanische',
+            '99' => 'Esperanto',
+        ];
+
+        if (is_array($this->source['Sprachschl'])) {
+            return array_map(function(string $languageCode) use ($languageCodes) {
+                # Be safe, trim strings
+                return $languageCodes[trim($languageCode)];
+            }, $this->source['Sprachschl']);
+        }
+
+        # Be safe, trim strings
+        return (array)$languageCodes[trim($this->source['Sprachschl'])];
+    }
+
+
+    /**
+     * Exports language(s)
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
+     */
+    public function languages(bool $asArray = false)
+    {
+        if (empty($this->languages)) {
+            return $asArray ? [] : '';
+        }
+
+        if ($asArray) {
+            return $this->languages;
+        }
+
+        return Butler::join($this->languages, ', ');
     }
 
 

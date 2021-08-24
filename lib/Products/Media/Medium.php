@@ -108,6 +108,7 @@ class Medium extends Product
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
             'Abmessungen'         => $this->dimensions(),
+            'Sprachen'            => $this->languages($asArray),
 
             # (2) Extension 'People'
             'AutorIn'             => $this->getRole('author', $asArray),
