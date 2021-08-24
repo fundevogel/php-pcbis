@@ -41,6 +41,7 @@ class Item extends Product {
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
+            'Abmessungen'         => $this->dimensions(),
         ];
     }
 }

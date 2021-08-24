@@ -85,7 +85,7 @@ class CalendarTest extends TestCase
 
             # Assert result
             # TODO: Migrate to `assertInstanceOf`
-            $this->assertTrue(is_a($result, '\Pcbis\Products\Nonbook\Item'));
+            $this->assertTrue(is_a($result, '\Pcbis\Products\Nonbook\Types\Calendar'));
 
             $result = $result->export();
 

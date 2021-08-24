@@ -70,6 +70,7 @@ class EbookTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Abmessungen',  # TODO: ??
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -84,7 +85,6 @@ class EbookTest extends TestCase
             'Band',
             'Einband',
             'Seitenzahl',
-            'Abmessungen',
             'Antolin',
             'Unterstützt',
             'Printausgabe',

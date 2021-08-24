@@ -124,6 +124,7 @@ class BookTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Abmessungen',
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -138,7 +139,6 @@ class BookTest extends TestCase
             'Band',
             'Einband',
             'Seitenzahl',
-            'Abmessungen',
             'Antolin',
         ];
 

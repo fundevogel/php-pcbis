@@ -68,6 +68,7 @@ class MediumTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Abmessungen',
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -95,7 +96,7 @@ class MediumTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(24, $result);
+            $this->assertCount(25, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);
