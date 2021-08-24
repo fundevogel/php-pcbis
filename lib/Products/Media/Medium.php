@@ -110,6 +110,7 @@ class Medium extends Product
 
             # (2) Extension 'People'
             'AutorIn'             => $this->getRole('author', $asArray),
+            'Vorlage'             => $this->getRole('original', $asArray),
             'IllustratorIn'       => $this->getRole('illustrator', $asArray),
             'ZeichnerIn'          => $this->getRole('drawer', $asArray),
             'PhotographIn'        => $this->getRole('photographer', $asArray),

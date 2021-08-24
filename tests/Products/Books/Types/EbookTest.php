@@ -71,6 +71,7 @@ class EbookTest extends TestCase
             'Erscheinungsjahr',
             'Altersempfehlung',
             'AutorIn',
+            'Vorlage',
             'IllustratorIn',
             'ZeichnerIn',
             'PhotographIn',
@@ -103,7 +104,7 @@ class EbookTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(27, $result);
+            $this->assertCount(28, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

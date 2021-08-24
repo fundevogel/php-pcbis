@@ -34,6 +34,9 @@ class MovieTest extends TestCase
     private static $isbns = [
         '5051890318947',  # Die Verurteilten (DVD)
         '5051890318930',  # Die Verurteilten (Blu-ray)
+        '4010884537970',  # Der Pate I (DVD)
+        '4010884250763',  # Der Pate I (Blu-ray)
+        '4010884592719',  # Der Pate I - III (DVD-Box)
     ];
 
 
@@ -69,6 +72,7 @@ class MovieTest extends TestCase
             'Erscheinungsjahr',
             'Altersempfehlung',
             'AutorIn',
+            'Vorlage',
             'IllustratorIn',
             'ZeichnerIn',
             'PhotographIn',
@@ -97,7 +101,7 @@ class MovieTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(23, $result);
+            $this->assertCount(24, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

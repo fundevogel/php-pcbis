@@ -26,6 +26,7 @@ trait People
      * @var array
      */
     protected $roles = [
+        'Vorlage'      => 'original',
         'Illustration' => 'illustrator',
         'Zeichnungen'  => 'drawer',
         'Fotos'        => 'photographer',
@@ -36,8 +37,6 @@ trait People
         'Produktion'   => 'producer',
         'Besetzung'    => 'actor',
         'Mitarbeit'    => 'participant',
-        # Edge case: author of original works
-        'Vorlage'      => 'original',
     ];
 
 
@@ -65,6 +64,8 @@ trait People
      * Extracts involved people from source array
      *
      * This includes a wide variety, such as
+     * - `author`
+     * - `original`
      * - `illustrator`
      * - `drawer`
      * - `photographer`
@@ -80,10 +81,11 @@ trait People
      */
     protected function separatePeople(): array
     {
-        $this->author = $this->buildAuthor();
-
+        # Isolate author detection as this may vary for each product,
+        # whereas all other roles are always part of the 'Mitarb' string
         $people = [
-            'author'       => $this->author,
+            'author'       => $this->buildAuthor(),
+            'original'     => [],
             'illustrator'  => [],
             'drawer'       => [],
             'photographer' => [],
@@ -288,10 +290,6 @@ trait People
 
         # Edge case: `AutorSachtitel` contains something other than a person
         if (!Butler::contains($string, $groupDelimiter) && !Butler::contains($string, $personDelimiter)) {
-            if (!empty($this->people['original'])) {
-                return $this->people['original'];
-            }
-
             if (isset($this->source['IndexAutor'])) {
                 if (is_array($this->source['IndexAutor'])) {
                     $string = Butler::join(array_map(function($string) {
@@ -310,9 +308,7 @@ trait People
             }
         }
 
-        $authors = $this->organizePeople($string);
-
-        return $authors;
+        return $this->organizePeople($string);
     }
 
 
@@ -364,6 +360,12 @@ trait People
     public function author(bool $asArray = false)
     {
         return $this->getRole('author', $asArray);
+    }
+
+
+    public function original(bool $asArray = false)
+    {
+        return $this->getRole('original', $asArray);
     }
 
 
