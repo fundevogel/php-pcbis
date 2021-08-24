@@ -37,8 +37,8 @@ class Movie extends Medium {
         parent::__construct($source, $props);
 
         # Extend dataset
-        $this->series    = $this->buildSeries();
-        $this->volume    = $this->buildVolume();
+        $this->series = $this->buildSeries();
+        $this->volume = $this->buildVolume();
     }
 
 
@@ -47,8 +47,36 @@ class Movie extends Medium {
      */
 
     /**
+     * Builds author(s)
+     *
+     * @return array
+     */
+    protected function buildAuthor(): array
+    {
+        if (!isset($this->source['AutorSachtitel'])) {
+            return [];
+         }
+
+        $array = [
+            ' DVD',
+            ' Blu-ray',
+        ];
+
+        # Loop over suspicious strings ..
+        foreach ($array as $string) {
+            # .. and in case of a match ..
+            if (Butler::contains($this->source['AutorSachtitel'], $string)) {
+                # .. reset author
+                return [];
+            }
+        }
+
+        return parent::buildAuthor();
+    }
+
+
+    /**
      * Builds minimum age recommendation (in years)
-     * TODO: Cater for months
      *
      * @return string
      */
