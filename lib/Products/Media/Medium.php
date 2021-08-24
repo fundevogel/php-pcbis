@@ -107,6 +107,7 @@ class Medium extends Product
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
+            'Gewicht'             => $this->weight(),
             'Abmessungen'         => $this->dimensions(),
             'Sprachen'            => $this->languages($asArray),
 

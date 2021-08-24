@@ -147,6 +147,14 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
+     * Weight (in gram)
+     *
+     * @var string
+     */
+    protected $weight;
+
+
+    /**
      * Dimensions (width x height in centimeters)
      *
      * @var string
@@ -195,6 +203,7 @@ abstract class Product implements Sociable, Taggable
         $this->retailPrice  = $this->buildretailPrice();
         $this->releaseYear  = $this->buildreleaseYear();
         $this->age          = $this->buildAge();
+        $this->weight       = $this->buildWeight();
         $this->dimensions   = $this->buildDimensions();
         $this->languages    = $this->buildLanguages();
 
@@ -601,6 +610,32 @@ abstract class Product implements Sociable, Taggable
     public function age(): string
     {
         return $this->age;
+    }
+
+
+    /**
+     * Builds weight (in gram)
+     *
+     * @return string
+     */
+    protected function buildWeight(): string
+    {
+        if (!isset($this->source['Gewicht'])) {
+            return '';
+        }
+
+        return $this->source['Gewicht'];
+    }
+
+
+    /**
+     * Exports weight
+     *
+     * @return string
+     */
+    public function weight(): string
+    {
+        return $this->weight;
     }
 
 
