@@ -87,7 +87,7 @@ class EbookTest extends TestCase
             'Einband',
             'Seitenzahl',
             'Antolin',
-            'Unterstützt',
+            'Lesegeräte',
             'Printausgabe',
             'Dateigröße',
             'Dateiformat',

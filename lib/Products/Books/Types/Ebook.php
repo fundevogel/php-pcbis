@@ -100,40 +100,23 @@ class Ebook extends Book {
 
 
     /**
-     * Exports all data
-     *
-     * @param bool $asArray - Whether to export an array (rather than a string)
-     * @return array
-     */
-    public function export(bool $asArray = false): array
-    {
-        # Build dataset
-        return array_merge(
-            # (1) 'Book' dataset
-            parent::export($asArray), [
-            # (2) 'Ebook' specific data
-            'Unterstützt'  => $this->devices(),
-            'Printausgabe' => $this->print(),
-            'Dateigröße'   => $this->fileSize(),
-            'Dateiformat'  => $this->fileFormat(),
-            'DRM'          => $this->drm(),
-        ]);
-    }
-
-
-    /**
      * Methods
      */
 
-    protected function buildDevices()
+    /**
+     * Builds supported devices
+     *
+     * @return array
+     */
+    protected function buildDevices(): array
     {
         if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
-            return '';
+            return [];
         }
 
-        $data = Butler::last(Butler::split($this->source['Utitel'], 'Unterstützte Lesegerätegruppen:'));
+        $string = Butler::last(Butler::split($this->source['Utitel'], 'Unterstützte Lesegerätegruppen:'));
 
-        return Butler::split($data, '/');
+        return Butler::split(Butler::replace($string, ['MAC', 'Tabl'], ['Mac', 'Tablet']), '/');
     }
 
 
@@ -251,7 +234,8 @@ class Ebook extends Book {
             '03' => 'Adobe DRM (benötigt Adobe Digital Editions)',
         ];
 
-        return $flags[$this->source['DRMFlags']];
+        # Be safe, trim strings
+        return $flags[trim($this->source['DRMFlags'])];
     }
 
 
@@ -263,5 +247,27 @@ class Ebook extends Book {
     public function drm(): string
     {
         return $this->drm;
+    }
+
+
+    /**
+     * Exports all data
+     *
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return array
+     */
+    public function export(bool $asArray = false): array
+    {
+        # Build dataset
+        return array_merge(
+            # (1) 'Book' dataset
+            parent::export($asArray), [
+            # (2) 'Ebook' specific data
+            'Lesegeräte'   => $this->devices(),
+            'Printausgabe' => $this->print(),
+            'Dateigröße'   => $this->fileSize(),
+            'Dateiformat'  => $this->fileFormat(),
+            'DRM'          => $this->drm(),
+        ]);
     }
 }
