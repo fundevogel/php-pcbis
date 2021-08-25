@@ -41,7 +41,8 @@ try {
 
     // (4) .. query its OLA status
     $book->ola()->isAvailable();
-} catch (\Exception $e) {
+
+} catch (Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
 }
 ```
@@ -76,7 +77,7 @@ try {
 ```
 
 ### Loading translations
-This library provides minimal translations for german strings out-of-the-box. However, you may want to bring your own - for example, you could load a JSON file, looking like this:
+This library provides minimal translations for german bindings out-of-the-box. However, you may want to bring your own - for example, you could load a JSON file, looking like this:
 
 ```json
 {

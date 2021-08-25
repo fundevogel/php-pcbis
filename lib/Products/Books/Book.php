@@ -73,19 +73,11 @@ class Book extends Product
             return '';
         }
 
-        $binding = $this->source['Einband'];
-
-        $translations = $this->translations['binding'];
-
-        if (!empty($this->translations)) {
-            $translations = $this->translations;
+        if (!isset($this->translations[$this->source['Einband']])) {
+            return $this->source['Einband'];
         }
 
-        if (!isset($translations[$binding])) {
-            return $binding;
-        }
-
-        return $translations[$binding];
+        return $this->translations[$this->source['Einband']];
     }
 
 
@@ -111,10 +103,9 @@ class Book extends Product
             return '';
         }
 
-        $string = $this->source['Abb'];
-        $array = Butler::split($string, '.');
+        $lines = Butler::split($this->source['Abb'], '.');
 
-        foreach ($array as $line) {
+        foreach ($lines as $line) {
             if (Butler::substr($line, -1) === 'S') {
                 return Butler::split($line, ' ')[0];
             }

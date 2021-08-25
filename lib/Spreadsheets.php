@@ -67,19 +67,16 @@ class Spreadsheets
      * @param string $file - Source CSV file to read data from
      * @param string $delimiter - Delimiting character
      * @param array $headers - Header names for CSV data rows
-     * @param array $translations - Translatable strings
+     * @param array $transcriptions - Transcribable info strings
      * @return array
      */
-    public static function csv2array(string $file, string $delimiter = ';', array $headers = null, array $translations = null): array
+    public static function csv2array(string $file, string $delimiter = ';', array $headers = null, array $transcriptions = null): array
     {
         $data = [];
 
         if (!file_exists($file) || !is_readable($file)) {
             return $data;
         }
-
-        # Load translations
-        $translations = $translations ?? json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
 
         # Define headers as exported via pcbis.de
         $headers = $headers ?? [
@@ -97,6 +94,61 @@ class Spreadsheets
             'Kommentar'
         ];
 
+        # Load transcriptions for info strings
+        $transcriptions = $transcriptions ?? [
+            '1. Aufl.' => 'Erstauflage',
+            '2. Aufl.' => 'Zweitauflage',
+            'Erstauflage 2019' => 'Erstauflage',
+            'Sonderausg.' => 'Sonderausgabe',
+            'Ktn.' => 'Karten',
+            'In Box' => 'in einer Box',
+            'In Metall-Box' => 'in einer Metallbox',
+            'In Spielebox' => 'in einer Spielebox',
+            'In Schachtel' => 'in einer Schachtel',
+            'im Karton' => 'in einem Kartón',
+            'm. zahlr.' => 'mit zahlreichen',
+            'Zeichn v ' => 'Zeichnungen von ',
+            'bunten Bild.' => 'bunten Bildern',
+            'aufklappb. Bild.' => 'aufklappbaren Bildern',
+            'durchg. farb.' => 'durchgehend farbige Illustrationen',
+            'farb. Illustrationen' => 'farbigen Illustrationen',
+            'farb. Abb.' => 'farbige Abbildungen',
+            'schw.-w. Abb.' => 'schwarz-weiße Abbildungen',
+            'Abb.' => 'Abbildungen',
+            'Farbabb.' => 'Farbabbildungen',
+            'sw Illustrationen' => 'schwarz-weißen Illustrationen',
+            'sw-Illus' => 'schwarz-weißen Illustrationen',
+            's/w' => 'schwarz-weiß',
+            'Konturgestanzt' => 'konturgestanzt',
+            'Klapp-S.' => 'Klappseiten',
+            'Illustr.' => 'Illustrationen',
+            'Ill.' => 'Illustrationen',
+            'Illustrationen Illustrationen' => 'Illustrationen',
+            'farb.' => 'farbigen',
+            'z. Tl.' => 'zum Teil',
+            'Unzerr.' => 'unzerreißbar',
+            'Formgestanzt' => 'formgestanzt',
+            'Mit ' => 'mit ',
+            'm. ' => 'mit ',
+            'Für ' => 'für ',
+            'Kinder u. Jugendliche' => 'Kinder & Jugendliche',
+            'u. ' => 'und ',
+            'Durchgehend' => 'durchgehend',
+            'In Kassette' => 'in einer Kassette',
+            'JEWELCASE' => 'Jewelcase',
+            'HALBLN' => 'Halbleinen',
+            'GB#21' => '',
+            'Min.' => 'Minuten',
+            'Min, ' => 'Minuten, ',
+            'Komplett' => 'komplett',
+            'Englisch Broschur' => 'Englische Broschur',
+            'Gebunden' => 'gebunden',
+            'Schwarz' => 'schwarz',
+            'Geblockt' => 'geblockt'
+        ];
+
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../i18n/bindings.json'), true);
+
         $raw = self::csvOpen($file, $headers, $delimiter);
 
         foreach ($raw as $array) {
@@ -111,7 +163,7 @@ class Spreadsheets
             }
 
             # Extract variables from info string
-            list($info, $year, $age, $pageCount) = self::generateInfo($infos, $translations);
+            list($info, $year, $age, $pageCount) = self::generateInfo($infos, $transcriptions);
 
             $array = Butler::update($array, [
                 # Add blanks to prevent column shifts
@@ -123,7 +175,7 @@ class Spreadsheets
                 'Altersempfehlung' => $age,
                 'Inhaltsbeschreibung' => '',
                 'Informationen' => $info,
-                'Einband' => $translations['binding'][$array['Einband']],
+                'Einband' => $bindings[$array['Einband']],
                 'Seitenzahl' => $pageCount,
                 'Abmessungen' => '',
             ]);
@@ -179,7 +231,7 @@ class Spreadsheets
      * @param array $translations - Translatable strings
      * @return array
      */
-    protected static function generateInfo(array $array, array $translations)
+    protected static function generateInfo(array $array, array $transcriptions)
     {
         $age = 'Keine Altersangabe';
         $pageCount = '';
@@ -210,10 +262,7 @@ class Spreadsheets
             }
         }
 
-        $array = Butler::replace($array,
-            array_keys($translations['information']),
-            array_values($translations['information'])
-        );
+        $array = Butler::replace($array, array_keys($transcriptions), array_values($transcriptions));
 
         $info = ucfirst(implode(', ', $array));
 
