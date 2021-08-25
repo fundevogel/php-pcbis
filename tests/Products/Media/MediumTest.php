@@ -68,6 +68,8 @@ class MediumTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Reihe',
+            'Band',
             'Gewicht',
             'Abmessungen',
             'Sprachen',

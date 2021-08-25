@@ -15,20 +15,6 @@ use Pcbis\Products\Media\Medium;
 
 class Audiobook extends Medium {
     /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->series    = $this->buildSeries();
-        $this->volume    = $this->buildVolume();
-    }
-
-
-    /**
      * Overrides
      */
 
@@ -46,8 +32,6 @@ class Audiobook extends Medium {
             parent::export($asArray), [
             # (2) 'Audiobook' specific data
             'ErzählerIn' => $this->getRole('narrator', $asArray),
-            'Reihe'      => $this->series(),
-            'Band'       => $this->volume(),
         ]);
     }
 }

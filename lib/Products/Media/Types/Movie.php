@@ -17,20 +17,6 @@ use Pcbis\Helpers\Butler;
 
 class Movie extends Medium {
     /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->series = $this->buildSeries();
-        $this->volume = $this->buildVolume();
-    }
-
-
-    /**
      * Overrides
      */
 
@@ -98,8 +84,6 @@ class Movie extends Medium {
             parent::export($asArray), [
             # (2) 'Movie' specific data
             'SchauspielerIn' => $this->getRole('actor', $asArray),
-            'Reihe'          => $this->series(),
-            'Band'           => $this->volume(),
         ]);
     }
 }

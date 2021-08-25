@@ -208,6 +208,7 @@ abstract class Product implements Exportable, Sociable, Taggable
         $this->retailPrice  = $this->buildretailPrice();
         $this->releaseYear  = $this->buildreleaseYear();
         $this->age          = $this->buildAge();
+        $this->series       = $this->buildSeries();
         $this->weight       = $this->buildWeight();
         $this->dimensions   = $this->buildDimensions();
         $this->languages    = $this->buildLanguages();
@@ -853,6 +854,8 @@ abstract class Product implements Exportable, Sociable, Taggable
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
+            'Reihe'               => $this->series($asArray),
+            'Band'                => $this->volume($asArray),
             'Gewicht'             => $this->weight(),
             'Abmessungen'         => $this->dimensions(),
             'Sprachen'            => $this->languages($asArray),

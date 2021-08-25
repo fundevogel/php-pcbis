@@ -54,8 +54,6 @@ class Book extends Product
         $this->publisher    = $this->buildPublisher();
         $this->binding      = $this->buildBinding();
         $this->pageCount    = $this->buildPageCount();
-        $this->series       = $this->buildSeries();
-        $this->volume       = $this->buildVolume();
         $this->antolin      = $this->buildAntolin();
     }
 
@@ -181,8 +179,6 @@ class Book extends Product
             # Build dataset
             parent::export($asArray), [
             # (1) 'Book' specific data
-            'Reihe'         => $this->series(),
-            'Band'          => $this->volume(),
             'Einband'       => $this->binding(),
             'Seitenzahl'    => $this->pageCount(),
             'Antolin'       => $this->antolin(),

@@ -76,6 +76,8 @@ class CalendarTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Reihe',
+            'Band',
             'Gewicht',
             'Abmessungen',
             'Sprachen',
@@ -94,7 +96,7 @@ class CalendarTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(12, $result);
+            $this->assertCount(14, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

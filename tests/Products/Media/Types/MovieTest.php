@@ -71,6 +71,8 @@ class MovieTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Reihe',
+            'Band',
             'Gewicht',
             'Abmessungen',
             'Sprachen',
@@ -89,8 +91,6 @@ class MovieTest extends TestCase
             'HerausgeberIn',
             'MitarbeiterIn',
             'SchauspielerIn',
-            'Reihe',
-            'Band',
         ];
 
         foreach (self::$isbns as $isbn) {

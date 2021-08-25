@@ -20,19 +20,11 @@ trait Series
      */
 
     /**
-     * Series
+     * Series & volumes
      *
-     * @var string
+     * @var array
      */
     protected $series;
-
-
-    /**
-     * Volume
-     *
-     * @var string
-     */
-    protected $volume;
 
 
     /**
@@ -42,70 +34,78 @@ trait Series
     /**
      * Builds series
      *
-     * @return string
+     * @return array
      */
-    protected function buildSeries(): string
+    protected function buildSeries(): array
     {
-        if (isset($this->source['VerwieseneReihe2'])) {
-            return trim($this->source['VerwieseneReihe2']);
+        $array = [
+            'VerwieseneReihe1' => 'BandnrVerwieseneReihe1',
+            'VerwieseneReihe2' => 'BandnrVerwieseneReihe2',
+            'VerwieseneReihe3' => 'BandnrVerwieseneReihe3',
+            'VerwieseneReihe4' => 'BandnrVerwieseneReihe4',
+            'VerwieseneReihe5' => 'BandnrVerwieseneReihe5',
+            'VerwieseneReihe6' => 'BandnrVerwieseneReihe6',
+        ];
+
+        $series = [];
+
+        foreach ($array as $key => $value) {
+            if (isset($this->source[$key]) && isset($this->source[$value])) {
+                $series[trim($this->source[$key])] = trim($this->source[$value]);
+            }
         }
 
-        if (isset($this->source['VerwieseneReihe1'])) {
-            return trim($this->source['VerwieseneReihe1']);
-        }
-
-        return '';
-    }
-
-
-    /**
-     * Builds volume
-     *
-     * @return string
-     */
-    protected function buildVolume(): string
-    {
-        if (isset($this->source['BandnrVerwieseneReihe2'])) {
-            return $this->source['BandnrVerwieseneReihe2'];
-        }
-
-        if (isset($this->source['BandnrVerwieseneReihe1'])) {
-            return $this->source['BandnrVerwieseneReihe1'];
-        }
-
-        return '';
+        return $series;
     }
 
 
     /**
      * Whether product is part of a series
      *
-     * @return string
+     * @return bool
      */
-    public function isSeries(): string
+    public function isSeries(): bool
     {
-        return $this->series !== '';
+        return $this->series !== [];
     }
 
 
     /**
      * Exports series
      *
-     * @return string
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
      */
-    public function series(): string
+    public function series(bool $asArray = false)
     {
-        return $this->series;
+        if (empty($this->series)) {
+            return $asArray ? [] : '';
+        }
+
+        if ($asArray) {
+            return array_keys($this->series);
+        }
+
+        return Butler::first(array_keys($this->series));
     }
 
 
     /**
-     * Exports volume
+     * Exports volume(s)
      *
-     * @return string
+     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return string|array
      */
-    public function volume(): string
+    public function volume(bool $asArray = false)
     {
-        return $this->volume;
+        if (empty($this->series)) {
+            return $asArray ? [] : '';
+        }
+
+        if ($asArray) {
+            return array_values($this->series);
+        }
+
+        return Butler::first(array_values($this->series));
     }
 }

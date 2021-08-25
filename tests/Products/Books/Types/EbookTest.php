@@ -70,13 +70,13 @@ class EbookTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Reihe',
+            'Band',
             'Gewicht',  # TODO: ??
             'Abmessungen',  # TODO: ??
             'Sprachen',
             'Kategorien',
             'Themen',
-            'Reihe',
-            'Band',
             'Einband',
             'Seitenzahl',
             'Antolin',

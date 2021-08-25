@@ -92,6 +92,8 @@ class AudiobookTest extends TestCase
             'Preis',
             'Erscheinungsjahr',
             'Altersempfehlung',
+            'Reihe',
+            'Band',
             'Gewicht',
             'Abmessungen',
             'Sprachen',
@@ -110,8 +112,6 @@ class AudiobookTest extends TestCase
             'HerausgeberIn',
             'MitarbeiterIn',
             'ErzählerIn',
-            'Reihe',
-            'Band',
         ];
 
         foreach (self::$isbns as $isbn) {
