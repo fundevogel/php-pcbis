@@ -837,6 +837,25 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
+     * Exports type of value added tax (VAT)
+     *
+     * '0' = zero
+     * '1' = half
+     * '2' = full
+     *
+     * @return string
+     */
+    public function vat(): string
+    {
+        if (!isset($this->source['Mwstknz'])) {
+            return '';
+        }
+
+        return $this->source['Mwstknz'];
+    }
+
+
+    /**
      * Exports all data
      *
      * @param bool $asArray - Whether to export an array (rather than a string)

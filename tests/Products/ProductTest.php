@@ -131,6 +131,8 @@ class ProductTest extends TestCase
 
             $this->assertIsBool($result->isAvailable());
             $this->assertIsBool($result->isUnavailable());
+
+            $this->assertIsString($result->vat());
         }
     }
 }
