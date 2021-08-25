@@ -667,10 +667,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return '';
         }
 
-        $width = Butler::convertMM($this->source['Breite']);
-        $height = Butler::convertMM($this->source['Hoehe']);
-
-        return $width . 'x' . $height;
+        return Butler::convertMM($this->source['Breite']) . 'x' . Butler::convertMM($this->source['Hoehe']);
     }
 
 

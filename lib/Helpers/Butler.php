@@ -61,13 +61,10 @@ class Butler
         # Edge case: string already contains width/height in centimeters
         # See 978-3-7891-2946-9
         if (static::contains($string, ',')) {
-            return $string . 'cm';
+            return $string;
         }
 
-        $number = $string / 10;
-        $number = static::replace($number, '.', ',');
-
-        return $number . 'cm';
+        return static::replace($string / 10, '.', ',');
     }
 
 
