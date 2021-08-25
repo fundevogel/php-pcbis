@@ -4,10 +4,6 @@ namespace Pcbis\Products\Media\Types;
 
 use Pcbis\Products\Media\Medium;
 
-use Pcbis\Traits\Shared\Categories;
-use Pcbis\Traits\Shared\Series;
-use Pcbis\Traits\Shared\Topics;
-
 
 /**
  * Class Audiobook
@@ -18,14 +14,6 @@ use Pcbis\Traits\Shared\Topics;
  */
 
 class Audiobook extends Medium {
-    /**
-     * Traits
-     */
-
-    use Categories, Topics;
-    use Series;
-
-
     /**
      * Constructor
      */
@@ -57,9 +45,9 @@ class Audiobook extends Medium {
             # (1) 'Media' dataset
             parent::export($asArray), [
             # (2) 'Audiobook' specific data
+            'ErzählerIn' => $this->getRole('narrator', $asArray),
             'Reihe'      => $this->series(),
             'Band'       => $this->volume(),
-            'ErzählerIn' => $this->getRole('narrator', $asArray),
         ]);
     }
 }

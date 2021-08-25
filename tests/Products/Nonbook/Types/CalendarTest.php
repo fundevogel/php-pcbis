@@ -79,6 +79,8 @@ class CalendarTest extends TestCase
             'Gewicht',
             'Abmessungen',
             'Sprachen',
+            'Kategorien',
+            'Themen',
         ];
 
         foreach (self::$isbns as $isbn) {
@@ -92,7 +94,7 @@ class CalendarTest extends TestCase
             $result = $result->export();
 
             $this->assertIsArray($result);
-            $this->assertCount(10, $result);
+            $this->assertCount(12, $result);
 
             foreach ($keys as $index => $key) {
                 $this->assertArrayHasKey($key, $result);

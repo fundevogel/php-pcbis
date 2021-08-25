@@ -71,6 +71,12 @@ class MediumTest extends TestCase
             'Gewicht',
             'Abmessungen',
             'Sprachen',
+            'Kategorien',
+            'Themen',
+            'Dauer',
+            'KomponistIn',
+            'RegisseurIn',
+            'ProduzentIn',
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -79,12 +85,6 @@ class MediumTest extends TestCase
             'ÜbersetzerIn',
             'HerausgeberIn',
             'MitarbeiterIn',
-            'Kategorien',
-            'Themen',
-            'Dauer',
-            'KomponistIn',
-            'RegisseurIn',
-            'ProduzentIn',
         ];
 
         foreach (self::$isbns as $isbn) {

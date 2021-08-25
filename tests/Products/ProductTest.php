@@ -115,6 +115,12 @@ class ProductTest extends TestCase
             $this->assertIsString($result->languages());
             $this->assertIsArray($result->languages(true));
             $this->assertIsString($result->languages(false));
+            $this->assertIsString($result->categories());
+            $this->assertIsArray($result->categories(true));
+            $this->assertIsString($result->categories(false));
+            $this->assertIsString($result->topics());
+            $this->assertIsArray($result->topics(true));
+            $this->assertIsString($result->topics(false));
 
             $this->assertIsBool($result->isAvailable());
             $this->assertIsBool($result->isUnavailable());

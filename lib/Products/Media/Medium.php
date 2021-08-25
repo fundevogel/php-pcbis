@@ -4,7 +4,6 @@ namespace Pcbis\Products\Media;
 
 use Pcbis\Helpers\Butler;
 use Pcbis\Products\Product;
-use Pcbis\Traits\DownloadCover;
 
 
 /**
@@ -15,13 +14,6 @@ use Pcbis\Traits\DownloadCover;
 
 class Medium extends Product
 {
-    /**
-     * Traits
-     */
-
-    use DownloadCover;
-
-
     /**
      * Properties
      */
@@ -97,39 +89,24 @@ class Medium extends Product
      * @return array
      */
     public function export(bool $asArray = false): array {
-        # Build dataset
-        return [
-            # (1) Base
-            'Titel'               => $this->title(),
-            'Untertitel'          => $this->subtitle(),
-            'Verlag'              => $this->publisher(),
-            'Inhaltsbeschreibung' => $this->description($asArray),
-            'Preis'               => $this->retailPrice(),
-            'Erscheinungsjahr'    => $this->releaseYear(),
-            'Altersempfehlung'    => $this->age(),
-            'Gewicht'             => $this->weight(),
-            'Abmessungen'         => $this->dimensions(),
-            'Sprachen'            => $this->languages($asArray),
+        return array_merge(
+            # Build dataset
+            parent::export($asArray), [
+            # (1) 'Media' specific data
+            'Dauer'         => $this->duration(),
+            'KomponistIn'   => $this->getRole('composer', $asArray),
+            'RegisseurIn'   => $this->getRole('director', $asArray),
+            'ProduzentIn'   => $this->getRole('producer', $asArray),
 
             # (2) Extension 'People'
-            'AutorIn'             => $this->getRole('author', $asArray),
-            'Vorlage'             => $this->getRole('original', $asArray),
-            'IllustratorIn'       => $this->getRole('illustrator', $asArray),
-            'ZeichnerIn'          => $this->getRole('drawer', $asArray),
-            'PhotographIn'        => $this->getRole('photographer', $asArray),
-            'ÜbersetzerIn'        => $this->getRole('translator', $asArray),
-            'HerausgeberIn'       => $this->getRole('editor', $asArray),
-            'MitarbeiterIn'       => $this->getRole('participant', $asArray),
-
-            # (3) Extension 'Tags'
-            'Kategorien'          => $this->categories($asArray),
-            'Themen'              => $this->topics($asArray),
-
-            # (4) 'Media' specific data
-            'Dauer'               => $this->duration(),
-            'KomponistIn'         => $this->getRole('composer', $asArray),
-            'RegisseurIn'         => $this->getRole('director', $asArray),
-            'ProduzentIn'         => $this->getRole('producer', $asArray),
-        ];
+            'AutorIn'       => $this->getRole('author', $asArray),
+            'Vorlage'       => $this->getRole('original', $asArray),
+            'IllustratorIn' => $this->getRole('illustrator', $asArray),
+            'ZeichnerIn'    => $this->getRole('drawer', $asArray),
+            'PhotographIn'  => $this->getRole('photographer', $asArray),
+            'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
+            'HerausgeberIn' => $this->getRole('editor', $asArray),
+            'MitarbeiterIn' => $this->getRole('participant', $asArray),
+        ]);
     }
 }

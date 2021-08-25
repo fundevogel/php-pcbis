@@ -4,11 +4,6 @@ namespace Pcbis\Products\Books;
 
 use Pcbis\Helpers\Butler;
 use Pcbis\Products\Product;
-use Pcbis\Traits\DownloadCover;
-
-use Pcbis\Traits\Shared\Categories;
-use Pcbis\Traits\Shared\Series;
-use Pcbis\Traits\Shared\Topics;
 
 
 /**
@@ -19,15 +14,6 @@ use Pcbis\Traits\Shared\Topics;
 
 class Book extends Product
 {
-    /**
-     * Traits
-     */
-
-    use Categories, Topics;
-    use DownloadCover;
-    use Series;
-
-
     /**
      * Properties
      */
@@ -91,18 +77,7 @@ class Book extends Product
 
         $binding = $this->source['Einband'];
 
-        $translations = [
-            'BUCH' => 'gebunden',
-            'CRD'  => 'Nonbook',
-            'GEB'  => 'gebunden',
-            'GEH'  => 'geheftet',
-            'HL'   => 'Halbleinen',
-            'KT'   => 'kartoniert',
-            'LN'   => 'Leinen',
-            'NON'  => 'Nonbook',
-            'PP'   => 'Pappband',
-            'SPL'  => 'Spiel',
-        ];
+        $translations = $this->translations['binding'];
 
         if (!empty($this->translations)) {
             $translations = $this->translations;
@@ -202,40 +177,25 @@ class Book extends Product
      */
     public function export(bool $asArray = false): array
     {
-        # Build dataset
-        return [
-            # (1) Base
-            'Titel'               => $this->title(),
-            'Untertitel'          => $this->subtitle(),
-            'Verlag'              => $this->publisher(),
-            'Inhaltsbeschreibung' => $this->description($asArray),
-            'Preis'               => $this->retailPrice(),
-            'Erscheinungsjahr'    => $this->releaseYear(),
-            'Altersempfehlung'    => $this->age(),
-            'Gewicht'             => $this->weight(),
-            'Abmessungen'         => $this->dimensions(),
-            'Sprachen'            => $this->languages($asArray),
+        return array_merge(
+            # Build dataset
+            parent::export($asArray), [
+            # (1) 'Book' specific data
+            'Reihe'         => $this->series(),
+            'Band'          => $this->volume(),
+            'Einband'       => $this->binding(),
+            'Seitenzahl'    => $this->pageCount(),
+            'Antolin'       => $this->antolin(),
 
             # (2) Extension 'People'
-            'AutorIn'             => $this->getRole('author', $asArray),
-            'Vorlage'             => $this->getRole('original', $asArray),
-            'IllustratorIn'       => $this->getRole('illustrator', $asArray),
-            'ZeichnerIn'          => $this->getRole('drawer', $asArray),
-            'PhotographIn'        => $this->getRole('photographer', $asArray),
-            'ÜbersetzerIn'        => $this->getRole('translator', $asArray),
-            'HerausgeberIn'       => $this->getRole('editor', $asArray),
-            'MitarbeiterIn'       => $this->getRole('participant', $asArray),
-
-            # (3) Extension 'Tags'
-            'Kategorien'          => $this->categories($asArray),
-            'Themen'              => $this->topics($asArray),
-
-            # (4) 'Book' specific data
-            'Reihe'               => $this->series(),
-            'Band'                => $this->volume(),
-            'Einband'             => $this->binding(),
-            'Seitenzahl'          => $this->pageCount(),
-            'Antolin'             => $this->antolin(),
-        ];
+            'AutorIn'       => $this->getRole('author', $asArray),
+            'Vorlage'       => $this->getRole('original', $asArray),
+            'IllustratorIn' => $this->getRole('illustrator', $asArray),
+            'ZeichnerIn'    => $this->getRole('drawer', $asArray),
+            'PhotographIn'  => $this->getRole('photographer', $asArray),
+            'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
+            'HerausgeberIn' => $this->getRole('editor', $asArray),
+            'MitarbeiterIn' => $this->getRole('participant', $asArray),
+        ]);
     }
 }

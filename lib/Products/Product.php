@@ -4,12 +4,15 @@ namespace Pcbis\Products;
 
 use Pcbis\Helpers\Butler;
 
+use Pcbis\Interfaces\Exportable;
 use Pcbis\Interfaces\Sociable;
 use Pcbis\Interfaces\Taggable;
 
 use Pcbis\Traits\CheckType;
+use Pcbis\Traits\DownloadCover;
 use Pcbis\Traits\OlaStatus;
 use Pcbis\Traits\People;
+use Pcbis\Traits\Series;
 use Pcbis\Traits\Tags;
 
 use DOMDocument;
@@ -23,15 +26,17 @@ use DOMDocument;
  * @package PHPCBIS
  */
 
-abstract class Product implements Sociable, Taggable
+abstract class Product implements Exportable, Sociable, Taggable
 {
     /**
      * Traits
      */
 
     use CheckType;
+    use DownloadCover;
     use OlaStatus;
     use People, Tags;
+    use Series;
 
 
     /**
@@ -831,9 +836,30 @@ abstract class Product implements Sociable, Taggable
 
 
     /**
-     * Forces all (sub)classes to provide an easy way to export a full dataset
+     * Exports all data
      *
      * @param bool $asArray - Whether to export an array (rather than a string)
+     * @return array
      */
-    abstract protected function export(bool $asArray);
+    public function export(bool $asArray = false): array
+    {
+        # Build dataset
+        return [
+            # (1) Base
+            'Titel'               => $this->title(),
+            'Untertitel'          => $this->subtitle(),
+            'Verlag'              => $this->publisher(),
+            'Inhaltsbeschreibung' => $this->description($asArray),
+            'Preis'               => $this->retailPrice(),
+            'Erscheinungsjahr'    => $this->releaseYear(),
+            'Altersempfehlung'    => $this->age(),
+            'Gewicht'             => $this->weight(),
+            'Abmessungen'         => $this->dimensions(),
+            'Sprachen'            => $this->languages($asArray),
+
+            # (2) Extension 'Tags'
+            'Kategorien'          => $this->categories($asArray),
+            'Themen'              => $this->topics($asArray),
+        ];
+    }
 }

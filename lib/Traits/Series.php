@@ -1,6 +1,6 @@
 <?php
 
-namespace Pcbis\Traits\Shared;
+namespace Pcbis\Traits;
 
 use Pcbis\Helpers\Butler;
 
@@ -8,7 +8,7 @@ use Pcbis\Helpers\Butler;
 /**
  * Trait Series
  *
- * Provides ability to extract series (book/audiobook)
+ * Provides ability to extract series & volume therein
  *
  * @package PHPCBIS
  */

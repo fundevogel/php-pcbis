@@ -5,10 +5,6 @@ namespace Pcbis\Products\Media\Types;
 use Pcbis\Products\Media\Medium;
 
 use Pcbis\Helpers\Butler;
-use Pcbis\Traits\Shared\Categories;
-use Pcbis\Traits\Shared\Series;
-use Pcbis\Traits\Shared\Topics;
-
 
 
 /**
@@ -20,14 +16,6 @@ use Pcbis\Traits\Shared\Topics;
  */
 
 class Movie extends Medium {
-    /**
-     * Traits
-     */
-
-    use Categories, Topics;
-    use Series;
-
-
     /**
      * Constructor
      */
@@ -109,9 +97,9 @@ class Movie extends Medium {
             # (1) 'Media' dataset
             parent::export($asArray), [
             # (2) 'Movie' specific data
+            'SchauspielerIn' => $this->getRole('actor', $asArray),
             'Reihe'          => $this->series(),
             'Band'           => $this->volume(),
-            'SchauspielerIn' => $this->getRole('actor', $asArray),
         ]);
     }
 }

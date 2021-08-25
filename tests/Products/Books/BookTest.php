@@ -127,6 +127,13 @@ class BookTest extends TestCase
             'Gewicht',
             'Abmessungen',
             'Sprachen',
+            'Kategorien',
+            'Themen',
+            'Reihe',
+            'Band',
+            'Einband',
+            'Seitenzahl',
+            'Antolin',
             'AutorIn',
             'Vorlage',
             'IllustratorIn',
@@ -135,13 +142,6 @@ class BookTest extends TestCase
             'ÜbersetzerIn',
             'HerausgeberIn',
             'MitarbeiterIn',
-            'Kategorien',
-            'Themen',
-            'Reihe',
-            'Band',
-            'Einband',
-            'Seitenzahl',
-            'Antolin',
         ];
 
         foreach (self::$isbns as $isbn) {
