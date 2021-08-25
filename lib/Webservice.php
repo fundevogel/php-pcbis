@@ -124,6 +124,9 @@ class Webservice
 
         # Initialize cache
         $this->cache = new FilesystemCache($cachePath);
+
+        # Load translations
+        $this->translations = json_decode(file_get_contents(__DIR__ . '/../i18n/de.json'), true);
     }
 
 
