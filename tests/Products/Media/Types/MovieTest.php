@@ -37,6 +37,8 @@ class MovieTest extends TestCase
         '4010884537970',  # Der Pate I (DVD)
         '4010884250763',  # Der Pate I (Blu-ray)
         '4010884592719',  # Der Pate I - III (DVD-Box)
+        '5053083238902',  # Pulp Fiction (Blu-ray)
+        '5053083238919',  # Pulp Fiction (DVD)
     ];
 
 
