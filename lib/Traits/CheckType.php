@@ -38,9 +38,10 @@ trait CheckType
      */
 
     protected $media = [
+        'Film',
         'Hörbuch',
-        'Tonträger',
         'Musik',
+        'Tonträger',
     ];
 
 
@@ -51,13 +52,13 @@ trait CheckType
      */
 
     protected $nonbook = [
-        'Nonbook',
-        'Software',
         'Games',
         'Kalender',
         'Landkarte/Globus',
+        'Nonbook',
         'Noten',
         'Papeterie/PBS',
+        'Software',
         'Spiel',
         'Spielzeug',
     ];
@@ -134,17 +135,6 @@ trait CheckType
 
 
     /**
-     * Checks whether this is music
-     *
-     * @return bool
-     */
-    public function isMovie(): bool
-    {
-        return $this->type === 'Film';
-    }
-
-
-    /**
      * Checks whether this is an audiobook
      *
      * @return bool
@@ -152,6 +142,17 @@ trait CheckType
     public function isAudiobook(): bool
     {
         return $this->type === 'Hörbuch';
+    }
+
+
+    /**
+     * Checks whether this is a movie
+     *
+     * @return bool
+     */
+    public function isMovie(): bool
+    {
+        return $this->type === 'Film';
     }
 
 
