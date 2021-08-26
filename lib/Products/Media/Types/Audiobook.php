@@ -28,7 +28,7 @@ class Audiobook extends Medium {
     {
         # Build dataset
         return array_merge(
-            # (1) 'Media' dataset
+            # (1) 'Medium' dataset
             parent::export($asArray), [
             # (2) 'Audiobook' specific data
             'ErzählerIn' => $this->getRole('narrator', $asArray),
