@@ -2,9 +2,8 @@
 
 namespace Pcbis\Products\Nonbook\Types;
 
-use Pcbis\Products\Nonbook\Item;
-
 use Pcbis\Helpers\Butler;
+use Pcbis\Products\Nonbook\Item;
 
 
 /**

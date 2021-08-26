@@ -31,7 +31,7 @@ class CalendarTest extends TestCase
      *
      * @var array
      */
-    private static $isbns = [
+    private static $eans = [
         # 2021-02
         '978-3-7795-0660-7',
         '978-3-7795-0659-1',
@@ -85,9 +85,9 @@ class CalendarTest extends TestCase
             'Themen',
         ];
 
-        foreach (self::$isbns as $isbn) {
+        foreach (self::$eans as $ean) {
             # Run function
-            $result = self::$object->load($isbn);
+            $result = self::$object->load($ean);
 
             # Assert result
             # TODO: Migrate to `assertInstanceOf`

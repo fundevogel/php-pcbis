@@ -77,29 +77,6 @@ class Ebook extends Book {
 
 
     /**
-     * Overrides
-     */
-
-    /**
-     * Builds subtitle
-     *
-     * @return string
-     */
-    protected function buildSubtitle(): string
-    {
-        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
-            return '';
-        }
-
-        if (Butler::startsWith($this->source['Utitel'], 'Unterstützte Lesegerätegruppen')) {
-            return '';
-        }
-
-        return Butler::first(Butler::split($this->source['Utitel'], '.'));
-    }
-
-
-    /**
      * Methods
      */
 
@@ -247,6 +224,29 @@ class Ebook extends Book {
     public function drm(): string
     {
         return $this->drm;
+    }
+
+
+    /**
+     * Overrides
+     */
+
+    /**
+     * Builds subtitle
+     *
+     * @return string
+     */
+    protected function buildSubtitle(): string
+    {
+        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
+            return '';
+        }
+
+        if (Butler::startsWith($this->source['Utitel'], 'Unterstützte Lesegerätegruppen')) {
+            return '';
+        }
+
+        return Butler::first(Butler::split($this->source['Utitel'], '.'));
     }
 
 

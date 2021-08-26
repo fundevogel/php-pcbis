@@ -2,9 +2,8 @@
 
 namespace Pcbis\Products\Media\Types;
 
-use Pcbis\Products\Media\Medium;
-
 use Pcbis\Helpers\Butler;
+use Pcbis\Products\Media\Medium;
 
 
 /**
@@ -80,7 +79,7 @@ class Movie extends Medium {
     {
         # Build dataset
         return array_merge(
-            # (1) 'Media' dataset
+            # (1) 'Medium' dataset
             parent::export($asArray), [
             # (2) 'Movie' specific data
             'SchauspielerIn' => $this->getRole('actor', $asArray),
