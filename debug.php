@@ -2,29 +2,22 @@
 
 require_once('vendor/autoload.php');
 
+/**
+ * TODO:
+ *
+ * KNV doesn't list 'BUCH', 'CRD', 'EBO', 'DIGI', 'LIZ', 'AUD', 'TRDE', 'ONL', 'FILM'
+ */
+
 $isbns = [
-    # Nonbook
-    '5055964778583',
-    # Hardcover
-    '978-3-96664-127-2',
-    # Softcover
-    '978-3-551-35401-3',
-    # Ebook
-    '978-3-96664-324-5',
-    # Stationary
-    '978-1-78370-594-8',
-    # Calendar
-    '978-3-8401-8256-3',
-    # Games
-    // '3558380068891',
-    # Movie
-    '5051890326966',
-    # Audiobook
-    '978-3-8445-3053-7',
-    # Sound
-    '0738572138127',
-    # Schoolbook
-    '978-3-640-51139-6',
+    '5010993411504',  # Monopoly Classic
+    '4002051693602',  # Die Siedler von Catan
+    '4002051694104',  # Die Siedler von Catan, Seefahrer
+    '4002051695101',  # Die Siedler von Catan, Städte & Ritter
+    '4002051693305',  # Die Siedler von Catan, Händler & Barbaren
+    '4002051694111',  # Die Siedler von Catan, Entdecker & Piraten
+    '4015566000964',  # Maus und Mystik
+    '0681706117010',  # Maus und Mystik, Herz des Glürm
+    '4015566033108',  # Maus und Mystik, Geschichten aus dem Dunkelwald
 ];
 
 
@@ -37,7 +30,10 @@ try {
         echo $isbn . "\n";
         $book = $object->load($isbn);
 
-        var_dump($book->showSource());
+        // var_dump($book->showSource());
+        var_dump($book->playerCount());
+        var_dump($book->playingTime());
+        var_dump($book->age());
     }
 
 } catch (Exception $e) {
