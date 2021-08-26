@@ -118,6 +118,9 @@ class ProductTest extends TestCase
             $this->assertIsArray($result->volume(true));
             $this->assertIsString($result->volume(false));
             $this->assertIsString($result->weight());
+            $this->assertIsString($result->height());
+            $this->assertIsString($result->width());
+            $this->assertIsString($result->depth());
             $this->assertIsString($result->dimensions());
             $this->assertIsString($result->languages());
             $this->assertIsArray($result->languages(true));

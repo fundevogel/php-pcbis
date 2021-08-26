@@ -152,7 +152,7 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Weight (in gram)
+     * Weight (in g)
      *
      * @var string
      */
@@ -160,7 +160,7 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Dimensions (width x height in centimeters)
+     * Dimensions (in cm)
      *
      * @var string
      */
@@ -620,7 +620,7 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Builds weight (in gram)
+     * Builds weight (in g)
      *
      * @return string
      */
@@ -646,28 +646,67 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Builds dimensions (width x height)
+     * Exports height (in cm)
+     *
+     * @return string
+     */
+    public function height(): string
+    {
+        if (!isset($this->source['Höhe'])) {
+            return '';
+        }
+
+        return Butler::convertMM($this->source['Höhe']);
+    }
+
+
+    /**
+     * Exports width (in cm)
+     *
+     * @return string
+     */
+    public function width(): string
+    {
+        if (!isset($this->source['Breite'])) {
+            return '';
+        }
+
+        return Butler::convertMM($this->source['Breite']);
+    }
+
+
+    /**
+     * Exports depth (in cm)
+     *
+     * @return string
+     */
+    public function depth(): string
+    {
+        if (!isset($this->source['Tiefe'])) {
+            return '';
+        }
+
+        return Butler::convertMM($this->source['Tiefe']);
+    }
+
+
+    /**
+     * Builds dimensions (in cm)
+     *
+     * Examples:
+     * - height / width
+     * - height x width
+     * - height x width x depth
      *
      * @return string
      */
     protected function buildDimensions(): string
     {
-        # Width & height are either both present, or not at all
-        if (!isset($this->source['Breite'])) {
-            $delimiter = ' cm';
-
-            # If they aren't though, check 'Abb' for further hints on dimensions
-            if (isset($this->source['Abb']) && Butler::contains($this->source['Abb'], $delimiter)) {
-                $string = Butler::replace($this->source['Abb'], $delimiter, '');
-                $array = Butler::split($string, ' ');
-
-                return Butler::convertMM(Butler::last($array));
-            }
-
-            return '';
-        }
-
-        return Butler::convertMM($this->source['Breite']) . 'x' . Butler::convertMM($this->source['Hoehe']);
+        return Butler::join(array_filter([
+            $this->height(),
+            $this->width(),
+            $this->depth(),
+        ]), 'x');
     }
 
 
