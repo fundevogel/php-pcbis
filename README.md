@@ -2,7 +2,7 @@
 [![Release](https://img.shields.io/github/release/Fundevogel/php-pcbis.svg)](https://github.com/Fundevogel/php-pcbis/releases) [![License](https://img.shields.io/github/license/Fundevogel/php-pcbis.svg)](https://github.com/Fundevogel/php-pcbis/blob/master/LICENSE) [![Issues](https://img.shields.io/github/issues/Fundevogel/php-pcbis.svg)](https://github.com/Fundevogel/php-pcbis/issues) [![Status](https://travis-ci.org/fundevogel/php-pcbis.svg?branch=master)](https://travis-ci.org/fundevogel/php-pcbis)
 
 ## What
-This small library is a PHP wrapper for [pcbis.de](https://pcbis.de), gathering information about books through wholesale book distributor [KNV](http://knv.de)'s API. For the documentation on their [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language) interface, see [here](http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf).
+This small library is a PHP wrapper for [pcbis.de](https://pcbis.de), gathering information about books through wholesale book distributor [KNV](http://knv.de)'s API. For the documentation on their [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language) interface, see [here](https://www.knv-zeitfracht.de/wp-content/uploads/2021/01/Webservice_ZF_2.0_21.pdf).
 
 
 ## Why
