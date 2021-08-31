@@ -12,7 +12,6 @@ use Pcbis\Traits\CheckType;
 use Pcbis\Traits\DownloadCover;
 use Pcbis\Traits\OlaStatus;
 use Pcbis\Traits\People;
-use Pcbis\Traits\Series;
 use Pcbis\Traits\Tags;
 
 use DOMDocument;
@@ -36,7 +35,6 @@ abstract class Product implements Exportable, Sociable, Taggable
     use DownloadCover;
     use OlaStatus;
     use People, Tags;
-    use Series;
 
 
     /**
@@ -149,6 +147,14 @@ abstract class Product implements Exportable, Sociable, Taggable
      * @var string
      */
     protected $age;
+
+
+    /**
+     * All series & volumes
+     *
+     * @var array
+     */
+    protected $series;
 
 
     /**
@@ -620,6 +626,90 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
+     * Builds series
+     *
+     * @return array
+     */
+    protected function buildSeries(): array
+    {
+        $array = [
+            'VerwieseneReihe1' => 'BandnrVerwieseneReihe1',
+            'VerwieseneReihe2' => 'BandnrVerwieseneReihe2',
+            'VerwieseneReihe3' => 'BandnrVerwieseneReihe3',
+            'VerwieseneReihe4' => 'BandnrVerwieseneReihe4',
+            'VerwieseneReihe5' => 'BandnrVerwieseneReihe5',
+            'VerwieseneReihe6' => 'BandnrVerwieseneReihe6',
+        ];
+
+        $series = [];
+
+        foreach ($array as $key => $value) {
+            if (isset($this->source[$key]) && isset($this->source[$value])) {
+                $series[trim($this->source[$key])] = trim($this->source[$value]);
+            }
+        }
+
+        return $series;
+    }
+
+
+    /**
+     * Whether product is part of one (or more) series
+     *
+     * @return bool
+     */
+    public function isSeries(): bool
+    {
+        return empty($this->series) === false;
+    }
+
+
+    /**
+     * Exports series
+     *
+     * @return string
+     */
+    public function series(): string
+    {
+        if (empty($this->series)) {
+            return '';
+        }
+
+        return Butler::first(array_keys($this->series));
+    }
+
+
+    /**
+     * Exports volume
+     *
+     * @return string
+     */
+    public function volume(): string
+    {
+        if (empty($this->series)) {
+            return '';
+        }
+
+        return Butler::first(array_values($this->series));
+    }
+
+
+    /**
+     * Exports all series & volumes
+     *
+     * @return array
+     */
+    public function allSeries(): array
+    {
+        if (empty($this->series)) {
+            return [];
+        }
+
+        return $this->series;
+    }
+
+
+    /**
      * Builds weight (in g)
      *
      * @return string
@@ -909,8 +999,8 @@ abstract class Product implements Exportable, Sociable, Taggable
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
-            'Reihe'               => $this->series($asArray),
-            'Band'                => $this->volume($asArray),
+            'Reihe'               => $this->series(),
+            'Band'                => $this->volume(),
             'Gewicht'             => $this->weight(),
             'Abmessungen'         => $this->dimensions(),
             'Sprachen'            => $this->languages($asArray),
