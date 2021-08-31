@@ -73,11 +73,13 @@ class Book extends Product
             return '';
         }
 
-        if (!isset($this->translations[$this->source['Einband']])) {
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../../../resources/binding_codes.json'), true);
+
+        if (!isset($bindings[$this->source['Einband']])) {
             return $this->source['Einband'];
         }
 
-        return $this->translations[$this->source['Einband']];
+        return $bindings[$this->source['Einband']];
     }
 
 

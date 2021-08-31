@@ -67,10 +67,9 @@ class Spreadsheets
      * @param string $file - Source CSV file to read data from
      * @param string $delimiter - Delimiting character
      * @param array $headers - Header names for CSV data rows
-     * @param array $transcriptions - Transcribable info strings
      * @return array
      */
-    public static function csv2array(string $file, string $delimiter = ';', array $headers = null, array $transcriptions = null): array
+    public static function csv2array(string $file, string $delimiter = ';', array $headers = null): array
     {
         $data = [];
 
@@ -94,64 +93,9 @@ class Spreadsheets
             'Kommentar'
         ];
 
-        # Load transcriptions for info strings
-        $transcriptions = $transcriptions ?? [
-            '1. Aufl.' => 'Erstauflage',
-            '2. Aufl.' => 'Zweitauflage',
-            'Erstauflage 2019' => 'Erstauflage',
-            'Sonderausg.' => 'Sonderausgabe',
-            'Ktn.' => 'Karten',
-            'In Box' => 'in einer Box',
-            'In Metall-Box' => 'in einer Metallbox',
-            'In Spielebox' => 'in einer Spielebox',
-            'In Schachtel' => 'in einer Schachtel',
-            'im Karton' => 'in einem Kartón',
-            'm. zahlr.' => 'mit zahlreichen',
-            'Zeichn v ' => 'Zeichnungen von ',
-            'bunten Bild.' => 'bunten Bildern',
-            'aufklappb. Bild.' => 'aufklappbaren Bildern',
-            'durchg. farb.' => 'durchgehend farbige Illustrationen',
-            'farb. Illustrationen' => 'farbigen Illustrationen',
-            'farb. Abb.' => 'farbige Abbildungen',
-            'schw.-w. Abb.' => 'schwarz-weiße Abbildungen',
-            'Abb.' => 'Abbildungen',
-            'Farbabb.' => 'Farbabbildungen',
-            'sw Illustrationen' => 'schwarz-weißen Illustrationen',
-            'sw-Illus' => 'schwarz-weißen Illustrationen',
-            's/w' => 'schwarz-weiß',
-            'Konturgestanzt' => 'konturgestanzt',
-            'Klapp-S.' => 'Klappseiten',
-            'Illustr.' => 'Illustrationen',
-            'Ill.' => 'Illustrationen',
-            'Illustrationen Illustrationen' => 'Illustrationen',
-            'farb.' => 'farbigen',
-            'z. Tl.' => 'zum Teil',
-            'Unzerr.' => 'unzerreißbar',
-            'Formgestanzt' => 'formgestanzt',
-            'Mit ' => 'mit ',
-            'm. ' => 'mit ',
-            'Für ' => 'für ',
-            'Kinder u. Jugendliche' => 'Kinder & Jugendliche',
-            'u. ' => 'und ',
-            'Durchgehend' => 'durchgehend',
-            'In Kassette' => 'in einer Kassette',
-            'JEWELCASE' => 'Jewelcase',
-            'HALBLN' => 'Halbleinen',
-            'GB#21' => '',
-            'Min.' => 'Minuten',
-            'Min, ' => 'Minuten, ',
-            'Komplett' => 'komplett',
-            'Englisch Broschur' => 'Englische Broschur',
-            'Gebunden' => 'gebunden',
-            'Schwarz' => 'schwarz',
-            'Geblockt' => 'geblockt'
-        ];
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../resources/binding_codes.json'), true);
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../i18n/bindings.json'), true);
-
-        $raw = self::csvOpen($file, $headers, $delimiter);
-
-        foreach ($raw as $array) {
+        foreach (self::csvOpen($file, $headers, $delimiter) as $array) {
             # Gathering & processing generic book information
             $string = $array['Informationen'];
 
@@ -163,7 +107,40 @@ class Spreadsheets
             }
 
             # Extract variables from info string
-            list($info, $year, $age, $pageCount) = self::generateInfo($infos, $transcriptions);
+            $age = 'Keine Altersangabe';
+            $pageCount = '';
+            $year = '';
+
+            foreach ($array as $entry) {
+                # Remove garbled book dimensions
+                if (Butler::contains($entry, ' cm') || Butler::contains($entry, ' mm')) {
+                    unset($array[array_search($entry, $array)]);
+                }
+
+                # Filter age
+                if (Butler::contains($entry, ' J.') || Butler::contains($entry, ' Mon.')) {
+                    $age = self::convertAge($entry);
+                    unset($array[array_search($entry, $array)]);
+                }
+
+                # Filter page count
+                if (Butler::contains($entry, ' S.')) {
+                    $pageCount = self::convertPageCount($entry);
+                    unset($array[array_search($entry, $array)]);
+                }
+
+                # Filter year (almost always right at this point)
+                if (Butler::length($entry) == 4) {
+                    $year = $entry;
+                    unset($array[array_search($entry, $array)]);
+                }
+            }
+
+            $info = ucfirst(implode(', ', $array));
+
+            if (Butler::length($info) > 0) {
+                $info = Butler::replace($info, '.', '') . '.';
+            }
 
             $array = Butler::update($array, [
                 # Add blanks to prevent column shifts
@@ -222,62 +199,6 @@ class Spreadsheets
     /**
      * Utilities
      */
-
-    /**
-     * Processes array containing general information,
-     * applying functions to convert wanted data
-     *
-     * @param array $array - Source PHP array to read data from
-     * @param array $translations - Translatable strings
-     * @return array
-     */
-    protected static function generateInfo(array $array, array $transcriptions)
-    {
-        $age = 'Keine Altersangabe';
-        $pageCount = '';
-        $year = '';
-
-        foreach ($array as $entry) {
-            # Remove garbled book dimensions
-            if (Butler::contains($entry, ' cm') || Butler::contains($entry, ' mm')) {
-                unset($array[array_search($entry, $array)]);
-            }
-
-            # Filter age
-            if (Butler::contains($entry, ' J.') || Butler::contains($entry, ' Mon.')) {
-                $age = self::convertAge($entry);
-                unset($array[array_search($entry, $array)]);
-            }
-
-            # Filter page count
-            if (Butler::contains($entry, ' S.')) {
-                $pageCount = self::convertPageCount($entry);
-                unset($array[array_search($entry, $array)]);
-            }
-
-            # Filter year (almost always right at this point)
-            if (Butler::length($entry) == 4) {
-                $year = $entry;
-                unset($array[array_search($entry, $array)]);
-            }
-        }
-
-        $array = Butler::replace($array, array_keys($transcriptions), array_values($transcriptions));
-
-        $info = ucfirst(implode(', ', $array));
-
-        if (Butler::length($info) > 0) {
-            $info = Butler::replace($info, '.', '') . '.';
-        }
-
-        return [
-            $info,
-            $year,
-            $age,
-            $pageCount,
-        ];
-    }
-
 
     /**
      * Builds 'Titel' attribute as exported with pcbis.de

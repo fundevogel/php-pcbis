@@ -84,14 +84,6 @@ class Webservice
 
 
     /**
-     * Translatable strings
-     *
-     * @var array
-     */
-    private $translations = [];
-
-
-    /**
      * Constructor
      */
 
@@ -124,9 +116,6 @@ class Webservice
 
         # Initialize cache
         $this->cache = new FilesystemCache($cachePath);
-
-        # Load translations
-        $this->translations = json_decode(file_get_contents(__DIR__ . '/../i18n/bindings.json'), true);
     }
 
 
@@ -139,22 +128,6 @@ class Webservice
         if (!$this->offlineMode) {
             $this->logOut();
         }
-    }
-
-
-    /**
-     * Setters & getters
-     */
-
-    public function setTranslations(array $translations)
-    {
-        $this->translations = $translations;
-    }
-
-
-    public function getTranslations(): array
-    {
-        return $this->translations;
     }
 
 
@@ -366,7 +339,6 @@ class Webservice
             'api'          => $this,
             'isbn'         => $isbn,
             'fromCache'    => $data['fromCache'],
-            'translations' => $this->translations,
         ];
 
         return Factory::factory($data['source'], $props);

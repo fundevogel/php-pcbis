@@ -74,14 +74,6 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Translatable strings
-     *
-     * @var array
-     */
-    protected $translations;
-
-
-    /**
      * Type of product
      *
      * @var string
@@ -226,9 +218,6 @@ abstract class Product implements Exportable, Sociable, Taggable
         # Set OLA code & message
         $this->olaCode    = $this->buildOlaCode();
         $this->olaMessage = $this->buildOlaMessage();
-
-        # Import translations
-        $this->translations = $props['translations'];
     }
 
 
