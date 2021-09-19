@@ -26,7 +26,7 @@
         }
     ],
     "require": {
-        "biblys/isbn": "^2.3.0",
+        "biblys/isbn": "2.4.0",
         "doctrine/cache": "^1.8",
         "guzzlehttp/guzzle": "^7.2"
     },
