@@ -27,7 +27,7 @@ class BookTest extends TestCase
 
 
     /**
-     * Picture books EANs/ISBNs
+     * Picture books ISBNs
      *
      * @var array
      */

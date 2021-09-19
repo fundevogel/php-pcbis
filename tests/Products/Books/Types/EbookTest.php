@@ -27,7 +27,7 @@ class EbookTest extends TestCase
 
 
     /**
-     * Ebook EANs/ISBNs
+     * Ebook ISBNs
      *
      * @var array
      */
@@ -72,8 +72,8 @@ class EbookTest extends TestCase
             'Altersempfehlung',
             'Reihe',
             'Band',
-            'Gewicht',  # TODO: ??
-            'Abmessungen',  # TODO: ??
+            'Gewicht',
+            'Abmessungen',
             'Sprachen',
             'Kategorien',
             'Themen',
