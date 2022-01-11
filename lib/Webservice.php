@@ -20,7 +20,7 @@ use Pcbis\Exceptions\NoRecordFoundException;
 use Pcbis\Helpers\Butler;
 
 use Pcbis\Products\Factory;
-use Pcbis\Products\Books\Books;
+use Pcbis\Products\ProductList;
 
 use Biblys\Isbn\Isbn;
 use Doctrine\Common\Cache\FilesystemCache;
@@ -261,23 +261,55 @@ class Webservice
 
 
     /**
-     * Validates and formats given EAN/ISBN
-     * For more information, see https://github.com/biblys/isbn
+     * Instantiates `Product` object from single EAN/ISBN
      *
-     * @param string $isbn - International Standard Book Number
-     * @throws \Pcbis\Exceptions\InvalidISBNException
-     * @return string Valid & formatted ISBN
+     * @param string|array $isbn - A given product's EAN/ISBN
+     * @param bool $forceRefresh - Whether to update cached data
+     * @return \Pcbis\Products\Product
      */
-    public function validate(string $isbn): string
+    private function factory(string $isbn, bool $forceRefresh): \Pcbis\Products\Product
     {
+        # Convert given number to ISBN-13 (if possible)
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
 
-        } catch(\Exception $e) {
-            throw new InvalidISBNException($e->getMessage());
+        } catch(\Exception $e) {}
+
+        $data = $this->fetch($isbn, $forceRefresh);
+
+        $props = [
+            'api'       => $this,
+            'isbn'      => $isbn,
+            'fromCache' => $data['fromCache'],
+        ];
+
+        return Factory::factory($data['source'], $props);
+    }
+
+
+    /**
+     * Instantiates `Product` object from single EAN/ISBN
+     *
+     * @param string|array $input - A given product's EAN/ISBN or array thereof
+     * @param bool $forceRefresh - Whether to update cached data
+     * @return \Pcbis\Products\Product|\Pcbis\Products\ProductList
+     */
+    public function load($input, bool $forceRefresh = false)
+    {
+        # If input is string ..
+        if (is_string($input)) {
+            # .. return single product
+            return $this->factory($input, $forceRefresh);
         }
 
-        return $isbn;
+        # .. otherwise return product list
+        $array = [];
+
+        foreach ($input as $isbn) {
+            $array[] = $this->factory($isbn, $forceRefresh);
+        }
+
+        return new ProductList($array);
     }
 
 
@@ -319,57 +351,22 @@ class Webservice
 
 
     /**
-     * Instantiates `Product` object from single EAN/ISBN
+     * Validates and formats given EAN/ISBN
+     * For more information, see https://github.com/biblys/isbn
      *
-     * @param string $isbn - A given product's EAN/ISBN
-     * @param bool $forceRefresh - Whether to update cached data
-     * @return \Pcbis\Products\Product
+     * @param string $isbn - International Standard Book Number
+     * @throws \Pcbis\Exceptions\InvalidISBNException
+     * @return string Valid & formatted ISBN
      */
-    public function load(string $isbn, bool $forceRefresh = false): \Pcbis\Products\Product
+    public function validate(string $isbn): string
     {
-        # Convert given number to ISBN-13 (if possible)
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
 
-        } catch(\Exception $e) {}
-
-        $data = $this->fetch($isbn, $forceRefresh);
-
-        $props = [
-            'api'          => $this,
-            'isbn'         => $isbn,
-            'fromCache'    => $data['fromCache'],
-        ];
-
-        return Factory::factory($data['source'], $props);
-    }
-
-
-    /**
-     * Instantiates `Books` object from multiple EANs/ISBNs
-     *
-     * TODO: This needs to be re-evaluated / outsourced to a factory
-     *
-     * @param array $isbns - A group of books' ISBNs
-     * @return \Pcbis\Products\Books\Books
-     */
-    public function loadBooks(array $isbns): \Pcbis\Products\Books\Books
-    {
-        $books = [];
-
-        foreach ($isbns as $isbn) {
-            try {
-                $book = $this->load($isbn);
-
-                if ($book->isBook() || $book->isAudiobook()) {
-                    $books[] = $book;
-                }
-
-            } catch (\Exception $e) {
-                continue;
-            }
+        } catch(\Exception $e) {
+            throw new InvalidISBNException($e->getMessage());
         }
 
-        return new Books($books);
+        return $isbn;
     }
 }
