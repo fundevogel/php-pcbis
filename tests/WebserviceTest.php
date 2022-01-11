@@ -173,14 +173,19 @@ class WebserviceTest extends TestCase
 
     public function testLoad(): void
     {
+        # Run function #1
         foreach (self::$available as $isbn) {
-            # Run function
             $result = self::$object->load($isbn);
 
             # Assert result
-            # TODO: Migrate to `assertInstanceOf`
-            $this->assertTrue(is_a($result, '\Pcbis\Products\Product'));
+            $this->assertInstanceOf('\Pcbis\Products\Product', $result);
         }
+
+        # Run function #2
+        $result = self::$object->load(self::$available);
+
+        # Assert result
+        $this->assertInstanceOf('\Pcbis\Products\ProductList', $result);
     }
 
 
@@ -189,20 +194,12 @@ class WebserviceTest extends TestCase
         # Assert exception
         $this->expectException(NoRecordFoundException::class);
 
-        # Run function
+        # Run function #1
         foreach (self::$unavailable as $isbn) {
             $result = self::$object->load($isbn);
         }
-    }
 
-
-    public function testLoadBooks(): void
-    {
-        # Run function
-        $result = self::$object->loadBooks(self::$available);
-
-        # Assert result
-        # TODO: Migrate to `assertInstanceOf`
-        $this->assertTrue(is_a($result, '\Pcbis\Products\Books\Books'));
+        # Run function #2
+        $result = self::$object->load(self::$unavailable);
     }
 }
