@@ -318,7 +318,7 @@ abstract class Products implements Countable, Iterator
         $result = [];
 
         foreach ($this->data as $item) {
-            $row = $this->getAttribute($item, $field);
+            $row = $item->$field();
 
             if ($split !== null) {
                 $result = array_merge($result, Str::split($row, $split));
