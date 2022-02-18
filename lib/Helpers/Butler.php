@@ -4,6 +4,9 @@ namespace Pcbis\Helpers;
 
 if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ClientException as GuzzleException;
+
 
 /**
  * Class Butler
@@ -744,5 +747,55 @@ class Butler
      */
     public static function last($array) {
         return array_pop($array);
+    }
+
+
+    /**
+     * Downloads cover images from the German National Library
+     *
+     * @param string $isbn - A given product's EAN/ISBN
+     * @param string $fileName - Filename for the image to be downloaded
+     * @param string $directory - Target download directory
+     * @param bool $overwrite - Whether existing file should be overwritten
+     * @return bool
+     */
+    public static function downloadCover(string $isbn, ?string $fileName = null, ?string $directory, bool $overwrite = false): bool
+    {
+        # Build path to file
+        # (1) Directory
+        $directory = $directory ?? __DIR__;
+
+        # (2) Filename
+        $fileName = $fileName ?? $isbn;
+
+        # (3) Complete path
+        $file = sprintf('%s/%s.jpg', $directory, $fileName);
+
+        # Skip if file exists & overwriting it is disabled
+        if (file_exists($file) && !$overwrite) {
+            return true;
+        }
+
+        # If directory does not exist ..
+        if (is_dir($directory) === false) {
+            # .. create it
+            mkdir(dirname($file), 0755, true);
+        }
+
+        # Download cover image
+        $success = false;
+
+        if ($handle = fopen($file, 'w')) {
+            $client = new GuzzleClient();
+            $url = sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn);
+
+            try {
+                $response = $client->get($url, ['sink' => $handle]);
+                $success = true;
+
+            } catch (GuzzleException $e) {}
+        }
+
+        return $success;
     }
 }
