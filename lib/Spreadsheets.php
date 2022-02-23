@@ -32,12 +32,52 @@ class Spreadsheets
      * Turns data from a single CSV file into a PHP array
      *
      * @param string $file - Source CSV file to read data from
+     * @param string $delimiter - Delimiting character
+     * @return array
+     */
+    public static function _csvOpen(string $file, string $delimiter = ';'): array
+    {
+        # Load file contents
+        $lines = file($file);
+
+        # Determine header row
+        $lines[0] = str_replace("\xEF\xBB\xBF", '', $lines[0]);
+
+        $csv = array_map(function($d) use ($delimiter) {
+            # Encode CSV data as UTF-8 (if necessary)
+            if (Butler::encoding($d) != 'UTF-8') {
+                $d = utf8_encode($d);
+            }
+
+            return str_getcsv($d, $delimiter);
+        }, $lines);
+
+        array_walk($csv, function(&$a) use ($csv) {
+            $a = array_combine($csv[0], $a);
+        });
+
+        array_shift($csv);
+
+        return $csv;
+    }
+
+
+    /**
+     * Turns data from a single CSV file (exported from pcbis.de) into a PHP array
+     *
+     * @param string $file - Source CSV file to read data from
      * @param array $headers - Header names for CSV data rows
      * @param string $delimiter - Delimiting character
      * @return array
      */
-    public static function csvOpen(string $file, array $headers, string $delimiter = ';')
+    public static function csvOpen(string $file, ?array $headers = null, string $delimiter = ';'): array
     {
+        # If no headers available ..
+        if (empty($headers)) {
+            # .. determine them & return file contents
+            return static::_csvOpen($file, $delimiter);
+        }
+
         $data = [];
 
         if (($handle = fopen($file, 'r')) !== false) {
@@ -69,7 +109,7 @@ class Spreadsheets
      * @param array $headers - Header names for CSV data rows
      * @return array
      */
-    public static function csv2array(string $file, string $delimiter = ';', array $headers = null): array
+    public static function csv2array(string $file, string $delimiter = ';', ?array $headers = null): array
     {
         $data = [];
 
