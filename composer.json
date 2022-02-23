@@ -5,7 +5,7 @@
     "keywords": ["pcbis", "knv"],
     "homepage": "https://github.com/Fundevogel",
     "license": "GPL-3.0",
-    "version": "2.5.1",
+    "version": "2.5.2",
     "scripts": {
         "cs-dry": "php-cs-fixer fix --dry-run --diff",
         "cs-fix": "php-cs-fixer fix",
