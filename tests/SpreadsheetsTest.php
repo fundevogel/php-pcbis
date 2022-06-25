@@ -11,40 +11,32 @@ namespace Pcbis\Tests;
 
 use Pcbis\Spreadsheets;
 
-use PHPUnit\Framework\TestCase;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 
-class SpreadsheetsTest extends TestCase
+class SpreadsheetsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Properties
      */
 
     /**
-     * Path to specific fixtures
+     * Path to fixtures
      *
      * @var string
      */
-    private static $filePath;
+    private static $fixturePath;
 
 
     /**
-     * Setup
+     * Setup (global)
      */
 
     public static function setUpBeforeClass(): void
     {
         # Define fixture directory
-        self::$filePath = __DIR__ . '/fixtures/SpreadsheetsTest';
-
-        # Clean up leftovers from prior tests
-        self::cleanUp();
-    }
-
-
-    public static function tearDownAfterClass(): void
-    {
-        self::cleanUp();
+        self::$fixturePath = __DIR__ . '/fixtures/SpreadsheetsTest';
     }
 
 
@@ -72,7 +64,7 @@ class SpreadsheetsTest extends TestCase
         ];
 
         # (2) File path
-        $file = self::$filePath . '/csv2array.csv';
+        $file = self::$fixturePath . '/csv2array.csv';
 
         # Run function
         $result = Spreadsheets::csvOpen($file, $headers);
@@ -114,7 +106,7 @@ class SpreadsheetsTest extends TestCase
         ];
 
         # (2) File path
-        $file = self::$filePath . '/csv2array.csv';
+        $file = self::$fixturePath . '/csv2array.csv';
 
         # Run function
         $result = Spreadsheets::csv2array($file);
@@ -160,8 +152,11 @@ class SpreadsheetsTest extends TestCase
             ],
         ];
 
-        # (2) File path
-        $file = self::$filePath . '/test_array2csv.csv';
+        # (2) Virtual directory
+        $root = vfsStream::setup('home');
+
+        # (3) File path
+        $file = vfsStream::url('home/test_array2csv.csv');
 
         # Run function
         $result = Spreadsheets::array2csv($array, $file);
@@ -169,7 +164,7 @@ class SpreadsheetsTest extends TestCase
         # Assert result
         $this->assertTrue($result);
         $this->assertFileExists($file);
-        $this->assertEquals(self::detectEncoding($file), 'utf-8');
+        $this->assertTrue(self::isUTF8($file));
     }
 
 
@@ -178,32 +173,15 @@ class SpreadsheetsTest extends TestCase
      */
 
     /**
-     * Detects character encoding of a file
+     * Checks whether file uses UTF-8 encoding
+     *
+     * See https://www.php.net/manual/de/function.mb-detect-encoding.php#91051
      *
      * @param string $file Path to file
-     * @return string Character encoding
+     * @return bool
      */
-    private static function detectEncoding(string $file): string
+    private static function isUTF8(string $file): bool
     {
-        $output = []; exec('file -i ' . $file, $output);
-
-        if (isset($output[0])) {
-            $charset = explode('charset=', $output[0]);
-
-            if (isset($charset[1])) return $charset[1];
-        }
-
-        return '';
-    }
-
-
-    /**
-     * Deletes generated files in test directory
-     *
-     * @return void
-     */
-    private static function cleanUp(): void
-    {
-        array_map('unlink', glob(self::$filePath . '/test_*.{csv,jpg}', GLOB_BRACE));
+        return substr(file_get_contents($file), 0, 3) == chr(0xEF) . chr(0xBB) . chr(0xBF);
     }
 }

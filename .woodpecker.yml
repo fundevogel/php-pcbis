@@ -1,0 +1,14 @@
+pipeline:
+  build:
+    image: jitesoft/composer:${PHP}
+    commands:
+      - composer install
+      - composer run test
+
+matrix:
+  PHP:
+    - 7.4
+    - 8.0
+    - 8.1
+
+branches: main

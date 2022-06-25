@@ -1,9 +1,9 @@
 {
     "name": "fundevogel/php-pcbis",
     "type": "library",
-    "description": "pcbis.de helper, written in PHP",
-    "keywords": ["pcbis", "knv"],
-    "homepage": "https://github.com/Fundevogel",
+    "description": "Simple PHP wrapper for pcbis.de API, written in PHP",
+    "keywords": ["pcbis", "knv", "api"],
+    "homepage": "https://codeberg.org/fundevogel/php-pcbis",
     "license": "GPL-3.0",
     "version": "2.5.2",
     "scripts": {
@@ -25,14 +25,22 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "email": "maschinenraum@fundevogel.de",
+        "forum": "https://forum.getkirby.com",
+        "source": "https://codeberg.org/fundevogel/php-pcbis",
+        "issues": "https://codeberg.org/fundevogel/php-pcbis/issues"
+    },
     "require": {
-        "biblys/isbn": "2.5.0",
-        "doctrine/cache": "^1.8",
-        "guzzlehttp/guzzle": "^7.2"
+        "php": "^7.4|^8.0",
+        "biblys/isbn": "^2.5.0|dev-next",
+        "doctrine/cache": "^2.2.0",
+        "guzzlehttp/guzzle": "^7.4.5"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.14",
-        "phpunit/phpunit": "^9.5"
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpunit/phpunit": "^8.5|^9.0",
+        "mikey179/vfsstream": "^1.6"
     },
     "autoload": {
         "psr-4": {
