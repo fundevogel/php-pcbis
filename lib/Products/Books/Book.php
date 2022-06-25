@@ -131,9 +131,9 @@ class Book extends Product
     /**
      * Builds Antolin rating
      *
-     * @return string
+     * @return array|string
      */
-    protected function buildAntolin(): string
+    protected function buildAntolin()
     {
         if (empty($this->tags)) {
             return '';

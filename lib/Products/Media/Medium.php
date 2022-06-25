@@ -62,9 +62,9 @@ class Medium extends Product
     /**
      * Builds duration
      *
-     * @return string
+     * @return array|string
      */
-    protected function buildDuration(): string
+    protected function buildDuration()
     {
         if (!isset($this->source['Utitel'])) {
             return '';

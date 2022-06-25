@@ -355,80 +355,117 @@ trait People
 
     /**
      * Shortcuts
+     *
+     * @return array|string
      */
-
     public function author(bool $asArray = false)
     {
         return $this->getRole('author', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function original(bool $asArray = false)
     {
         return $this->getRole('original', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function illustrator(bool $asArray = false)
     {
         return $this->getRole('illustrator', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function drawer(bool $asArray = false)
     {
         return $this->getRole('drawer', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function photographer(bool $asArray = false)
     {
         return $this->getRole('photographer', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function translator(bool $asArray = false)
     {
         return $this->getRole('translator', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function editor(bool $asArray = false)
     {
         return $this->getRole('editor', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function narrator(bool $asArray = false)
     {
         return $this->getRole('narrator', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function composer(bool $asArray = false)
     {
         return $this->getRole('composer', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function director(bool $asArray = false)
     {
         return $this->getRole('director', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function producer(bool $asArray = false)
     {
         return $this->getRole('producer', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function actor(bool $asArray = false)
     {
         return $this->getRole('actor', $asArray);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function participant(bool $asArray = false)
     {
         return $this->getRole('participant', $asArray);
@@ -437,8 +474,9 @@ trait People
 
     /**
      * Setters & getters
+     *
+     * @return void
      */
-
     public function setDelimiter(string $delimiter)
     {
         $this->delimiter = $delimiter;

@@ -40,10 +40,12 @@ final class Factory
      *
      * @param array $source - Source data fetched from KNV's API
      * @param array $props - Properties being passed to product
+     *
      * @throws \Pcbis\Exceptions\UnknownTypeException
-     * @return \Pcbis\Product
+     *
+     * @return Audiobook|Boardgame|Calendar|Ebook|Hardcover|Map|Movie|Music|Nonbook|Notes|Schoolbook|Softcover|Software|Sound|Stationery|Toy|Videogame
      */
-    public static function factory(array $source, array $props): Product
+    public static function factory(array $source, array $props)
     {
         $groups = [
             'AB' => 'Nonbook',

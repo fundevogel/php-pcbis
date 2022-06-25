@@ -248,7 +248,8 @@ class Spreadsheets
      * Builds 'Altersangabe' attribute as exported with pcbis.de
      *
      * @param string $string - Altersangabe string
-     * @return string
+     *
+     * @return array|string
      */
     protected static function convertAge($string)
     {
@@ -265,9 +266,8 @@ class Spreadsheets
      * Builds 'Seitenzahl' attribute as exported with pcbis.de
      *
      * @param string $string - Seitenzahl string
-     * @return string
      */
-    protected static function convertPageCount($string)
+    protected static function convertPageCount($string): int
     {
         return (int) $string;
     }
@@ -277,7 +277,8 @@ class Spreadsheets
      * Builds 'Preis' attribute as exported with pcbis.de
      *
      * @param string $string - Preis string
-     * @return string
+     *
+     * @return array|string
      */
     protected static function convertPrice($string)
     {

@@ -56,7 +56,7 @@ class Webservice
      *
      * @var string
      */
-    private $sessionID = null;
+    private $sessionID;
 
 
     /**
@@ -64,7 +64,7 @@ class Webservice
      *
      * @var \SoapClient
      */
-    private $client = null;
+    private $client;
 
 
     /**
@@ -72,15 +72,7 @@ class Webservice
      *
      * @var \Doctrine\Common\Cache\FilesystemCache
      */
-    private $cache = null;
-
-
-    /**
-     * Whether cached data should be refreshed
-     *
-     * @var bool
-     */
-    private $forceRefresh;
+    private $cache;
 
 
     /**
@@ -263,11 +255,12 @@ class Webservice
     /**
      * Instantiates `Product` object from single EAN/ISBN
      *
-     * @param string|array $isbn - A given product's EAN/ISBN
+     * @param string $isbn
      * @param bool $forceRefresh - Whether to update cached data
-     * @return \Pcbis\Products\Product
+     *
+     * @return Products\Books\Types\Ebook|Products\Books\Types\Hardcover|Products\Books\Types\Schoolbook|Products\Books\Types\Softcover|Products\Media\Types\Audiobook|Products\Media\Types\Movie|Products\Media\Types\Music|Products\Media\Types\Sound|Products\Nonbook\Types\Boardgame|Products\Nonbook\Types\Calendar|Products\Nonbook\Types\Map|Products\Nonbook\Types\Nonbook|Products\Nonbook\Types\Notes|Products\Nonbook\Types\Software|Products\Nonbook\Types\Stationery|Products\Nonbook\Types\Toy|Products\Nonbook\Types\Videogame
      */
-    private function factory(string $isbn, bool $forceRefresh): \Pcbis\Products\Product
+    private function factory(string $isbn, bool $forceRefresh)
     {
         # Convert given number to ISBN-13 (if possible)
         try {
@@ -292,6 +285,7 @@ class Webservice
      *
      * @param string|array $input - A given product's EAN/ISBN or array thereof
      * @param bool $forceRefresh - Whether to update cached data
+     *
      * @return \Pcbis\Products\Product|\Pcbis\Products\ProductList
      */
     public function load($input, bool $forceRefresh = false)
@@ -320,7 +314,7 @@ class Webservice
      * @param int $quantity - Number of products to be delivered
      * @return \Pcbis\Api\Ola
      */
-    public function ola(string $isbn, int $quantity = 1): \Pcbis\Api\Ola
+    public function ola(string $isbn, int $quantity = 1): Ola
     {
         $id = 'ola-' . $isbn;
 
@@ -344,6 +338,9 @@ class Webservice
             $this->cache->save($id, $result, 3600);
         }
 
+        /**
+         * @var \stdClass
+         */
         $ola = $this->cache->fetch($id);
 
         return new Ola($ola->OLAResponse->OLAResponseRecord);

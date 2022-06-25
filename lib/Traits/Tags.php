@@ -173,6 +173,9 @@ trait Tags
     }
 
 
+    /**
+     * @return array|string
+     */
     private function exportTag(array $property, bool $asArray, string $delimiter)
     {
         if ($asArray) {
@@ -183,12 +186,18 @@ trait Tags
     }
 
 
+    /**
+     * @return array|string
+     */
     public function categories(bool $asArray = false, string $delimiter = ', ')
     {
         return $this->exportTag($this->categories, $asArray, $delimiter);
     }
 
 
+    /**
+     * @return array|string
+     */
     public function topics(bool $asArray = false, string $delimiter = ', ')
     {
         return $this->exportTag($this->topics, $asArray, $delimiter);

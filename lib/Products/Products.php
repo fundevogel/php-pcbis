@@ -2,6 +2,8 @@
 
 namespace Pcbis\Products;
 
+use Pcbis\Helpers\Butler;
+
 use Countable;
 use Iterator;
 
@@ -321,7 +323,7 @@ abstract class Products implements Countable, Iterator
             $row = $item->$field();
 
             if ($split !== null) {
-                $result = array_merge($result, Str::split($row, $split));
+                $result = array_merge($result, Butler::split($row, $split));
 
             } else {
                 $result[] = $row;

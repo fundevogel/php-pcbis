@@ -87,10 +87,8 @@ class Software extends Item {
 
     /**
      * Exports version schema
-     *
-     * @return string
      */
-    public function version(): string
+    public function version(): array
     {
         return $this->version;
     }
@@ -98,8 +96,6 @@ class Software extends Item {
 
     /**
      * Whether software is educational
-     *
-     * @return bool
      */
     public function isEducational(): bool
     {

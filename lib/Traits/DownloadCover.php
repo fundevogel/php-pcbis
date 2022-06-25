@@ -38,8 +38,7 @@ trait DownloadCover
     /**
      * Setters & getters
      */
-
-    public function setImagePath(string $imagePath)
+    public function setImagePath(string $imagePath): void
     {
         $this->imagePath = $imagePath;
     }
@@ -51,7 +50,7 @@ trait DownloadCover
     }
 
 
-    public function setUserAgent(string $userAgent)
+    public function setUserAgent(string $userAgent): void
     {
         $this->userAgent = $userAgent;
     }

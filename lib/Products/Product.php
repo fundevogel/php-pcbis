@@ -281,9 +281,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Loads & returns predecessor
      *
-     * @return bool
+     * @return ProductList|self
      */
-    public function downgrade(): \Pcbis\Products\Product
+    public function downgrade()
     {
         if (!isset($this->source['VorherigeAuflageGtin'])) {
             return $this;
@@ -307,9 +307,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Loads & returns successor
      *
-     * @return bool
+     * @return ProductList|self
      */
-    public function upgrade(): \Pcbis\Products\Product
+    public function upgrade()
     {
         if (!isset($this->source['NeueAuflageGtin'])) {
             return $this;
@@ -727,9 +727,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports height (in cm)
      *
-     * @return string
+     * @return array|string
      */
-    public function height(): string
+    public function height()
     {
         if (!isset($this->source['Höhe'])) {
             return '';
@@ -742,9 +742,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports width (in cm)
      *
-     * @return string
+     * @return array|string
      */
-    public function width(): string
+    public function width()
     {
         if (!isset($this->source['Breite'])) {
             return '';
@@ -757,9 +757,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports depth (in cm)
      *
-     * @return string
+     * @return array|string
      */
-    public function depth(): string
+    public function depth()
     {
         if (!isset($this->source['Tiefe'])) {
             return '';
@@ -776,8 +776,6 @@ abstract class Product implements Exportable, Sociable, Taggable
      * - height / width
      * - height x width
      * - height x width x depth
-     *
-     * @return string
      */
     protected function buildDimensions(): string
     {

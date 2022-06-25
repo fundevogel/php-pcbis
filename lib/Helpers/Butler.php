@@ -7,6 +7,8 @@ if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException as GuzzleException;
 
+use Exception;
+
 
 /**
  * Class Butler
@@ -41,9 +43,8 @@ class Butler
      * Reverses name, going from 'Doe, John' to 'John Doe'
      *
      * @param string $string - Name to be reversed
-     * @return string
      */
-    public static function reverseName(string $string, string $delimiter = ',')
+    public static function reverseName(string $string, string $delimiter = ','): string
     {
         $array = Butler::split($string, $delimiter);
         $arrayReverse = array_reverse($array);
@@ -56,9 +57,10 @@ class Butler
      * Converts millimeters to centimeters
      *
      * @param string $string - Millimeter information
-     * @return string
+     *
+     * @return array|string
      */
-    public static function convertMM(string $string): string
+    public static function convertMM(string $string)
     {
         # TODO: Messing up some other values, needs fixing
         # Edge case: string already contains width/height in centimeters
@@ -113,8 +115,11 @@ class Butler
     /**
      * An UTF-8 safe version of strlen()
      *
-     * @param  string  $str
-     * @return string
+     * @param string  $str
+     *
+     * @return int
+     *
+     * @psalm-return 0|positive-int
      */
     public static function length($str)
     {
@@ -125,12 +130,11 @@ class Butler
     /**
      * Checks if a str contains another string
      *
-     * @param  string  $str
-     * @param  string  $needle
-     * @param  boolean $i ignore upper/lowercase
-     * @return string
+     * @param string  $str
+     * @param string  $needle
+     * @param boolean $i ignore upper/lowercase
      */
-    public static function contains($str, $needle, $i = true)
+    public static function contains($str, $needle, $i = true): bool
     {
         if($i) {
             $str    = static::lower($str);
@@ -157,11 +161,6 @@ class Butler
      */
     public static function replace($string, $search, $replace, $limit = -1)
     {
-        // convert Kirby collections to arrays
-        if(is_a($string,  'Collection')) $string  = $string->toArray();
-        if(is_a($search,  'Collection')) $search  = $search->toArray();
-        if(is_a($replace, 'Collection')) $replace = $replace->toArray();
-
         // without a limit we might as well use the built-in function
         if($limit === -1) return str_replace($search, $replace, $string);
 
@@ -233,7 +232,7 @@ class Butler
         } else if(is_string($search) && is_string($replace) && is_int($limit)) {
             $replacements[] = compact('search', 'replace', 'limit');
         } else {
-            throw new Error('Invalid combination of $search, $replace and $limit params.');
+            throw new Exception('Invalid combination of $search, $replace and $limit params.');
         }
 
         return $replacements;
@@ -254,7 +253,7 @@ class Butler
         // behavior is identical to the official PHP str_replace()
         foreach($replacements as $r) {
             if(!is_int($r['limit'])) {
-                throw new Error('Invalid limit "' . $r['limit'] . '".');
+                throw new Exception('Invalid limit "' . $r['limit'] . '".');
             } else if($r['limit'] === -1) {
                 // no limit, we don't need our special replacement routine
                 $string = str_replace($r['search'], $r['replace'], $string);
@@ -283,12 +282,13 @@ class Butler
     /**
      * Better alternative for implode()
      *
-     * @param  string  $value The value to join
-     * @param  string  $separator The string to join by
-     * @param  int     $length The min length of values.
-     * @return array   An array of found values
+     * @param string  $value The value to join
+     * @param string  $separator The string to join by
+     * @param int     $length The min length of values.
+     *
+     * @return string An array of found values
      */
-    public static function join($value, $separator = ', ')
+    public static function join($value, $separator = ', '): string
     {
         if (is_string($value) === true) {
             return $value;
@@ -494,14 +494,10 @@ class Butler
      * @param array $array
      * @param array $update
      */
-    public static function update($array, $update)
+    public static function update($array, $update): array
     {
         foreach($update as $key => $value) {
-            if(is_a($value, 'Closure')) {
-                $array[$key] = call($value, static::get($array, $key));
-            } else {
-                $array[$key] = $value;
-            }
+            $array[$key] = $value;
         }
 
         return $array;
@@ -664,7 +660,7 @@ class Butler
      * @param   array   $array The source array
      * @param   string  $field The name of the column
      * @param   string  $direction desc (descending) or asc (ascending)
-     * @param   const   $method A PHP sort method flag or 'natural' for natural sorting, which is not supported in PHP by sort flags
+     * @param   int   $method A PHP sort method flag or 'natural' for natural sorting, which is not supported in PHP by sort flags
      * @return  array   The sorted array
      */
     public static function sort($array, $field, $direction = 'desc', $method = SORT_REGULAR)
