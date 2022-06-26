@@ -81,6 +81,14 @@ try {
 }
 ```
 
+**Note**: If you want to validate and/or format (= hyphenate) ISBNs beforehand, have a look at [`biblys/isbn`](https://github.com/biblys/isbn) and [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn):
+
+```php
+use Nicebooks\Isbn\Isbn;
+
+$isbn = Isbn::of($isbn)->to13()->format();
+```
+
 
 ## Credits
 Most of the helper functions were taken from [Kirby](https://getkirby.com)'s excellent [`toolkit`](https://github.com/getkirby-v2/toolkit) package by [Bastian Allgeier](https://github.com/bastianallgeier) (who's just awesome, btw).

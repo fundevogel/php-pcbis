@@ -22,13 +22,13 @@ class ProductList extends Products
     /**
      * Gets `Product` from EAN/ISBN
      *
-     * @param string $isbn - A given product's EAN/ISBN
+     * @param string $identifier - Product EAN/ISBN
      * @return \Pcbis\Products\Product|false
      */
-    public function getISBN(string $isbn)
+    public function getISBN(string $identifier)
     {
         foreach ($this->data as $item) {
-            if ($isbn === $item->isbn()) {
+            if ($identifier === $item->isbn()) {
                 return $item;
             }
         }

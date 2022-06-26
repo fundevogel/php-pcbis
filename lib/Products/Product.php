@@ -189,7 +189,7 @@ abstract class Product implements Exportable, Sociable, Taggable
         $this->api = $props['api'];
 
         # Store valid ISBN
-        $this->isbn = $props['isbn'];
+        $this->isbn = $props['identifier'];
 
         # Store product type
         $this->type = $props['type'];

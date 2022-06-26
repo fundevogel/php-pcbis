@@ -13,7 +13,6 @@ namespace Pcbis;
 use Pcbis\Api\Ola;
 
 use Pcbis\Exceptions\IncompatibleClientException;
-use Pcbis\Exceptions\InvalidISBNException;
 use Pcbis\Exceptions\InvalidLoginException;
 use Pcbis\Exceptions\NoRecordFoundException;
 
@@ -22,7 +21,6 @@ use Pcbis\Helpers\Butler;
 use Pcbis\Products\Factory;
 use Pcbis\Products\ProductList;
 
-use Biblys\Isbn\Isbn;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
@@ -171,11 +169,11 @@ class Webservice
      *
      * .. if product for given EAN/ISBN exists
      *
-     * @param string $isbn
+     * @param string $identifier
      * @throws \Pcbis\Exceptions\InvalidLoginException
      * @return array
      */
-    private function query(string $isbn)
+    private function query(string $identifier)
     {
         if ($this->offlineMode) {
             throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
@@ -200,7 +198,7 @@ class Webservice
                     'SimpleTerm' => [
                         # Simple search suffices for querying single ISBN
                         'Suchfeld' => 'ISBN',
-                        'Suchwert' => $isbn,
+                        'Suchwert' => $identifier,
                         'Schwert2' => '',
                         'Suchart'  => 'Genau',
                     ],
@@ -221,7 +219,7 @@ class Webservice
             return Butler::last($array);
         }
 
-        throw new NoRecordFoundException('No database record found for ISBN ' . $isbn);
+        throw new NoRecordFoundException(sprintf('No database record found for "%s".', $identifier));
     }
 
 
@@ -229,24 +227,24 @@ class Webservice
      * Fetches information from cache if they exist,
      * otherwise loads them & saves to cache
      *
-     * @param string $isbn - A given product's EAN/ISBN
+     * @param string $identifier - A given product's EAN/ISBN
      * @param bool $forceRefresh - Whether to update cached data
      * @return array
      */
-    public function fetch(string $isbn, bool $forceRefresh = false): array
+    public function fetch(string $identifier, bool $forceRefresh = false): array
     {
         if ($forceRefresh) {
-            $this->cache->delete($isbn);
+            $this->cache->delete($identifier);
         }
 
         # Data might be cached already ..
         $fromCache = true;
 
-        $data = $this->cache->get($isbn, function (ItemInterface $item) use ($isbn, $fromCache) {
+        $data = $this->cache->get($identifier, function (ItemInterface $item) use ($identifier, $fromCache) {
             # .. turns out, it was not
             $fromCache = false;
 
-            return $this->query($isbn);
+            return $this->query($identifier);
         });
 
         return [
@@ -259,25 +257,20 @@ class Webservice
     /**
      * Instantiates `Product` object from single EAN/ISBN
      *
-     * @param string $isbn
+     * @param string $identifier Product EAN/ISBN
      * @param bool $forceRefresh - Whether to update cached data
      *
      * @return Products\Books\Types\Ebook|Products\Books\Types\Hardcover|Products\Books\Types\Schoolbook|Products\Books\Types\Softcover|Products\Media\Types\Audiobook|Products\Media\Types\Movie|Products\Media\Types\Music|Products\Media\Types\Sound|Products\Nonbook\Types\Boardgame|Products\Nonbook\Types\Calendar|Products\Nonbook\Types\Map|Products\Nonbook\Types\Nonbook|Products\Nonbook\Types\Notes|Products\Nonbook\Types\Software|Products\Nonbook\Types\Stationery|Products\Nonbook\Types\Toy|Products\Nonbook\Types\Videogame
      */
-    private function factory(string $isbn, bool $forceRefresh)
+    private function factory(string $identifier, bool $forceRefresh)
     {
-        # Convert given number to ISBN-13 (if possible)
-        try {
-            $isbn = Isbn::convertToIsbn13($isbn);
-
-        } catch(Exception $e) {}
-
-        $data = $this->fetch($isbn, $forceRefresh);
+        # Fetch raw data for given ISBN
+        $data = $this->fetch($identifier, $forceRefresh);
 
         $props = [
-            'api'       => $this,
-            'isbn'      => $isbn,
-            'fromCache' => $data['fromCache'],
+            'api'        => $this,
+            'fromCache'  => $data['fromCache'],
+            'identifier' => $identifier,
         ];
 
         return Factory::factory($data['data'], $props);
@@ -287,24 +280,24 @@ class Webservice
     /**
      * Instantiates `Product` object from single EAN/ISBN
      *
-     * @param string|array $input - A given product's EAN/ISBN or array thereof
+     * @param string|array $data - Product EAN/ISBN
      * @param bool $forceRefresh - Whether to update cached data
      *
      * @return \Pcbis\Products\Product|\Pcbis\Products\ProductList
      */
-    public function load($input, bool $forceRefresh = false)
+    public function load($data, bool $forceRefresh = false)
     {
         # If input is string ..
-        if (is_string($input)) {
+        if (is_string($data)) {
             # .. return single product
-            return $this->factory($input, $forceRefresh);
+            return $this->factory($data, $forceRefresh);
         }
 
         # .. otherwise return product list
         $array = [];
 
-        foreach ($input as $isbn) {
-            $array[] = $this->factory($isbn, $forceRefresh);
+        foreach ($data as $identifier) {
+            $array[] = $this->factory($identifier, $forceRefresh);
         }
 
         return new ProductList($array);
@@ -314,18 +307,18 @@ class Webservice
     /**
      * Checks if product is available for delivery via OLA query
      *
-     * @param string $isbn - A given product's EAN/ISBN
+     * @param string $identifier -Product EAN/ISBN
      * @param int $quantity - Number of products to be delivered
      * @return \Pcbis\Api\Ola
      */
-    public function ola(string $isbn, int $quantity = 1): Ola
+    public function ola(string $identifier, int $quantity = 1): Ola
     {
         /**
          * Fetch from cache (if needed)
          *
          * @var \Pcbis\Api\Ola
          */
-        $ola = $this->cache->get('ola-' . $isbn, function (ItemInterface $item) use ($isbn, $quantity) {
+        $ola = $this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity) {
             # Expire after one hour
             $item->expiresAfter(3600);
 
@@ -335,7 +328,7 @@ class Webservice
                 'OLA' => [
                     'Art' => 'Abfrage',
                     'OLAItem' => [
-                        'Bestellnummer' => ['ISBN' => $isbn],
+                        'Bestellnummer' => ['ISBN' => $identifier],
                         'Menge' => $quantity,
                     ],
                 ],
@@ -343,26 +336,5 @@ class Webservice
         });
 
         return new Ola($ola->OLAResponse->OLAResponseRecord);
-    }
-
-
-    /**
-     * Validates and formats given EAN/ISBN
-     * For more information, see https://github.com/biblys/isbn
-     *
-     * @param string $isbn - International Standard Book Number
-     * @throws \Pcbis\Exceptions\InvalidISBNException
-     * @return string Valid & formatted ISBN
-     */
-    public function validate(string $isbn): string
-    {
-        try {
-            $isbn = Isbn::convertToIsbn13($isbn);
-
-        } catch(Exception $e) {
-            throw new InvalidISBNException($e->getMessage());
-        }
-
-        return $isbn;
     }
 }

@@ -749,7 +749,7 @@ class Butler
     /**
      * Downloads cover images from the German National Library
      *
-     * @param string $isbn - A given product's EAN/ISBN
+     * @param string $isbn - Product ISBN
      * @param string $fileName - Filename for the image to be downloaded
      * @param string $directory - Target download directory
      * @param bool $overwrite - Whether existing file should be overwritten
