@@ -48,12 +48,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Pcbis\\": "lib/"
+            "Fundevogel\\Pcbis\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Pcbis\\Tests\\": "tests/"
+            "Fundevogel\\Pcbis\\Tests\\": "tests/"
         }
     }
 }

@@ -30,7 +30,7 @@ Getting started is pretty straight-forward:
 
 require_once('vendor/autoload.php');
 
-$object = new Pcbis\Webservice;
+$object = new Fundevogel\Pcbis\Webservice;
 
 try {
     // After loading a book, you might want to ..
@@ -59,7 +59,7 @@ If you want to load multiple books at once, you may pass their ISBNs to `loadBoo
 
 require_once('vendor/autoload.php');
 
-$object = new Pcbis\Webservice;
+$object = new Fundevogel\Pcbis\Webservice;
 
 try {
     $isbns = [
