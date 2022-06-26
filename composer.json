@@ -33,9 +33,9 @@
     },
     "require": {
         "php": "^7.4|^8.0",
-        "biblys/isbn": "^2.5.0|dev-next",
+        "biblys/isbn": "dev-next",
         "guzzlehttp/guzzle": "^7.4.5",
-        "symfony/cache": "^6.0.9"
+        "symfony/cache": "^5.4.9|^6.0.9"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",

@@ -1,14 +1,14 @@
 pipeline:
   build:
-    image: jitesoft/composer:${PHP}
+    image: jitesoft/composer:${TAG}
     commands:
       - composer install
       - composer run test
+    when:
+      event: push
 
 matrix:
-  PHP:
+  TAG:
     - 7.4
     - 8.0
     - 8.1
-
-branches: main

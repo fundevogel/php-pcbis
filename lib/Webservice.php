@@ -23,8 +23,10 @@ use Pcbis\Products\Factory;
 use Pcbis\Products\ProductList;
 
 use Biblys\Isbn\Isbn;
-use Doctrine\Common\Cache\FilesystemCache;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
+use Exception;
 use SoapClient;
 use SoapFault;
 
@@ -70,16 +72,19 @@ class Webservice
     /**
      * Cache object storing product data fetched from KNV's API
      *
-     * @var \Doctrine\Common\Cache\FilesystemCache
+     * @var \Symfony\Component\Cache\Adapter\FilesystemAdapter
      */
     private $cache;
 
 
     /**
      * Constructor
+     *
+     * @param array $credentials Login credentials
+     * @param string $cachePath Cache directory
+     * @param int $ttl Lifetime for cache items (in seconds)
      */
-
-    public function __construct(array $credentials = null, string $cachePath = './.cache')
+    public function __construct(?array $credentials = null, string $cachePath = './.cache', int $ttl = 0)
     {
         try {
             # Fire up SOAP client
@@ -107,7 +112,7 @@ class Webservice
         }
 
         # Initialize cache
-        $this->cache = new FilesystemCache($cachePath);
+        $this->cache = new FilesystemAdapter('pcbis', $ttl, $cachePath);
     }
 
 
@@ -130,7 +135,7 @@ class Webservice
     /**
      * Uses credentials to log into KNV's API & generates a sessionID
      *
-     * @param array $credentials
+     * @param array $credentials Login credentials
      * @throws \Pcbis\Exceptions\InvalidLoginException
      * @return string
      */
@@ -197,7 +202,7 @@ class Webservice
                         'Suchfeld' => 'ISBN',
                         'Suchwert' => $isbn,
                         'Schwert2' => '',
-                        'Suchart' => 'Genau',
+                        'Suchart'  => 'Genau',
                     ],
                 ],
             ],
@@ -205,7 +210,7 @@ class Webservice
             'Lesen' => [
                 'SatzVon' => 1,
                 'SatzBis' => 1,
-                'Format' => 'KNVXMLLangText',
+                'Format'  => 'KNVXMLLangText',
             ],
         ]);
 
@@ -230,24 +235,23 @@ class Webservice
      */
     public function fetch(string $isbn, bool $forceRefresh = false): array
     {
-        if ($this->cache->contains($isbn) && $forceRefresh) {
+        if ($forceRefresh) {
             $this->cache->delete($isbn);
         }
 
         # Data might be cached already ..
         $fromCache = true;
 
-        if (!$this->cache->contains($isbn)) {
-            $result = $this->query($isbn);
-            $this->cache->save($isbn, $result);
-
+        $data = $this->cache->get($isbn, function (ItemInterface $item) use ($isbn, $fromCache) {
             # .. turns out, it was not
             $fromCache = false;
-        }
+
+            return $this->query($isbn);
+        });
 
         return [
+            'data' => $data,
             'fromCache' => $fromCache,
-            'source'    => $this->cache->fetch($isbn),
         ];
     }
 
@@ -266,7 +270,7 @@ class Webservice
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
 
-        } catch(\Exception $e) {}
+        } catch(Exception $e) {}
 
         $data = $this->fetch($isbn, $forceRefresh);
 
@@ -276,7 +280,7 @@ class Webservice
             'fromCache' => $data['fromCache'],
         ];
 
-        return Factory::factory($data['source'], $props);
+        return Factory::factory($data['data'], $props);
     }
 
 
@@ -316,32 +320,27 @@ class Webservice
      */
     public function ola(string $isbn, int $quantity = 1): Ola
     {
-        $id = 'ola-' . $isbn;
+        /**
+         * Fetch from cache (if needed)
+         *
+         * @var \Pcbis\Api\Ola
+         */
+        $ola = $this->cache->get('ola-' . $isbn, function (ItemInterface $item) use ($isbn, $quantity) {
+            # Expire after one hour
+            $item->expiresAfter(3600);
 
-        # Check cache for OLA request
-        if (!$this->cache->contains($id)) {
-            $result = $this->client->WSCall([
+            return $this->client->WSCall([
                 # Log in using sessionID
                 'SessionID' => $this->sessionID,
                 'OLA' => [
                     'Art' => 'Abfrage',
                     'OLAItem' => [
-                        'Bestellnummer' => [
-                            'ISBN' => $isbn,
-                        ],
+                        'Bestellnummer' => ['ISBN' => $isbn],
                         'Menge' => $quantity,
                     ],
                 ],
             ]);
-
-            # Store result for an hour
-            $this->cache->save($id, $result, 3600);
-        }
-
-        /**
-         * @var \stdClass
-         */
-        $ola = $this->cache->fetch($id);
+        });
 
         return new Ola($ola->OLAResponse->OLAResponseRecord);
     }
@@ -360,7 +359,7 @@ class Webservice
         try {
             $isbn = Isbn::convertToIsbn13($isbn);
 
-        } catch(\Exception $e) {
+        } catch(Exception $e) {
             throw new InvalidISBNException($e->getMessage());
         }
 
