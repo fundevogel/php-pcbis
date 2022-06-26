@@ -13,13 +13,12 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
-
+use Fundevogel\Pcbis\Butler;
 use Fundevogel\Pcbis\Exceptions\IncompatibleClientException;
 use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
-
-use Fundevogel\Pcbis\Helpers\Butler;
-
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Factory;
 
 use Symfony\Contracts\Cache\ItemInterface;
@@ -116,7 +115,6 @@ class Webservice
     /**
      * Destructor
      */
-
     public function __destruct()
     {
         if (!$this->offlineMode) {
@@ -179,7 +177,7 @@ class Webservice
         }
 
         # For getting started with KNV's (surprisingly well documented) german API,
-        # see http://www.knv-zeitfracht.de/wp-content/uploads/2020/07/Webservice_2.0.pdf
+        # see https://zeitfracht-medien.de/wp-content/uploads/2022/05/ZF-Webservice_3.0-1.pdf
         $query = $this->client->WSCall([
             # Log in using sessionID
             'SessionID' => $this->sessionID,
@@ -215,7 +213,7 @@ class Webservice
             $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
             $array = Butler::loadXML($result);
 
-            return Butler::last($array);
+            return A::last($array);
         }
 
         throw new NoRecordFoundException(sprintf('No database record found for "%s".', $identifier));

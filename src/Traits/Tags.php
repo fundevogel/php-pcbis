@@ -2,7 +2,8 @@
 
 namespace Fundevogel\Pcbis\Traits;
 
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 
 
 /**
@@ -58,13 +59,13 @@ trait Tags
         $data = $this->source['IndexSchlagw'];
 
         if (is_string($data)) {
-            $data = Butler::split(trim($data), ';');
+            $data = Str::split(trim($data), ';');
         }
 
         $tags = [];
 
         foreach ($data as $string) {
-            $tags = array_merge($tags, Butler::split(trim($string), ';'));
+            $tags = array_merge($tags, Str::split(trim($string), ';'));
         }
 
         return $tags;
@@ -97,25 +98,25 @@ trait Tags
             }
 
             # 'Erstlesebuch', 'Erstlesesachbuch'
-            if (Butler::startsWith($tag, 'Erstlese')) {
+            if (Str::startsWith($tag, 'Erstlese')) {
                 $categories[] = 'Erstlesebuch';
             }
 
             # 'Vorlesebuch', 'Vorlesen'
-            if (Butler::startsWith($tag, 'Vorlese')) {
+            if (Str::startsWith($tag, 'Vorlese')) {
                 $categories[] = 'Vorlesebuch';
             }
 
             # Low(er) accuracy
-            $lowercase = Butler::lower($tag);
+            $lowercase = Str::lower($tag);
 
             # 'Kindersachbuch', 'Jugendsachbuch', 'Erstlesesachbuch' || 'Sach-Bilderbuch', 'Sachbilderbuch'
-            if (Butler::contains($lowercase, 'sachbuch') || in_array($tag, ['Sach-Bilderbuch', 'Sachbilderbuch'])) {
+            if (Str::contains($lowercase, 'sachbuch') || in_array($tag, ['Sach-Bilderbuch', 'Sachbilderbuch'])) {
                 $categories[] = 'Sachbuch';
             }
 
             # 'Kunst-Bilderbuch', 'Fühl-Bilderbuch', 'Märchen-Bilderbuch'
-            if (Butler::contains($lowercase, 'bilderbuch')) {
+            if (Str::contains($lowercase, 'bilderbuch')) {
                 $categories[] = 'Bilderbuch';
             }
         }
@@ -159,7 +160,7 @@ trait Tags
             }
 
             # Skip 'Antolin' rating
-            if (Butler::startsWith($topic, 'Antolin')) {
+            if (Str::startsWith($topic, 'Antolin')) {
                 return '';
             }
 
@@ -171,31 +172,37 @@ trait Tags
 
 
     /**
+     * Exports tag
+     *
      * @return array|string
      */
-    private function exportTag($property, bool $asArray, string $delimiter)
+    private function exportTag($property, bool $asArray, string $delimiter): array|string
     {
         if ($asArray) {
             return $property;
         }
 
-        return Butler::join($property, $delimiter);
+        return A::join($property, $delimiter);
     }
 
 
     /**
+     * Exports categories
+     *
      * @return array|string
      */
-    public function categories(bool $asArray = false, string $delimiter = ', ')
+    public function categories(bool $asArray = false, string $delimiter = ', '): array|string
     {
         return $this->exportTag($this->categories, $asArray, $delimiter);
     }
 
 
     /**
+     * Exports topics
+     *
      * @return array|string
      */
-    public function topics(bool $asArray = false, string $delimiter = ', ')
+    public function topics(bool $asArray = false, string $delimiter = ', '): array|string
     {
         return $this->exportTag($this->topics, $asArray, $delimiter);
     }

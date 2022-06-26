@@ -3,7 +3,8 @@
 namespace Fundevogel\Pcbis\Traits;
 
 use Fundevogel\Pcbis\Exceptions\UnknownRoleException;
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 
 
 /**
@@ -123,20 +124,20 @@ trait People
         $data = $this->source['Mitarb'];
 
         # Take care of delimiters with two or more dots
-        if (Butler::contains($data, 'Illustr. v. ')) {
-            $data = Butler::replace($data, 'Illustr. v. ', 'Illustriert von ');
+        if (Str::contains($data, 'Illustr. v. ')) {
+            $data = Str::replace($data, 'Illustr. v. ', 'Illustriert von ');
         }
 
-        if (Butler::contains($data, 'Hrsg. v. ')) {
-            $data = Butler::replace($data, 'Hrsg. v. ', 'Herausgegeben von ');
+        if (Str::contains($data, 'Hrsg. v. ')) {
+            $data = Str::replace($data, 'Hrsg. v. ', 'Herausgegeben von ');
         }
 
-        if (Butler::contains($data, 'Aus d. Amerik. v. ')) {
-            $data = Butler::replace($data, 'Aus d. Amerik. v. ', 'Aus dem Amerikanischen von ');
+        if (Str::contains($data, 'Aus d. Amerik. v. ')) {
+            $data = Str::replace($data, 'Aus d. Amerik. v. ', 'Aus dem Amerikanischen von ');
         }
 
-        if (Butler::contains($data, 'Aus d. Engl. v. ')) {
-            $data = Butler::replace($data, 'Aus d. Engl. v. ', 'Aus dem Englischen von ');
+        if (Str::contains($data, 'Aus d. Engl. v. ')) {
+            $data = Str::replace($data, 'Aus d. Engl. v. ', 'Aus dem Englischen von ');
         }
 
         # Check for names with two dots
@@ -146,23 +147,23 @@ trait People
             # Create replacements for each match, replacing the dots with sharps
             # For example, 'Tripp, F. J.' becomes 'Tripp, F# J#'
             $replacements = array_map(function ($string) {
-                return Butler::replace(trim($string), ['. ', '.;', '.'], ['# ', '#;', '#.']);
+                return Str::replace(trim($string), ['. ', '.;', '.'], ['# ', '#;', '#.']);
             }, $matches);
 
-            $data = Butler::replace($data, $matches, $replacements);
+            $data = Str::replace($data, $matches, $replacements);
         }
 
-        foreach (Butler::split($data, '.') as $string) {
+        foreach (Str::split($data, '.') as $string) {
             # If dots were replaced, change them back
-            $string = Butler::replace($string, '#', '.');
+            $string = Str::replace($string, '#', '.');
 
             # First, see if there's a colon
-            if (!Butler::contains($string, ':')) {
-                # If not, the string is eligible for an alternative delimiter
+            if (!Str::contains($string, ':')) {
+                # If not, the Str is eligible for an alternative delimiter
                 foreach ($delimiters as $delimiter => $role) {
-                    if (Butler::startsWith($string, $delimiter)) {
+                    if (Str ::startsWith($string, $delimiter)) {
                         # If so, remove it from the string, change role and end the loop
-                        $group = Butler::replace($string, $delimiter, '');
+                        $group = Str::replace($string, $delimiter, '');
                         $role = $delimiters[$delimiter];  # .. or $role
 
                         break;
@@ -171,7 +172,7 @@ trait People
 
             } else {
                 # Otherwise, split role & people as usual
-                $array = Butler::split($string, ':');
+                $array = Str::split($string, ':');
 
                 if (isset($this->roles[$array[0]])) {
                     $role = $this->roles[$array[0]];
@@ -206,19 +207,19 @@ trait People
      *   ],
      * ]
      *
-     * @param string $string - Involved people
-     * @param string $groupDelimiter - Character between people
-     * @param string $nameDelimiter - Character between first & last name
+     * @param string $string Involved people
+     * @param string $groupDelimiter Character between people
+     * @param string $nameDelimiter Character between first & last name
      * @return array
      */
     protected function organizePeople(string $string, string $groupDelimiter = ';', string $nameDelimiter = ','): array
     {
-        $group = Butler::split($string, $groupDelimiter);
+        $group = Str::split($string, $groupDelimiter);
 
         $people = [];
 
         foreach ($group as $member) {
-            $names = Butler::split($member, $nameDelimiter);
+            $names = Str::split($member, $nameDelimiter);
 
             # Edge case: single person entry, such as 'Diverse'
             $person = ['name' => $names[0]];
@@ -240,12 +241,12 @@ trait People
     /**
      * Exports involved people of a given role as string (or array)
      *
-     * @param string $role - Individual role
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param string $role Individual role
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownRoleException
-     * @return string|array
+     * @return array|string
      */
-    public function getRole(string $role, bool $asArray = false)
+    public function getRole(string $role, bool $asArray = false): array|string
     {
         if (!array_key_exists($role, $this->people)) {
             throw new UnknownRoleException('Unknown role: "' . $role . '"');
@@ -262,10 +263,10 @@ trait People
         $people = [];
 
         foreach (array_values($this->people[$role]) as $person) {
-            $people[] = Butler::join($person, ' ');
+            $people[] = A::join($person, ' ');
         }
 
-        return Butler::join($people, $this->delimiter);
+        return A::join($people, $this->delimiter);
     }
 
 
@@ -286,10 +287,10 @@ trait People
         $personDelimiter = ',';
 
         # Edge case: `AutorSachtitel` contains something other than a person
-        if (!Butler::contains($string, $groupDelimiter) && !Butler::contains($string, $personDelimiter)) {
+        if (!Str::contains($string, $groupDelimiter) && !Str::contains($string, $personDelimiter)) {
             if (isset($this->source['IndexAutor'])) {
                 if (is_array($this->source['IndexAutor'])) {
-                    $string = Butler::join(array_map(function($string) {
+                    $string = A::join(array_map(function($string) {
                         return trim($string);
                     }, $this->source['IndexAutor']), ';');
 
@@ -312,11 +313,10 @@ trait People
     /**
      * Exports all involved people as string (or array)
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
-     * @return string|array
+     * @param bool $asArray Whether to export an array (rather than a string)
+     * @return array|string
      */
-
-    public function people(bool $asArray = false)
+    public function people(bool $asArray = false): array|string
     {
         if ($asArray) {
             return $this->people;
@@ -340,130 +340,158 @@ trait People
             $array = [];
 
             foreach ($people as $person) {
-                $array[] = Butler::join($person, ' ');
+                $array[] = A::join($person, ' ');
             }
 
-            $result[] = $roles[$role] . ': ' . Butler::join($array, $this->delimiter);
+            $result[] = $roles[$role] . ': ' . A::join($array, $this->delimiter);
         }
 
-        return Butler::join($result, '. ');
+        return A::join($result, '. ');
     }
 
 
     /**
      * Shortcuts
+     */
+
+    /**
+     * Exports author
      *
      * @return array|string
      */
-    public function author(bool $asArray = false)
+    public function author(bool $asArray = false): array|string
     {
         return $this->getRole('author', $asArray);
     }
 
 
     /**
+     * Exports original author
+     *
      * @return array|string
      */
-    public function original(bool $asArray = false)
+    public function original(bool $asArray = false): array|string
     {
         return $this->getRole('original', $asArray);
     }
 
 
     /**
+     * Exports illustrator
+     *
      * @return array|string
      */
-    public function illustrator(bool $asArray = false)
+    public function illustrator(bool $asArray = false): array|string
     {
         return $this->getRole('illustrator', $asArray);
     }
 
 
     /**
+     * Exports drawer
+     *
      * @return array|string
      */
-    public function drawer(bool $asArray = false)
+    public function drawer(bool $asArray = false): array|string
     {
         return $this->getRole('drawer', $asArray);
     }
 
 
     /**
+     * Exports photographer
+     *
      * @return array|string
      */
-    public function photographer(bool $asArray = false)
+    public function photographer(bool $asArray = false): array|string
     {
         return $this->getRole('photographer', $asArray);
     }
 
 
     /**
+     * Exports translator
+     *
      * @return array|string
      */
-    public function translator(bool $asArray = false)
+    public function translator(bool $asArray = false): array|string
     {
         return $this->getRole('translator', $asArray);
     }
 
 
     /**
+     * Exports editor
+     *
      * @return array|string
      */
-    public function editor(bool $asArray = false)
+    public function editor(bool $asArray = false): array|string
     {
         return $this->getRole('editor', $asArray);
     }
 
 
     /**
+     * Exports narrator
+     *
      * @return array|string
      */
-    public function narrator(bool $asArray = false)
+    public function narrator(bool $asArray = false): array|string
     {
         return $this->getRole('narrator', $asArray);
     }
 
 
     /**
+     * Export composer
+     *
      * @return array|string
      */
-    public function composer(bool $asArray = false)
+    public function composer(bool $asArray = false): array|string
     {
         return $this->getRole('composer', $asArray);
     }
 
 
     /**
+     * Exports director
+     *
      * @return array|string
      */
-    public function director(bool $asArray = false)
+    public function director(bool $asArray = false): array|string
     {
         return $this->getRole('director', $asArray);
     }
 
 
     /**
+     * Exports producer
+     *
      * @return array|string
      */
-    public function producer(bool $asArray = false)
+    public function producer(bool $asArray = false): array|string
     {
         return $this->getRole('producer', $asArray);
     }
 
 
     /**
+     * Exports actor
+     *
      * @return array|string
      */
-    public function actor(bool $asArray = false)
+    public function actor(bool $asArray = false): array|string
     {
         return $this->getRole('actor', $asArray);
     }
 
 
     /**
+     * Exports participant
+     *
      * @return array|string
      */
-    public function participant(bool $asArray = false)
+    public function participant(bool $asArray = false): array|string
     {
         return $this->getRole('participant', $asArray);
     }

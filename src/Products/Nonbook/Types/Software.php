@@ -2,7 +2,7 @@
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 
@@ -66,7 +66,7 @@ class Software extends Item {
 
             # Remove strings indicating number of CDs/DVDs involved
             if (preg_match('/\d{1,2}\s[A-Z]{2,3}-ROMs?/', $this->source['Titel'], $matches)) {
-                $string = Butler::replace($string, $matches[0], '');
+                $string = Str::replace($string, $matches[0], '');
             }
 
             # Look for simple number to use as version ..
@@ -84,8 +84,10 @@ class Software extends Item {
 
     /**
      * Exports version schema
+     *
+     * @return string
      */
-    public function version(): array
+    public function version(): string
     {
         return $this->version;
     }
@@ -97,7 +99,7 @@ class Software extends Item {
     public function isEducational(): bool
     {
         if (isset($this->source['SonstTxt'])) {
-            return Butler::contains(Butler::lower($this->source['SonstTxt']), '14 juschg');
+            return Str::contains(Str::lower($this->source['SonstTxt']), '14 juschg');
         }
 
         return false;
@@ -111,7 +113,7 @@ class Software extends Item {
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

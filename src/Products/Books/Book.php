@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Products\Books;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Products\Product;
 
 
@@ -72,7 +71,7 @@ class Book extends Product
             return '';
         }
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../../../resources/binding_codes.json'), true);
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../../../data/binding_codes.json'), true);
 
         if (!isset($bindings[$this->source['Einband']])) {
             return $this->source['Einband'];
@@ -104,11 +103,11 @@ class Book extends Product
             return '';
         }
 
-        $lines = Butler::split($this->source['Abb'], '.');
+        $lines = Str::split($this->source['Abb'], '.');
 
         foreach ($lines as $line) {
-            if (Butler::substr($line, -1) === 'S') {
-                return Butler::split($line, ' ')[0];
+            if (Str::substr($line, -1) === 'S') {
+                return Str::split($line, ' ')[0];
             }
         }
 
@@ -130,17 +129,17 @@ class Book extends Product
     /**
      * Builds Antolin rating
      *
-     * @return array|string
+     * @return string
      */
-    protected function buildAntolin()
+    protected function buildAntolin(): string
     {
         if (empty($this->tags)) {
             return '';
         }
 
         foreach ($this->tags as $tag) {
-            if (Butler::startsWith($tag, 'Antolin')) {
-                return Butler::replace($tag, ['Antolin (', ')'], '');
+            if (Str::startsWith($tag, 'Antolin')) {
+                return Str::replace($tag, ['Antolin (', ')'], '');
             }
         }
 
@@ -162,7 +161,7 @@ class Book extends Product
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

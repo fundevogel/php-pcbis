@@ -3,14 +3,12 @@
 namespace Fundevogel\Pcbis\Products;
 
 use Fundevogel\Pcbis\Api\Ola;
-
-use Fundevogel\Pcbis\Helpers\Butler;
-
+use Fundevogel\Pcbis\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Interfaces\Exportable;
 use Fundevogel\Pcbis\Interfaces\Sociable;
 use Fundevogel\Pcbis\Interfaces\Taggable;
-
-use Fundevogel\Pcbis\Traits\DownloadCover;
 use Fundevogel\Pcbis\Traits\OlaStatus;
 use Fundevogel\Pcbis\Traits\People;
 use Fundevogel\Pcbis\Traits\Tags;
@@ -30,7 +28,6 @@ abstract class Product implements Exportable, Sociable, Taggable
      * Traits
      */
 
-    use DownloadCover;
     use OlaStatus;
     use People;
     use Tags;
@@ -205,7 +202,6 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Magic methods
      */
-
 
     /**
      * Export author & title when echoing object
@@ -399,7 +395,7 @@ abstract class Product implements Exportable, Sociable, Taggable
 
             foreach ($this->source['IndexVerlag'] as $string) {
                 # Skip variations
-                if (Butler::contains($string, ' # ')) {
+                if (Str::contains($string, ' # ')) {
                     continue;
                 }
 
@@ -416,10 +412,10 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports publisher(s)
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
-     * @return string|array
+     * @param bool $asArray Whether to export an array (rather than a string)
+     * @return array|string
      */
-    public function publisher(bool $asArray = false)
+    public function publisher(bool $asArray = false): array|string
     {
         if (empty($this->publisher)) {
             return $asArray ? [] : '';
@@ -429,7 +425,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return $this->publisher;
         }
 
-        return Butler::first($this->publisher);
+        return A::first($this->publisher);
     }
 
 
@@ -448,7 +444,7 @@ abstract class Product implements Exportable, Sociable, Taggable
         # (1) Avoid `htmlParseStartTag: invalid element name in Entity` warnings
         # Sometimes, KNV uses '>>' & '<<' instead of quotation marks, leading to broken texts
         # See 978-3-8373-9003-2
-        $text = Butler::replace($this->source['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
+        $text = Str::replace($this->source['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
 
         # (2) Convert HTML elements
         $text = html_entity_decode($text);
@@ -456,7 +452,7 @@ abstract class Product implements Exportable, Sociable, Taggable
         # (3) Avoid `htmlParseEntityRef: no name in Entity` warnings
         # See https://stackoverflow.com/a/14832134
         # TODO: Should be deprecated
-        $text = Butler::replace($text, '&', '&amp;');
+        $text = Str::replace($text, '&', '&amp;');
 
         # Create DOM document & load HTML
         $dom = new DOMDocument();
@@ -484,10 +480,10 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports description
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
-     * @return string|array
+     * @param bool $asArray Whether to export an array (rather than a string)
+     * @return array|string
      */
-    public function description(bool $asArray = false)
+    public function description(bool $asArray = false): array|string
     {
         if (empty($this->description)) {
             return $asArray ? [] : '';
@@ -497,7 +493,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return $this->description;
         }
 
-        return Butler::first($this->description);
+        return A::first($this->description);
     }
 
 
@@ -564,10 +560,10 @@ abstract class Product implements Exportable, Sociable, Taggable
             return '';
         }
 
-        $age = Butler::substr($this->source['Alter'], 0, 2);
+        $age = Str::substr($this->source['Alter'], 0, 2);
 
-        if (Butler::substr($age, 0, 1) === '0') {
-            $age = Butler::substr($age, 1, 1);
+        if (Str::substr($age, 0, 1) === '0') {
+            $age = Str::substr($age, 1, 1);
         }
 
       	return 'ab ' . $age . ' Jahren';
@@ -635,7 +631,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return '';
         }
 
-        return Butler::first(array_keys($this->series));
+        return A::first(array_keys($this->series));
     }
 
 
@@ -650,7 +646,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return '';
         }
 
-        return Butler::first(array_values($this->series));
+        return A::first(array_values($this->series));
     }
 
 
@@ -698,9 +694,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports height (in cm)
      *
-     * @return array|string
+     * @return string
      */
-    public function height()
+    public function height(): string
     {
         if (!isset($this->source['Höhe'])) {
             return '';
@@ -713,9 +709,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports width (in cm)
      *
-     * @return array|string
+     * @return string
      */
-    public function width()
+    public function width(): string
     {
         if (!isset($this->source['Breite'])) {
             return '';
@@ -728,9 +724,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports depth (in cm)
      *
-     * @return array|string
+     * @return string
      */
-    public function depth()
+    public function depth(): string
     {
         if (!isset($this->source['Tiefe'])) {
             return '';
@@ -750,7 +746,7 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
     protected function buildDimensions(): string
     {
-        return Butler::join(array_filter([
+        return A::join(array_filter([
             $this->height(),
             $this->width(),
             $this->depth(),
@@ -843,7 +839,7 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports language(s)
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return string|array
      */
     public function languages(bool $asArray = false)
@@ -856,7 +852,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             return $this->languages;
         }
 
-        return Butler::join($this->languages, ', ');
+        return A::join($this->languages, ', ');
     }
 
 
@@ -942,7 +938,7 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

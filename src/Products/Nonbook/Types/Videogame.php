@@ -2,7 +2,8 @@
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 
@@ -77,7 +78,7 @@ class Videogame extends Item {
         # Detect platforms
         # (1) Check for console gaming
         foreach ($array as $key => $value) {
-            if (Butler::contains($this->source['AutorSachtitel'], $key)) {
+            if (Str::contains($this->source['AutorSachtitel'], $key)) {
                 $platforms[] = $value;
             }
         }
@@ -97,7 +98,7 @@ class Videogame extends Item {
     /**
      * Exports supported platforms
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return string|array
      */
     public function platforms(bool $asArray = false)
@@ -106,7 +107,7 @@ class Videogame extends Item {
             return $this->platforms;
         }
 
-        return Butler::join($this->platforms, '; ');
+        return A::join($this->platforms, '; ');
     }
 
 
@@ -138,7 +139,7 @@ class Videogame extends Item {
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

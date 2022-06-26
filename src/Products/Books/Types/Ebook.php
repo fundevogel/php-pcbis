@@ -2,8 +2,10 @@
 
 namespace Fundevogel\Pcbis\Products\Books\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Products\Books\Book;
+
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 
 
 /**
@@ -88,25 +90,25 @@ class Ebook extends Book {
             return [];
         }
 
-        $string = Butler::last(Butler::split($this->source['Utitel'], 'Unterstützte Lesegerätegruppen:'));
+        $string = A::last(Str::split($this->source['Utitel'], 'Unterstützte Lesegerätegruppen:'));
 
-        return Butler::split(Butler::replace($string, ['MAC', 'Tabl'], ['Mac', 'Tablet']), '/');
+        return Str::split(Str::replace($string, ['MAC', 'Tabl'], ['Mac', 'Tablet']), '/');
     }
 
 
     /**
      * Exports supported devices
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
-     * @return string|array
+     * @param bool $asArray Whether to export an array (rather than a string)
+     * @return array|string
      */
-    public function devices(bool $asArray = false)
+    public function devices(bool $asArray = false): array|string
     {
         if ($asArray) {
             return $this->devices;
         }
 
-        return Butler::join($this->devices, ' / ');
+        return A::join($this->devices, ' / ');
     }
 
 
@@ -147,7 +149,7 @@ class Ebook extends Book {
             return '';
         }
 
-        $kilobytes = (int) Butler::replace($this->source['DateiGroesse'], ' KB', '');
+        $kilobytes = (int) Str::replace($this->source['DateiGroesse'], ' KB', '');
 
         return number_format($kilobytes / 1024, 2) . ' MB';
     }
@@ -175,7 +177,7 @@ class Ebook extends Book {
             return '';
         }
 
-        return Butler::lower($this->source['DateiFormat']);
+        return Str::lower($this->source['DateiFormat']);
     }
 
 
@@ -239,18 +241,18 @@ class Ebook extends Book {
             return '';
         }
 
-        if (Butler::startsWith($this->source['Utitel'], 'Unterstützte Lesegerätegruppen')) {
+        if (Str::startsWith($this->source['Utitel'], 'Unterstützte Lesegerätegruppen')) {
             return '';
         }
 
-        return Butler::first(Butler::split($this->source['Utitel'], '.'));
+        return A::first(Str::split($this->source['Utitel'], '.'));
     }
 
 
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

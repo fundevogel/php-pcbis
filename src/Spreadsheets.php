@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis;
 
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 
 
 /**
@@ -30,9 +31,9 @@ class Spreadsheets
     /**
      * Turns data from a single CSV file into a PHP array
      *
-     * @param string $file - Source CSV file to read data from
-     * @param array $headers - Header names for CSV data rows
-     * @param string $delimiter - Delimiting character
+     * @param string $file Source CSV file to read data from
+     * @param array $headers Header names for CSV data rows
+     * @param string $delimiter Delimiting character
      * @return array
      */
     public static function csvOpen(string $file, ?array $headers = null, string $delimiter = ';'): array
@@ -49,7 +50,7 @@ class Spreadsheets
             # (3) Extract CSV data
             $csv = array_map(function($d) use ($delimiter) {
                 # Encode CSV data as UTF-8 (if necessary)
-                if (Butler::encoding($d) != 'UTF-8') {
+                if (Str::encoding($d) != 'UTF-8') {
                     $d = utf8_encode($d);
                 }
 
@@ -75,7 +76,7 @@ class Spreadsheets
                 }
 
                 # Encode CSV data as UTF-8 (if necessary)
-                if (Butler::encoding($row[0]) !== 'UTF-8') {
+                if (Str::encoding($row[0]) !== 'UTF-8') {
                     $row = array_map('utf8_encode', $row);
                 }
 
@@ -94,8 +95,8 @@ class Spreadsheets
      *
      * This only works with files exported from `pcbis.de`
      *
-     * @param string $file - Source CSV file to read data from
-     * @param string $delimiter - Delimiting character
+     * @param string $file Source CSV file to read data from
+     * @param string $delimiter Delimiting character
      * @return array
      */
     public static function csv2array(string $file, string $delimiter = ';'): array
@@ -122,17 +123,17 @@ class Spreadsheets
             'Kommentar'
         ];
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../resources/binding_codes.json'), true);
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../data/binding_codes.json'), true);
 
         foreach (self::csvOpen($file, $headers, $delimiter) as $array) {
             # Gathering & processing generic book information
             $string = $array['Informationen'];
 
             # Determine separator
-            $infos = Butler::split($string, ';');
+            $infos = Str::split($string, ';');
 
             if (count($infos) === 1) {
-                $infos = Butler::split($string, '.');
+                $infos = Str::split($string, '.');
             }
 
             # Extract variables from info string
@@ -142,24 +143,24 @@ class Spreadsheets
 
             foreach ($array as $entry) {
                 # Remove garbled book dimensions
-                if (Butler::contains($entry, ' cm') || Butler::contains($entry, ' mm')) {
+                if (Str::contains($entry, ' cm') || Str::contains($entry, ' mm')) {
                     unset($array[array_search($entry, $array)]);
                 }
 
                 # Filter age
-                if (Butler::contains($entry, ' J.') || Butler::contains($entry, ' Mon.')) {
+                if (Str::contains($entry, ' J.') || Str::contains($entry, ' Mon.')) {
                     $age = self::convertAge($entry);
                     unset($array[array_search($entry, $array)]);
                 }
 
                 # Filter page count
-                if (Butler::contains($entry, ' S.')) {
+                if (Str::contains($entry, ' S.')) {
                     $pageCount = self::convertPageCount($entry);
                     unset($array[array_search($entry, $array)]);
                 }
 
                 # Filter year (almost always right at this point)
-                if (Butler::length($entry) == 4) {
+                if (Str::length($entry) == 4) {
                     $year = $entry;
                     unset($array[array_search($entry, $array)]);
                 }
@@ -167,11 +168,11 @@ class Spreadsheets
 
             $info = ucfirst(implode(', ', $array));
 
-            if (Butler::length($info) > 0) {
-                $info = Butler::replace($info, '.', '') . '.';
+            if (Str::length($info) > 0) {
+                $info = Str::replace($info, '.', '') . '.';
             }
 
-            $array = Butler::update($array, [
+            $array = A::update($array, [
                 # Add blanks to prevent column shifts
                 'Titel' => self::convertTitle($array['Titel']),
                 'Untertitel' => '',
@@ -189,16 +190,16 @@ class Spreadsheets
             $data[] = self::sortArray($array);
         }
 
-        return Butler::sort($data, 'AutorIn', 'asc');
+        return A::sort($data, 'AutorIn', 'asc');
     }
 
 
     /**
      * Turns a PHP array into CSV file
      *
-     * @param array $array - Source PHP array to read data from
-     * @param string $file - Destination CSV file to write data to
-     * @param string $delimiter - Separator character
+     * @param array $array Source PHP array to read data from
+     * @param string $file Destination CSV file to write data to
+     * @param string $delimiter Separator character
      * @return bool
      */
     public static function array2csv(array $array, string $file, string $delimiter = ','): bool
@@ -232,30 +233,29 @@ class Spreadsheets
     /**
      * Builds 'Titel' attribute as exported with pcbis.de
      *
-     * @param string $string - Title string
+     * @param string $string Title string
      * @return string
      */
-    protected static function convertTitle($string)
+    protected static function convertTitle(string $string): string
     {
         # Input: Book title.
         # Output: Book title
-        return Butler::substr($string, 0, -1);
+        return Str::substr($string, 0, -1);
     }
 
 
     /**
      * Builds 'Altersangabe' attribute as exported with pcbis.de
      *
-     * @param string $string - Altersangabe string
-     *
-     * @return array|string
+     * @param string $string Altersangabe string
+     * @return string
      */
-    protected static function convertAge($string)
+    protected static function convertAge(string $string): string
     {
-      	$string = Butler::replace($string, 'J.', 'Jahren');
-      	$string = Butler::replace($string, 'Mon.', 'Monaten');
-      	$string = Butler::replace($string, '-', ' bis ');
-      	$string = Butler::replace($string, 'u.', '&');
+      	$string = Str::replace($string, 'J.', 'Jahren');
+      	$string = Str::replace($string, 'Mon.', 'Monaten');
+      	$string = Str::replace($string, '-', ' bis ');
+      	$string = Str::replace($string, 'u.', '&');
 
       	return $string;
     }
@@ -264,9 +264,10 @@ class Spreadsheets
     /**
      * Builds 'Seitenzahl' attribute as exported with pcbis.de
      *
-     * @param string $string - Seitenzahl string
+     * @param string $string Seitenzahl string
+     * @return int
      */
-    protected static function convertPageCount($string): int
+    protected static function convertPageCount(string $string): int
     {
         return (int) $string;
     }
@@ -275,16 +276,15 @@ class Spreadsheets
     /**
      * Builds 'Preis' attribute as exported with pcbis.de
      *
-     * @param string $string - Preis string
-     *
-     * @return array|string
+     * @param string $string Preis string
+     * @return string
      */
-    protected static function convertPrice($string)
+    protected static function convertPrice($string): string
     {
         # Input: XX.YY EUR
         # Output: XX,YY €
-        $string = Butler::replace($string, 'EUR', '€');
-        $string = Butler::replace($string, '.', ',');
+        $string = Str::replace($string, 'EUR', '€');
+        $string = Str::replace($string, '.', ',');
 
         return $string;
     }
@@ -293,11 +293,11 @@ class Spreadsheets
     /**
      * Sorts a given array holding book information by certain sort order
      *
-     * @param array $array - Input that should be sorted
+     * @param array $array Input that should be sorted
      * @return array
      * TODO: https://www.php.net/manual/en/function.usort.php#25360
      */
-    protected static function sortArray(array $array)
+    protected static function sortArray(array $array): array
     {
         $sortOrder = [
             'AutorIn',

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fundevogel\Pcbis\Api;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Traits\OlaStatus;
 
 use stdClass;

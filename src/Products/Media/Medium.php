@@ -2,7 +2,8 @@
 
 namespace Fundevogel\Pcbis\Products\Media;
 
-use Fundevogel\Pcbis\Helpers\Butler;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Product;
 
 
@@ -61,20 +62,25 @@ class Medium extends Product
     /**
      * Builds duration
      *
-     * @return array|string
+     * @return string
      */
-    protected function buildDuration()
+    protected function buildDuration(): string
     {
         if (!isset($this->source['Utitel'])) {
             return '';
         }
 
-        $array = Butler::split($this->source['Utitel'], '.');
+        $array = Str::split($this->source['Utitel'], '.');
 
-        return Butler::replace(Butler::last($array), ' Min', '');
+        return Str::replace(A::last($array), ' Min', '');
     }
 
 
+    /**
+     * Exports duration
+     *
+     * @return string
+     */
     public function duration(): string
     {
         return $this->duration;
@@ -84,10 +90,11 @@ class Medium extends Product
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array {
+    public function export(bool $asArray = false): array
+    {
         return array_merge(
             # Build dataset
             parent::export($asArray), [

@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Products\Books\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Products\Books\Book;
 
 
@@ -156,7 +155,7 @@ class Schoolbook extends Book {
             # .. as well as known subjects ..
             foreach ($subjects as $key => $value) {
                 # .. and see what sticks
-                if (Butler::contains(Butler::lower($string), $key)) {
+                if (Str::contains(Str::lower($string), $key)) {
                     return $value;
                 }
             }
@@ -184,7 +183,7 @@ class Schoolbook extends Book {
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

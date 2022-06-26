@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Products\Media\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Products\Media\Medium;
 
 
@@ -35,7 +34,7 @@ class Movie extends Medium {
         # Loop over suspicious strings ..
         foreach ($array as $string) {
             # .. and in case of a match ..
-            if (Butler::contains($this->source['AutorSachtitel'], $string)) {
+            if (Str::contains($this->source['AutorSachtitel'], $string)) {
                 # .. reset author
                 return [];
             }
@@ -69,7 +68,7 @@ class Movie extends Medium {
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

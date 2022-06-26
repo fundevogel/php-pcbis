@@ -2,8 +2,6 @@
 
 namespace Fundevogel\Pcbis\Traits;
 
-use Fundevogel\Pcbis\Helpers\Butler;
-
 
 /**
  * Trait OlaStatus

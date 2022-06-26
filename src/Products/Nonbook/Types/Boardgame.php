@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\Butler;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 
@@ -105,7 +104,7 @@ class Boardgame extends Item {
             if (isset($this->source['IndexStichw']) && is_array($this->source['IndexStichw']) === true) {
                 foreach ($this->source['IndexStichw'] as $index => $tag) {
                     # Match each tag for term 'playing time' ..
-                    if (Butler::contains(Butler::lower($tag), 'spieldauer')) {
+                    if (Str::contains(Str::lower($tag), 'spieldauer')) {
                         # .. which means the next entry contains playing time ..
                         $playingTime = $this->source['IndexStichw'][$index + 1];
 
@@ -139,7 +138,7 @@ class Boardgame extends Item {
     /**
      * Exports all data
      *
-     * @param bool $asArray - Whether to export an array (rather than a string)
+     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
     public function export(bool $asArray = false): array

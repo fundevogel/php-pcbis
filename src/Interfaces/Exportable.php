@@ -2,8 +2,6 @@
 
 namespace Fundevogel\Pcbis\Interfaces;
 
-use Fundevogel\Pcbis\Helpers\Butler;
-
 
 /**
  * Interface Exportable
