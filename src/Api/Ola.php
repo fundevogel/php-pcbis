@@ -3,7 +3,9 @@
 namespace Fundevogel\Pcbis\Api;
 
 use Fundevogel\Pcbis\Helpers\Butler;
-use Pcbis\Traits\OlaStatus;
+use Fundevogel\Pcbis\Traits\OlaStatus;
+
+use stdClass;
 
 
 /**
@@ -160,7 +162,7 @@ class Ola
      *
      * @return \stdClass
      */
-    public function showSource(): \stdClass
+    public function showSource(): stdClass
     {
         return $this->data;
     }

@@ -2,17 +2,19 @@
 
 namespace Fundevogel\Pcbis\Products;
 
+use Fundevogel\Pcbis\Api\Ola;
+
 use Fundevogel\Pcbis\Helpers\Butler;
 
-use Pcbis\Interfaces\Exportable;
-use Pcbis\Interfaces\Sociable;
-use Pcbis\Interfaces\Taggable;
+use Fundevogel\Pcbis\Interfaces\Exportable;
+use Fundevogel\Pcbis\Interfaces\Sociable;
+use Fundevogel\Pcbis\Interfaces\Taggable;
 
-use Pcbis\Traits\DownloadCover;
-use Pcbis\Traits\OlaStatus;
-use Pcbis\Traits\People;
-use Pcbis\Traits\Tags;
-use Pcbis\Traits\Type;
+use Fundevogel\Pcbis\Traits\DownloadCover;
+use Fundevogel\Pcbis\Traits\OlaStatus;
+use Fundevogel\Pcbis\Traits\People;
+use Fundevogel\Pcbis\Traits\Tags;
+use Fundevogel\Pcbis\Traits\Type;
 
 use DOMDocument;
 
@@ -42,9 +44,9 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Object granting access to KNV's API
      *
-     * @var \Pcbis\Webservice
+     * @var \Fundevogel\Pcbis\Webservice
      */
-    private $api = null;
+    private $api;
 
 
     /**
@@ -260,7 +262,7 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Loads & returns predecessor
      *
-     * @return ProductList|self
+     * @return self
      */
     public function downgrade()
     {
@@ -286,7 +288,7 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Loads & returns successor
      *
-     * @return ProductList|self
+     * @return self
      */
     public function upgrade()
     {
@@ -301,9 +303,10 @@ abstract class Product implements Exportable, Sociable, Taggable
     /**
      * Exports OLA record
      *
-     * @return \Pcbis\Api\Ola
+     * @param int $quantity Number of products to be delivered
+     * @return \Fundevogel\Pcbis\Api\Ola
      */
-    public function ola(int $quantity = 1): \Pcbis\Api\Ola
+    public function ola(int $quantity = 1): Ola
     {
         return $this->api->ola($this->isbn, $quantity);
     }

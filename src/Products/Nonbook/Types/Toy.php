@@ -2,7 +2,7 @@
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
-use Pcbis\Products\Nonbook\Item;
+use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 
 /**

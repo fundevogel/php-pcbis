@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+/**
+ * Simple PHP wrapper for pcbis.de API
+ *
+ * @link https://codeberg.org/Fundevogel/php-pcbis
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
+ * @version 3.0.0-beta.1
+ */
+
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Helpers\Butler;

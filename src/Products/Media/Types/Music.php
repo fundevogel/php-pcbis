@@ -2,7 +2,7 @@
 
 namespace Fundevogel\Pcbis\Products\Media\Types;
 
-use Pcbis\Products\Media\Medium;
+use Fundevogel\Pcbis\Products\Media\Medium;
 
 
 /**

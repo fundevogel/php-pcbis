@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * PHPCBIS - pcbis.de helper library
+ * Simple PHP wrapper for pcbis.de API
  *
  * @link https://codeberg.org/Fundevogel/php-pcbis
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
@@ -10,16 +12,15 @@
 
 namespace Fundevogel\Pcbis;
 
-use Pcbis\Api\Ola;
+use Fundevogel\Pcbis\Api\Ola;
 
-use Pcbis\Exceptions\IncompatibleClientException;
-use Pcbis\Exceptions\InvalidLoginException;
-use Pcbis\Exceptions\NoRecordFoundException;
+use Fundevogel\Pcbis\Exceptions\IncompatibleClientException;
+use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
+use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
 
 use Fundevogel\Pcbis\Helpers\Butler;
 
-use Pcbis\Products\Factory;
-use Pcbis\Products\ProductList;
+use Fundevogel\Pcbis\Products\Factory;
 
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -27,6 +28,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Exception;
 use SoapClient;
 use SoapFault;
+use stdClass;
 
 
 /**
@@ -65,7 +67,7 @@ class Webservice
 
 
     /**
-     * Cache object storing product data fetched from KNV's API
+     * Cache storing data fetched from KNV's API
      *
      * @var \Symfony\Component\Cache\Adapter\FilesystemAdapter
      */
@@ -97,7 +99,7 @@ class Webservice
             }
 
             # Authenticate with API (if necessary)
-            if ($credentials !== null) {
+            if (!is_null($credentials)) {
                 $this->sessionID = $this->logIn($credentials);
             }
 
@@ -131,7 +133,7 @@ class Webservice
      * Uses credentials to log into KNV's API & generates a sessionID
      *
      * @param array $credentials Login credentials
-     * @throws \Pcbis\Exceptions\InvalidLoginException
+     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
      * @return string
      */
     private function logIn(array $credentials): string
@@ -166,8 +168,8 @@ class Webservice
      *
      * .. if product for given EAN/ISBN exists
      *
-     * @param string $identifier
-     * @throws \Pcbis\Exceptions\InvalidLoginException
+     * @param string $identifier Product EAN/ISBN
+     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
      * @return array
      */
     private function query(string $identifier)
@@ -224,8 +226,8 @@ class Webservice
      * Fetches information from cache if they exist,
      * otherwise loads them & saves to cache
      *
-     * @param string $identifier - A given product's EAN/ISBN
-     * @param bool $forceRefresh - Whether to update cached data
+     * @param string $identifier Product EAN/ISBN
+     * @param bool $forceRefresh Whether to update cached data
      * @return array
      */
     public function fetch(string $identifier, bool $forceRefresh = false): array
@@ -245,11 +247,11 @@ class Webservice
      * Instantiates `Product` object from single EAN/ISBN
      *
      * @param string $identifier Product EAN/ISBN
-     * @param bool $forceRefresh - Whether to update cached data
+     * @param bool $forceRefresh Whether to update cached data
      *
-     * @return Products\Books\Types\Ebook|Products\Books\Types\Hardcover|Products\Books\Types\Schoolbook|Products\Books\Types\Softcover|Products\Media\Types\Audiobook|Products\Media\Types\Movie|Products\Media\Types\Music|Products\Media\Types\Sound|Products\Nonbook\Types\Boardgame|Products\Nonbook\Types\Calendar|Products\Nonbook\Types\Map|Products\Nonbook\Types\Nonbook|Products\Nonbook\Types\Notes|Products\Nonbook\Types\Software|Products\Nonbook\Types\Stationery|Products\Nonbook\Types\Toy|Products\Nonbook\Types\Videogame
+     * @return \Fundevogel\Pcbis\Products\Product
      */
-    private function factory(string $identifier, bool $forceRefresh)
+    public function load(string $identifier, bool $forceRefresh = false)
     {
         # Fetch raw data for given ISBN
         $data = $this->fetch($identifier, $forceRefresh);
@@ -259,47 +261,17 @@ class Webservice
 
 
     /**
-     * Instantiates `Product` object from single EAN/ISBN
-     *
-     * @param string|array $data - Product EAN/ISBN
-     * @param bool $forceRefresh - Whether to update cached data
-     *
-     * @return \Pcbis\Products\Product|\Pcbis\Products\ProductList
-     */
-    public function load($data, bool $forceRefresh = false)
-    {
-        # If input is string ..
-        if (is_string($data)) {
-            # .. return single product
-            return $this->factory($data, $forceRefresh);
-        }
-
-        # .. otherwise return product list
-        $array = [];
-
-        foreach ($data as $identifier) {
-            $array[] = $this->factory($identifier, $forceRefresh);
-        }
-
-        return new ProductList($array);
-    }
-
-
-    /**
      * Checks if product is available for delivery via OLA query
      *
-     * @param string $identifier -Product EAN/ISBN
-     * @param int $quantity - Number of products to be delivered
-     * @return \Pcbis\Api\Ola
+     * @param string $identifier Product EAN/ISBN
+     * @param int $quantity Number of products to be delivered
      */
-    public function ola(string $identifier, int $quantity = 1): Ola
+    public function ola(string $identifier, int $quantity = 1): stdClass
     {
         /**
-         * Fetch from cache (if needed)
-         *
-         * @var \stdClass
+         * @var stdClass
          */
-        $ola = $this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): \stdClass
+        return new Ola($this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): stdClass
         {
             # Expire after one hour
             $item->expiresAfter(3600);
@@ -315,8 +287,6 @@ class Webservice
                     ],
                 ],
             ]);
-        });
-
-        return new Ola($ola);
+        }));
     }
 }

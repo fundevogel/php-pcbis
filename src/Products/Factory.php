@@ -2,27 +2,27 @@
 
 namespace Fundevogel\Pcbis\Products;
 
-use Pcbis\Exceptions\UnknownTypeException;
+use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
 
-use Pcbis\Products\Books\Types\Ebook;
-use Pcbis\Products\Books\Types\Hardcover;
-use Pcbis\Products\Books\Types\Schoolbook;
-use Pcbis\Products\Books\Types\Softcover;
+use Fundevogel\Pcbis\Products\Books\Types\Ebook;
+use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
+use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
+use Fundevogel\Pcbis\Products\Books\Types\Softcover;
 
-use Pcbis\Products\Media\Types\Audiobook;
-use Pcbis\Products\Media\Types\Movie;
-use Pcbis\Products\Media\Types\Music;
-use Pcbis\Products\Media\Types\Sound;
+use Fundevogel\Pcbis\Products\Media\Types\Audiobook;
+use Fundevogel\Pcbis\Products\Media\Types\Movie;
+use Fundevogel\Pcbis\Products\Media\Types\Music;
+use Fundevogel\Pcbis\Products\Media\Types\Sound;
 
-use Pcbis\Products\Nonbook\Types\Boardgame;
-use Pcbis\Products\Nonbook\Types\Calendar;
-use Pcbis\Products\Nonbook\Types\Map;
-use Pcbis\Products\Nonbook\Types\Nonbook;
-use Pcbis\Products\Nonbook\Types\Notes;
-use Pcbis\Products\Nonbook\Types\Software;
-use Pcbis\Products\Nonbook\Types\Stationery;
-use Pcbis\Products\Nonbook\Types\Toy;
-use Pcbis\Products\Nonbook\Types\Videogame;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Boardgame;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Calendar;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Map;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Nonbook;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Notes;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
 
 /**
@@ -38,7 +38,7 @@ final class Factory
      * @param array $source - Source data fetched from KNV's API
      * @param array $props - Properties being passed to product
      *
-     * @throws \Pcbis\Exceptions\UnknownTypeException
+     * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
      *
      * @return Audiobook|Boardgame|Calendar|Ebook|Hardcover|Map|Movie|Music|Nonbook|Notes|Schoolbook|Softcover|Software|Sound|Stationery|Toy|Videogame
      */

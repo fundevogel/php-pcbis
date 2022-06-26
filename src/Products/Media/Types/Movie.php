@@ -3,7 +3,7 @@
 namespace Fundevogel\Pcbis\Products\Media\Types;
 
 use Fundevogel\Pcbis\Helpers\Butler;
-use Pcbis\Products\Media\Medium;
+use Fundevogel\Pcbis\Products\Media\Medium;
 
 
 /**

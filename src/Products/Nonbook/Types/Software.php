@@ -3,7 +3,7 @@
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
 use Fundevogel\Pcbis\Helpers\Butler;
-use Pcbis\Products\Nonbook\Item;
+use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 
 /**

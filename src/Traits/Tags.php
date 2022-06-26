@@ -173,7 +173,7 @@ trait Tags
     /**
      * @return array|string
      */
-    private function exportTag(array $property, bool $asArray, string $delimiter)
+    private function exportTag($property, bool $asArray, string $delimiter)
     {
         if ($asArray) {
             return $property;

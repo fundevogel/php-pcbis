@@ -3,7 +3,7 @@
 namespace Fundevogel\Pcbis\Products\Books;
 
 use Fundevogel\Pcbis\Helpers\Butler;
-use Pcbis\Products\Product;
+use Fundevogel\Pcbis\Products\Product;
 
 
 /**
@@ -38,7 +38,7 @@ class Book extends Product
      *
      * @var string
      */
-    protected $antolin = '';
+    protected $antolin;
 
 
     /**
@@ -50,10 +50,10 @@ class Book extends Product
         parent::__construct($source, $props);
 
         # Extend dataset
-        $this->publisher    = $this->buildPublisher();
-        $this->binding      = $this->buildBinding();
-        $this->pageCount    = $this->buildPageCount();
-        $this->antolin      = $this->buildAntolin();
+        $this->publisher = $this->buildPublisher();
+        $this->binding   = $this->buildBinding();
+        $this->pageCount = $this->buildPageCount();
+        $this->antolin   = $this->buildAntolin();
     }
 
 
