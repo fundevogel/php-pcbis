@@ -120,6 +120,6 @@ final class Factory
             }
         }
 
-        throw new UnknownTypeException('Unknown type: "' . $group . '"');
+        throw new UnknownTypeException(sprintf('Unknown type: "%s"', $group));
     }
 }

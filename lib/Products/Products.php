@@ -315,7 +315,7 @@ abstract class Products implements Countable, Iterator
      * @param bool $unique
      * @return array
      */
-    public function pluck(string $field, string $split = null, bool $unique = false): array
+    public function pluck(string $field, ?string $split = null, bool $unique = false): array
     {
         $result = [];
 

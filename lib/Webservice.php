@@ -237,20 +237,10 @@ class Webservice
             $this->cache->delete($identifier);
         }
 
-        # Data might be cached already ..
-        $fromCache = true;
-
-        $data = $this->cache->get($identifier, function (ItemInterface $item) use ($identifier, $fromCache) {
-            # .. turns out, it was not
-            $fromCache = false;
-
+        return $this->cache->get($identifier, function (ItemInterface $item) use ($identifier): array
+        {
             return $this->query($identifier);
         });
-
-        return [
-            'data' => $data,
-            'fromCache' => $fromCache,
-        ];
     }
 
 
@@ -267,13 +257,7 @@ class Webservice
         # Fetch raw data for given ISBN
         $data = $this->fetch($identifier, $forceRefresh);
 
-        $props = [
-            'api'        => $this,
-            'fromCache'  => $data['fromCache'],
-            'identifier' => $identifier,
-        ];
-
-        return Factory::factory($data['data'], $props);
+        return Factory::factory($data, ['api' => $this, 'identifier' => $identifier]);
     }
 
 
@@ -316,9 +300,10 @@ class Webservice
         /**
          * Fetch from cache (if needed)
          *
-         * @var \Pcbis\Api\Ola
+         * @var \stdClass
          */
-        $ola = $this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity) {
+        $ola = $this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): \stdClass
+        {
             # Expire after one hour
             $item->expiresAfter(3600);
 
@@ -335,6 +320,6 @@ class Webservice
             ]);
         });
 
-        return new Ola($ola->OLAResponse->OLAResponseRecord);
+        return new Ola($ola);
     }
 }

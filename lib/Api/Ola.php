@@ -112,19 +112,19 @@ class Ola
 
     public function __construct(\stdClass $data)
     {
-        $this->data = $data;
+        $this->data = $data->OLAResponse->OLAResponseRecord;
 
         # Whether OLA query for given product was successfull
         # Note: This doesn't convern given product's availability!
-        $this->success = $data->StatusPosition === 'OK' ? true : false;
+        $this->success = $this->data->StatusPosition === 'OK' ? true : false;
 
         # Number of items ordered & available for order
-        $this->quantityOrdered = $data->Bestellmenge;
-        $this->quantityAvailable = $data->Lieferbaremenge;
+        $this->quantityOrdered = $this->data->Bestellmenge;
+        $this->quantityAvailable = $this->data->Lieferbaremenge;
 
         # Set OLA code & message
-        if (isset($data->Meldenummer)) {
-            $this->olaCode = (string) $data->Meldenummer;
+        if (isset($this->data->Meldenummer)) {
+            $this->olaCode = (string) $this->data->Meldenummer;
         }
 
         if (array_key_exists($this->olaCode, $this->olaMessages)) {
@@ -132,14 +132,14 @@ class Ola
         }
 
         # Set error code & error message
-        if (isset($data->Fehlercode)) {
-            $this->errorCode = (string) $data->Fehlercode;
+        if (isset($this->data->Fehlercode)) {
+            $this->errorCode = (string) $this->data->Fehlercode;
         }
 
         if (array_key_exists($this->errorCode, $this->errorMessages)) {
             $this->errorMessage = $this->errorMessages[$this->errorCode];
-        } elseif (isset($data->Fehlertext)) {
-            $this->errorMessage = $data->Fehlertext;
+        } elseif (isset($this->data->Fehlertext)) {
+            $this->errorMessage = $this->data->Fehlertext;
         }
     }
 

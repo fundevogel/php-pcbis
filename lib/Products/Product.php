@@ -66,14 +66,6 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Whether source data was fetched from cache
-     *
-     * @var bool
-     */
-    protected $fromCache;
-
-
-    /**
      * Type of product
      *
      * @var string
@@ -179,11 +171,8 @@ abstract class Product implements Exportable, Sociable, Taggable
 
     public function __construct(array $source, array $props)
     {
-        # Store source data, fetched from KNV's API ..
+        # Store source data
         $this->source = $source;
-
-        # .. or from cache?
-        $this->fromCache = $props['fromCache'];
 
         # Store API proxy
         $this->api = $props['api'];
@@ -393,7 +382,7 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
     protected function buildSubtitle(): string
     {
-        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
+        if (!isset($this->source['Utitel']) || is_null($this->source['Utitel']) == null) {
             return '';
         }
 
