@@ -33,6 +33,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
+        "ext-mbstring": "*",
         "guzzlehttp/guzzle": "^7.4.5",
         "symfony/cache": "^5.4.9 || ^6.0.9"
     },
