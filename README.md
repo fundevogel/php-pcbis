@@ -52,36 +52,7 @@ try {
 }
 ```
 
-If you want to load multiple books at once, you may pass their ISBNs to `loadBooks()`, like this:
-
-```php
-<?php
-
-require_once('vendor/autoload.php');
-
-$object = new Fundevogel\Pcbis\Webservice;
-
-try {
-    $isbns = [
-        '978-3-522-20255-8',
-        '978-3-522-20072-1',
-        '978-3-12-674104-0',
-        '978-0-14-031753-4',
-        '978-3-522-20210-7',
-        '978-3-95751-338-0',
-    ];
-
-    $books = $object->loadBooks($isbns);
-
-    foreach ($books as $book) {
-        echo $book->title();
-    }
-} catch (\Exception $e) {
-    echo 'Error: ' . $e->getMessage(), "\n";
-}
-```
-
-**Note**: If you want to validate and/or format (= hyphenate) ISBNs beforehand, have a look at [`biblys/isbn`](https://github.com/biblys/isbn) and [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn):
+**Note**: Starting with v3, ISBN validation is no longer part of this project. If you need to validate and/or format (= hyphenate) ISBNs beforehand, please have a look at [`biblys/isbn`](https://github.com/biblys/isbn) and [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn):
 
 ```php
 use Nicebooks\Isbn\Isbn;
