@@ -32,19 +32,18 @@
         "issues": "https://codeberg.org/fundevogel/php-pcbis/issues"
     },
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-mbstring": "*",
         "guzzlehttp/guzzle": "^7.4.5",
-        "symfony/cache": "^5.4.9 || ^6.0.9"
+        "symfony/cache": "^6.0.9"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
         "mikey179/vfsstream": "^1.6",
-        "phpunit/phpunit": "^8.5 || ^9.0",
+        "phpunit/phpunit": "^9.0",
         "vimeo/psalm": "^4.23"
     },
     "suggest": {
-        "biblys/isbn": "Provides ISBN functionality such as validation, formatting & more.",
         "nicebooks/isbn": "Provides ISBN functionality such as validation, formatting & more."
     },
     "autoload": {
