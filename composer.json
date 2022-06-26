@@ -5,7 +5,7 @@
     "keywords": ["pcbis", "knv", "api"],
     "homepage": "https://codeberg.org/fundevogel/php-pcbis",
     "license": "GPL-3.0",
-    "version": "3.0.0-beta.1",
+    "version": "3.0.0-beta.2",
     "scripts": {
         "cs-dry": "php-cs-fixer fix --diff --dry-run",
         "cs-fix": "php-cs-fixer fix --diff",
