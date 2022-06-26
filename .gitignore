@@ -1,12 +1,13 @@
-# Composer + sensitive files
-/composer.lock
-/login.json
-/*.cache
+# Composer
 /vendor
+/composer.lock
 
-# Auto-generated
-/dist
+# Cache
+*.cache
 
-# Tests
-/tests/fixtures/**/test_*.csv
-/tests/fixtures/**/test_*.jpg
+# Pages
+.phpdoc
+/pages
+
+# Misc
+/login.json

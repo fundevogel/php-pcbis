@@ -7,8 +7,8 @@
     "license": "GPL-3.0",
     "version": "3.0.0-beta.1",
     "scripts": {
-        "cs-dry": "php-cs-fixer fix --dry-run --diff",
-        "cs-fix": "php-cs-fixer fix",
+        "cs-dry": "php-cs-fixer fix --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix --diff",
         "test": "phpunit"
     },
     "authors": [

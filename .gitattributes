@@ -1,0 +1,12 @@
+# Set default behaviour to automatically normalize line endings
+* text=auto
+
+# Git stuff
+.gitignore export-ignore
+.gitattributes export-ignore
+
+# Tests
+tests/ export-ignore
+psalm.xml.dist export-ignore
+phpunit.xml.dist export-ignore
+.php-cs-fixer.dist.php export-ignore
