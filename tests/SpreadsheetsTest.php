@@ -1,6 +1,6 @@
 <?php
 
-namespace Pcbis\Tests;
+namespace Fundevogel\Pcbis\Tests;
 
 use Fundevogel\Pcbis\Spreadsheets;
 
