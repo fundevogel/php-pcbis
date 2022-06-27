@@ -8,7 +8,6 @@ use Fundevogel\Pcbis\Traits\OlaStatus;
 
 use stdClass;
 
-
 /**
  * Class Ola
  *

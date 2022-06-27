@@ -4,7 +4,6 @@ namespace Fundevogel\Pcbis\Products\Books;
 
 use Fundevogel\Pcbis\Products\Product;
 
-
 /**
  * Class Book
  *
@@ -168,21 +167,23 @@ class Book extends Product
     {
         return array_merge(
             # Build dataset
-            parent::export($asArray), [
-            # (1) 'Book' specific data
-            'Einband'       => $this->binding(),
-            'Seitenzahl'    => $this->pageCount(),
-            'Antolin'       => $this->antolin(),
+            parent::export($asArray),
+            [
+                # (1) 'Book' specific data
+                'Einband'       => $this->binding(),
+                'Seitenzahl'    => $this->pageCount(),
+                'Antolin'       => $this->antolin(),
 
-            # (2) Extension 'People'
-            'AutorIn'       => $this->getRole('author', $asArray),
-            'Vorlage'       => $this->getRole('original', $asArray),
-            'IllustratorIn' => $this->getRole('illustrator', $asArray),
-            'ZeichnerIn'    => $this->getRole('drawer', $asArray),
-            'PhotographIn'  => $this->getRole('photographer', $asArray),
-            'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
-            'HerausgeberIn' => $this->getRole('editor', $asArray),
-            'MitarbeiterIn' => $this->getRole('participant', $asArray),
-        ]);
+                # (2) Extension 'People'
+                'AutorIn'       => $this->getRole('author', $asArray),
+                'Vorlage'       => $this->getRole('original', $asArray),
+                'IllustratorIn' => $this->getRole('illustrator', $asArray),
+                'ZeichnerIn'    => $this->getRole('drawer', $asArray),
+                'PhotographIn'  => $this->getRole('photographer', $asArray),
+                'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
+                'HerausgeberIn' => $this->getRole('editor', $asArray),
+                'MitarbeiterIn' => $this->getRole('participant', $asArray),
+            ]
+        );
     }
 }

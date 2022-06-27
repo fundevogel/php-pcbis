@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Interfaces;
 
-
 /**
  * Interface Sociable
  *

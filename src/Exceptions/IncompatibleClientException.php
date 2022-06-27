@@ -2,8 +2,9 @@
 
 namespace Fundevogel\Pcbis\Exceptions;
 
-
 /**
  * Class IncompatibleClientException
  */
-class IncompatibleClientException extends KNVException {}
+class IncompatibleClientException extends KNVException
+{
+}

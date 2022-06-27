@@ -5,13 +5,13 @@ namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
-
 /**
  * Class Software
  *
  * KNV product category 'Software'
  */
-class Software extends Item {
+class Software extends Item
+{
     /**
      * Properties
      */
@@ -121,9 +121,11 @@ class Software extends Item {
         # Build dataset
         return array_merge(
             # (1) 'Item' dataset
-            parent::export($asArray), [
-            # (2) 'Software' specific data
-            'Version' => $this->version(),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Software' specific data
+                'Version' => $this->version(),
+            ]
+        );
     }
 }

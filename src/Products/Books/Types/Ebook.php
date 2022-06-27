@@ -7,13 +7,13 @@ use Fundevogel\Pcbis\Products\Books\Book;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
-
 /**
  * Class Ebook
  *
  * KNV product category 'ePublikation'
  */
-class Ebook extends Book {
+class Ebook extends Book
+{
     /**
      * Properties
      */
@@ -260,13 +260,15 @@ class Ebook extends Book {
         # Build dataset
         return array_merge(
             # (1) 'Book' dataset
-            parent::export($asArray), [
-            # (2) 'Ebook' specific data
-            'Lesegeräte'   => $this->devices(),
-            'Printausgabe' => $this->print(),
-            'Dateigröße'   => $this->fileSize(),
-            'Dateiformat'  => $this->fileFormat(),
-            'DRM'          => $this->drm(),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Ebook' specific data
+                'Lesegeräte'   => $this->devices(),
+                'Printausgabe' => $this->print(),
+                'Dateigröße'   => $this->fileSize(),
+                'Dateiformat'  => $this->fileFormat(),
+                'DRM'          => $this->drm(),
+            ]
+        );
     }
 }

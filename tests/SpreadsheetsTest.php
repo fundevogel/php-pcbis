@@ -5,8 +5,6 @@ namespace Fundevogel\Pcbis\Tests;
 use Fundevogel\Pcbis\Spreadsheets;
 
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-
 
 class SpreadsheetsTest extends \PHPUnit\Framework\TestCase
 {

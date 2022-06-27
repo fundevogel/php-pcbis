@@ -16,7 +16,6 @@ use Fundevogel\Pcbis\Traits\Type;
 
 use DOMDocument;
 
-
 /**
  * Class Product
  *
@@ -566,7 +565,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             $age = Str::substr($age, 1, 1);
         }
 
-      	return 'ab ' . $age . ' Jahren';
+        return 'ab ' . $age . ' Jahren';
     }
 
 
@@ -825,7 +824,7 @@ abstract class Product implements Exportable, Sociable, Taggable
         ];
 
         if (is_array($this->source['Sprachschl'])) {
-            return array_map(function(string $languageCode) use ($languageCodes) {
+            return array_map(function (string $languageCode) use ($languageCodes) {
                 # Be safe, trim strings
                 return $languageCodes[trim($languageCode)];
             }, $this->source['Sprachschl']);

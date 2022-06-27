@@ -6,7 +6,6 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Product;
 
-
 /**
  * Class Medium
  *
@@ -97,22 +96,24 @@ class Medium extends Product
     {
         return array_merge(
             # Build dataset
-            parent::export($asArray), [
-            # (1) 'Media' specific data
-            'Dauer'         => $this->duration(),
-            'KomponistIn'   => $this->getRole('composer', $asArray),
-            'RegisseurIn'   => $this->getRole('director', $asArray),
-            'ProduzentIn'   => $this->getRole('producer', $asArray),
+            parent::export($asArray),
+            [
+                # (1) 'Media' specific data
+                'Dauer'         => $this->duration(),
+                'KomponistIn'   => $this->getRole('composer', $asArray),
+                'RegisseurIn'   => $this->getRole('director', $asArray),
+                'ProduzentIn'   => $this->getRole('producer', $asArray),
 
-            # (2) Extension 'People'
-            'AutorIn'       => $this->getRole('author', $asArray),
-            'Vorlage'       => $this->getRole('original', $asArray),
-            'IllustratorIn' => $this->getRole('illustrator', $asArray),
-            'ZeichnerIn'    => $this->getRole('drawer', $asArray),
-            'PhotographIn'  => $this->getRole('photographer', $asArray),
-            'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
-            'HerausgeberIn' => $this->getRole('editor', $asArray),
-            'MitarbeiterIn' => $this->getRole('participant', $asArray),
-        ]);
+                # (2) Extension 'People'
+                'AutorIn'       => $this->getRole('author', $asArray),
+                'Vorlage'       => $this->getRole('original', $asArray),
+                'IllustratorIn' => $this->getRole('illustrator', $asArray),
+                'ZeichnerIn'    => $this->getRole('drawer', $asArray),
+                'PhotographIn'  => $this->getRole('photographer', $asArray),
+                'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
+                'HerausgeberIn' => $this->getRole('editor', $asArray),
+                'MitarbeiterIn' => $this->getRole('participant', $asArray),
+            ]
+        );
     }
 }

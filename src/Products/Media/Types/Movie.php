@@ -4,13 +4,13 @@ namespace Fundevogel\Pcbis\Products\Media\Types;
 
 use Fundevogel\Pcbis\Products\Media\Medium;
 
-
 /**
  * Class Movie
  *
  * KNV product category 'Film'
  */
-class Movie extends Medium {
+class Movie extends Medium
+{
     /**
      * Overrides
      */
@@ -24,7 +24,7 @@ class Movie extends Medium {
     {
         if (!isset($this->source['AutorSachtitel'])) {
             return [];
-         }
+        }
 
         $array = [
             ' DVD',
@@ -61,7 +61,7 @@ class Movie extends Medium {
             $age = $matches[1] . ' Jahren';
         }
 
-      	return $age;
+        return $age;
     }
 
 
@@ -76,9 +76,11 @@ class Movie extends Medium {
         # Build dataset
         return array_merge(
             # (1) 'Medium' dataset
-            parent::export($asArray), [
-            # (2) 'Movie' specific data
-            'SchauspielerIn' => $this->getRole('actor', $asArray),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Movie' specific data
+                'SchauspielerIn' => $this->getRole('actor', $asArray),
+            ]
+        );
     }
 }

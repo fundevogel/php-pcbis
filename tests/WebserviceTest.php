@@ -5,7 +5,6 @@ namespace Fundevogel\Pcbis\Tests;
 use Fundevogel\Pcbis\Webservice;
 use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 
-
 class WebserviceTest extends \PHPUnit\Framework\TestCase
 {
     /**

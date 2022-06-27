@@ -20,8 +20,6 @@ use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
-use Fundevogel\Pcbis\Products\Product;
-
 
 /**
  * Class ProductFactory

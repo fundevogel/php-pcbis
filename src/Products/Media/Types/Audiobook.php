@@ -4,13 +4,13 @@ namespace Fundevogel\Pcbis\Products\Media\Types;
 
 use Fundevogel\Pcbis\Products\Media\Medium;
 
-
 /**
  * Class Audiobook
  *
  * KNV product category 'Hörbuch'
  */
-class Audiobook extends Medium {
+class Audiobook extends Medium
+{
     /**
      * Overrides
      */
@@ -26,9 +26,11 @@ class Audiobook extends Medium {
         # Build dataset
         return array_merge(
             # (1) 'Medium' dataset
-            parent::export($asArray), [
-            # (2) 'Audiobook' specific data
-            'ErzählerIn' => $this->getRole('narrator', $asArray),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Audiobook' specific data
+                'ErzählerIn' => $this->getRole('narrator', $asArray),
+            ]
+        );
     }
 }

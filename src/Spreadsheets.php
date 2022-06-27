@@ -15,7 +15,6 @@ namespace Fundevogel\Pcbis;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
-
 /**
  * Class Spreadsheet
  *
@@ -48,7 +47,7 @@ class Spreadsheets
             $lines[0] = str_replace("\xEF\xBB\xBF", '', $lines[0]);
 
             # (3) Extract CSV data
-            $csv = array_map(function($d) use ($delimiter) {
+            $csv = array_map(function ($d) use ($delimiter) {
                 # Encode CSV data as UTF-8 (if necessary)
                 if (Str::encoding($d) != 'UTF-8') {
                     $d = utf8_encode($d);
@@ -58,7 +57,7 @@ class Spreadsheets
             }, $lines);
 
             # (4) Add header names
-            array_walk($csv, function(&$a) use ($csv) {
+            array_walk($csv, function (&$a) use ($csv) {
                 $a = array_combine($csv[0], $a);
             });
 
@@ -252,12 +251,12 @@ class Spreadsheets
      */
     protected static function convertAge(string $string): string
     {
-      	$string = Str::replace($string, 'J.', 'Jahren');
-      	$string = Str::replace($string, 'Mon.', 'Monaten');
-      	$string = Str::replace($string, '-', ' bis ');
-      	$string = Str::replace($string, 'u.', '&');
+        $string = Str::replace($string, 'J.', 'Jahren');
+        $string = Str::replace($string, 'Mon.', 'Monaten');
+        $string = Str::replace($string, '-', ' bis ');
+        $string = Str::replace($string, 'u.', '&');
 
-      	return $string;
+        return $string;
     }
 
 

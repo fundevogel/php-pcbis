@@ -6,13 +6,13 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
-
 /**
  * Class Videogame
  *
  * KNV product category 'Games'
  */
-class Videogame extends Item {
+class Videogame extends Item
+{
     /**
      * Properties
      */
@@ -132,7 +132,7 @@ class Videogame extends Item {
             $age = $matches[1] . ' Jahren';
         }
 
-      	return $age;
+        return $age;
     }
 
 
@@ -147,9 +147,11 @@ class Videogame extends Item {
         # Build dataset
         return array_merge(
             # (1) 'Item' dataset
-            parent::export($asArray), [
-            # (2) 'Videogame' specific data
-            'Plattformen' => $this->platforms($asArray),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Videogame' specific data
+                'Plattformen' => $this->platforms($asArray),
+            ]
+        );
     }
 }

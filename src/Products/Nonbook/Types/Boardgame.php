@@ -4,13 +4,13 @@ namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
-
 /**
  * Class Boardgame
  *
  * KNV product category 'Spiel'
  */
-class Boardgame extends Item {
+class Boardgame extends Item
+{
     /**
      * Properties
      */
@@ -146,10 +146,12 @@ class Boardgame extends Item {
         # Build dataset
         return array_merge(
             # (1) 'Item' dataset
-            parent::export($asArray), [
-            # (2) 'Boardgame' specific data
-            'Spieleranzahl' => $this->playerCount(),
-            'Spieldauer'    => $this->playingTime(),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Boardgame' specific data
+                'Spieleranzahl' => $this->playerCount(),
+                'Spieldauer'    => $this->playingTime(),
+            ]
+        );
     }
 }

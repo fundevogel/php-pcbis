@@ -6,7 +6,6 @@ use Fundevogel\Pcbis\Exceptions\UnknownRoleException;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
-
 /**
  * Trait People
  *
@@ -161,7 +160,7 @@ trait People
             if (!Str::contains($string, ':')) {
                 # If not, the Str is eligible for an alternative delimiter
                 foreach ($delimiters as $delimiter => $role) {
-                    if (Str ::startsWith($string, $delimiter)) {
+                    if (Str::startsWith($string, $delimiter)) {
                         # If so, remove it from the string, change role and end the loop
                         $group = Str::replace($string, $delimiter, '');
                         $role = $delimiters[$delimiter];  # .. or $role
@@ -169,7 +168,6 @@ trait People
                         break;
                     }
                 }
-
             } else {
                 # Otherwise, split role & people as usual
                 $array = Str::split($string, ':');
@@ -290,17 +288,14 @@ trait People
         if (!Str::contains($string, $groupDelimiter) && !Str::contains($string, $personDelimiter)) {
             if (isset($this->source['IndexAutor'])) {
                 if (is_array($this->source['IndexAutor'])) {
-                    $string = A::join(array_map(function($string) {
+                    $string = A::join(array_map(function ($string) {
                         return trim($string);
                     }, $this->source['IndexAutor']), ';');
-
                 } elseif (is_string($this->source['IndexAutor'])) {
                     $string = trim($this->source['IndexAutor']);
-
                 } else {
                     return [];
                 }
-
             } else {
                 return [];
             }

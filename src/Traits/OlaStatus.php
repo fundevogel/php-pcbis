@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Traits;
 
-
 /**
  * Trait OlaStatus
  *
@@ -68,7 +67,7 @@ trait OlaStatus
      * @var array
      */
     protected $unavailable = [
-         '7',
+        '7',
         '17',
         '19',
         '20',
@@ -91,34 +90,34 @@ trait OlaStatus
      */
     protected $olaMessages = [
         '7' => 'Vergriffen, keine Neuauflage, Bestellung abgelegt',
-       '11' => 'Erscheint laut Verlag/Lieferant .../... in neuer Auflage/als Nachfolgeprodukt',
-       '12' => 'Nachdruck/wird nachproduziert. Folgt laut Verlag/Lieferant .../...',
-       '15' => 'Fehlt kurzfristig am Lager',
-       '17' => 'Führen wir nicht bzw. nicht mehr',
-       '18' => 'Wird besorgt – nicht remittierbar/nicht stornierbar',
-       '19' => 'Ladenpreis aufgehoben. Führen wir nicht mehr',
-       '20' => 'Noch nicht erschienen. Bestellung nicht vorgemerkt',
-       '21' => 'Noch nicht erschienen. Erscheint laut Verlag/Lieferant ...',
-       '22' => 'Terminauftrag, vorgemerkt',
-       '24' => 'Erscheint nicht laut Verlag/Lieferant',
-       '23' => 'Titel wegen Lieferverzug des Verlags/der Verlagsauslieferung derzeit nicht lieferbar',
-       '25' => 'Artikel neu aufgenommen. Noch nicht am Lager',
-       '27' => 'Vormerkung storniert',
-       '28' => 'Titelnummer unbekannt',
-       '29' => 'ISBN oder EAN unbekannt',
-       '43' => 'Vergriffen – Neuauflage/Nachfolgeprodukt unbestimmt – Bestellung wird nicht vorgemerkt',
-       '59' => 'Bestellung storniert',
-       '60' => 'Indiziert. Führen wir nicht mehr',
-       '62' => 'Artikel infolge rechtlicher Auseinandersetzungen zur Zeit nicht lieferbar. Bestellung nicht vorgemerkt',
-       '63' => 'Versandart Stornierung',
-       '73' => 'Fortsetzung',
-       '80' => 'Fehlt, da der Verlag/Lieferant derzeit nicht liefern kann',
-       '88' => 'Konditionsänderung durch den Verlag/Lieferanten. Führen wir nicht mehr',
-       '94' => 'Wird zur Zeit nur ab Verlag/Lieferant geliefert – Bestellung nicht vorgemerkt',
-       '97' => 'Print on Demand (ggf. mit Angabe der Lieferzeit) – nicht remittierbar/nicht stornierbar',
-       '98' => 'Folgt mit nächster Lieferung',
-       '99' => 'Titel hat Nachfolgetitel/-auflage',
-   ];
+        '11' => 'Erscheint laut Verlag/Lieferant .../... in neuer Auflage/als Nachfolgeprodukt',
+        '12' => 'Nachdruck/wird nachproduziert. Folgt laut Verlag/Lieferant .../...',
+        '15' => 'Fehlt kurzfristig am Lager',
+        '17' => 'Führen wir nicht bzw. nicht mehr',
+        '18' => 'Wird besorgt – nicht remittierbar/nicht stornierbar',
+        '19' => 'Ladenpreis aufgehoben. Führen wir nicht mehr',
+        '20' => 'Noch nicht erschienen. Bestellung nicht vorgemerkt',
+        '21' => 'Noch nicht erschienen. Erscheint laut Verlag/Lieferant ...',
+        '22' => 'Terminauftrag, vorgemerkt',
+        '24' => 'Erscheint nicht laut Verlag/Lieferant',
+        '23' => 'Titel wegen Lieferverzug des Verlags/der Verlagsauslieferung derzeit nicht lieferbar',
+        '25' => 'Artikel neu aufgenommen. Noch nicht am Lager',
+        '27' => 'Vormerkung storniert',
+        '28' => 'Titelnummer unbekannt',
+        '29' => 'ISBN oder EAN unbekannt',
+        '43' => 'Vergriffen – Neuauflage/Nachfolgeprodukt unbestimmt – Bestellung wird nicht vorgemerkt',
+        '59' => 'Bestellung storniert',
+        '60' => 'Indiziert. Führen wir nicht mehr',
+        '62' => 'Artikel infolge rechtlicher Auseinandersetzungen zur Zeit nicht lieferbar. Bestellung nicht vorgemerkt',
+        '63' => 'Versandart Stornierung',
+        '73' => 'Fortsetzung',
+        '80' => 'Fehlt, da der Verlag/Lieferant derzeit nicht liefern kann',
+        '88' => 'Konditionsänderung durch den Verlag/Lieferanten. Führen wir nicht mehr',
+        '94' => 'Wird zur Zeit nur ab Verlag/Lieferant geliefert – Bestellung nicht vorgemerkt',
+        '97' => 'Print on Demand (ggf. mit Angabe der Lieferzeit) – nicht remittierbar/nicht stornierbar',
+        '98' => 'Folgt mit nächster Lieferung',
+        '99' => 'Titel hat Nachfolgetitel/-auflage',
+    ];
 
 
     /**

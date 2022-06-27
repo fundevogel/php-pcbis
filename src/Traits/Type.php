@@ -2,7 +2,6 @@
 
 namespace Fundevogel\Pcbis\Traits;
 
-
 /**
  * Trait Type
  *

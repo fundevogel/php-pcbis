@@ -13,22 +13,18 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
-use Fundevogel\Pcbis\Butler;
 use Fundevogel\Pcbis\Exceptions\IncompatibleClientException;
 use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
 use Fundevogel\Pcbis\Helpers\A;
-use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Factory;
 
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
-use Exception;
 use SoapClient;
 use SoapFault;
 use stdClass;
-
 
 /**
  * Class Webservice
@@ -101,7 +97,6 @@ class Webservice
             if (!is_null($credentials)) {
                 $this->sessionID = $this->logIn($credentials);
             }
-
         } catch (SoapFault $e) {
             # Activate offline mode on network error
             $this->offlineMode = true;
@@ -138,7 +133,6 @@ class Webservice
     {
         try {
             $query = $this->client->WSCall(['LoginInfo' => $credentials]);
-
         } catch (SoapFault $e) {
             throw new InvalidLoginException($e->getMessage());
         }
@@ -234,8 +228,7 @@ class Webservice
             $this->cache->delete($identifier);
         }
 
-        return $this->cache->get($identifier, function (ItemInterface $item) use ($identifier): array
-        {
+        return $this->cache->get($identifier, function (ItemInterface $item) use ($identifier): array {
             return $this->query($identifier);
         });
     }
@@ -269,8 +262,7 @@ class Webservice
         /**
          * @var stdClass
          */
-        return new Ola($this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): stdClass
-        {
+        return new Ola($this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): stdClass {
             # Expire after one hour
             $item->expiresAfter(3600);
 

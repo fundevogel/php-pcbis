@@ -9,7 +9,6 @@ use Fundevogel\Pcbis\Helpers\Str;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
 
-
 /**
  * Class Butler
  *
@@ -118,9 +117,8 @@ class Butler
 
                 # Report back
                 $success = true;
+            } catch (ClientException $e) {
             }
-
-            catch (ClientException $e) {}
         }
 
         return $success;

@@ -4,13 +4,13 @@ namespace Fundevogel\Pcbis\Products\Books\Types;
 
 use Fundevogel\Pcbis\Products\Books\Book;
 
-
 /**
  * Class Schoolbook
  *
  * KNV product category 'Schulbuch'
  */
-class Schoolbook extends Book {
+class Schoolbook extends Book
+{
     /**
      * Properties
      */
@@ -191,9 +191,11 @@ class Schoolbook extends Book {
         # Build dataset
         return array_merge(
             # (1) 'Book' dataset
-            parent::export($asArray), [
-            # (2) 'Schoolbook' specific data
-            'Schulfach' => $this->subject(),
-        ]);
+            parent::export($asArray),
+            [
+                # (2) 'Schoolbook' specific data
+                'Schulfach' => $this->subject(),
+            ]
+        );
     }
 }
