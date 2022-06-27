@@ -5,8 +5,12 @@
 .gitignore export-ignore
 .gitattributes export-ignore
 
+# Development
+.editorconfig export-ignore
+.woodpecker export-ignore
+pint.json export-ignore
+psalm.xml export-ignore
+
 # Tests
 tests/ export-ignore
-psalm.xml.dist export-ignore
-phpunit.xml.dist export-ignore
-.php-cs-fixer.dist.php export-ignore
+phpunit.xml export-ignore
