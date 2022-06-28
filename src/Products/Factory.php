@@ -1,8 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * Simple PHP wrapper for pcbis.de API
+ *
+ * @link https://codeberg.org/Fundevogel/php-pcbis
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
+ */
+
 namespace Fundevogel\Pcbis\Products;
 
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
+use Fundevogel\Pcbis\Products\Product;
 use Fundevogel\Pcbis\Products\Books\Types\Ebook;
 use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
 use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
@@ -22,97 +32,96 @@ use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
 /**
- * Class ProductFactory
+ * Class Factory
  *
  * Creates products - pretty much like a factory *duh*
  */
 final class Factory
 {
     /**
+     * Available product types
+     *
+     * @var array
+     */
+
+    public static $types = [
+        'AB' => 'Nonbook',
+        'AC' => 'Hörbuch',
+        'AD' => 'Film',
+        'AE' => 'Software',
+        'AF' => 'Tonträger',
+        'AG' => 'ePublikation',
+        'AH' => 'Games',
+        'AI' => 'Kalender',
+        'AJ' => 'Landkarte/Globus',
+        'AK' => 'Musik',
+        'AL' => 'Noten',
+        'AM' => 'Papeterie/PBS',
+        'AN' => 'Spiel',
+        'AO' => 'Spielzeug',
+        'HC' => 'Hardcover',
+        'SB' => 'Schulbuch',
+        'TB' => 'Taschenbuch',
+    ];
+
+
+    /**
      * Creates new product
      *
-     * @param array $source Source data fetched from KNV's API
-     * @param array $props Properties being passed to product
-     *
+     * @param array $data Source data fetched from KNV's API
+     * @param array $api Object granting access to KNV's API
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
-     *
-     * @return Product
+     * @return \Fundevogel\Pcbis\Products\Product
      */
-    public static function factory(array $source, array $props)
+    public static function factory(array $data, $api)
     {
-        $groups = [
-            'AB' => 'Nonbook',
-            'AC' => 'Hörbuch',
-            'AD' => 'Film',
-            'AE' => 'Software',
-            'AF' => 'Tonträger',
-            'AG' => 'ePublikation',
-            'AH' => 'Games',
-            'AI' => 'Kalender',
-            'AJ' => 'Landkarte/Globus',
-            'AK' => 'Musik',
-            'AL' => 'Noten',
-            'AM' => 'Papeterie/PBS',
-            'AN' => 'Spiel',
-            'AO' => 'Spielzeug',
-            'HC' => 'Hardcover',
-            'SB' => 'Schulbuch',
-            'TB' => 'Taschenbuch',
-        ];
+        # Determine product type
+        $type = $data['Sortimentskennzeichen'];
 
-        # Default group (rarely)
-        $group = 'HC';
-
-        if (isset($source['Sortimentskennzeichen'])) {
-            $group = $source['Sortimentskennzeichen'];
+        if (!array_key_exists($type, static::$types)) {
+            throw new UnknownTypeException(sprintf('Unknown type: "%s"', $type));
         }
 
-        if (array_key_exists($group, $groups)) {
-            $props['type'] = $groups[$group];
+        switch (static::$types[$type]) {
+            # Books
+            case 'ePublikation':
+                return new Ebook($data, $api);
+            case 'Hardcover':
+                return new Hardcover($data, $api);
+            case 'Schulbuch':
+                return new Schoolbook($data, $api);
+            case 'Taschenbuch':
+                return new Softcover($data, $api);
 
-            switch ($groups[$group]) {
-                # Books
-                case 'ePublikation':
-                    return new Ebook($source, $props);
-                case 'Hardcover':
-                    return new Hardcover($source, $props);
-                case 'Schulbuch':
-                    return new Schoolbook($source, $props);
-                case 'Taschenbuch':
-                    return new Softcover($source, $props);
+            # Media
+            case 'Film':
+                return new Movie($data, $api);
+            case 'Hörbuch':
+                return new Audiobook($data, $api);
+            case 'Musik':
+                return new Music($data, $api);
+            case 'Tonträger':
+                return new Sound($data, $api);
 
-                # Media
-                case 'Film':
-                    return new Movie($source, $props);
-                case 'Hörbuch':
-                    return new Audiobook($source, $props);
-                case 'Musik':
-                    return new Music($source, $props);
-                case 'Tonträger':
-                    return new Sound($source, $props);
-
-                # Nonbook
-                case 'Games':
-                    return new Videogame($source, $props);
-                case 'Kalender':
-                    return new Calendar($source, $props);
-                case 'Landkarte/Globus':
-                    return new Map($source, $props);
-                case 'Nonbook':
-                    return new Nonbook($source, $props);
-                case 'Noten':
-                    return new Notes($source, $props);
-                case 'Papeterie/PBS':
-                    return new Stationery($source, $props);
-                case 'Software':
-                    return new Software($source, $props);
-                case 'Spiel':
-                    return new Boardgame($source, $props);
-                case 'Spielzeug':
-                    return new Toy($source, $props);
-            }
+            # Nonbook
+            case 'Games':
+                return new Videogame($data, $api);
+            case 'Kalender':
+                return new Calendar($data, $api);
+            case 'Landkarte/Globus':
+                return new Map($data, $api);
+            case 'Nonbook':
+                return new Nonbook($data, $api);
+            case 'Noten':
+                return new Notes($data, $api);
+            case 'Papeterie/PBS':
+                return new Stationery($data, $api);
+            case 'Software':
+                return new Software($data, $api);
+            case 'Spiel':
+                return new Boardgame($data, $api);
+            case 'Spielzeug':
+                return new Toy($data, $api);
         }
-
-        throw new UnknownTypeException(sprintf('Unknown type: "%s"', $group));
     }
 }

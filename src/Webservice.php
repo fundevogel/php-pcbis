@@ -7,7 +7,6 @@ declare(strict_types=1);
  *
  * @link https://codeberg.org/Fundevogel/php-pcbis
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- * @version 3.0.0-beta.2
  */
 
 namespace Fundevogel\Pcbis;
@@ -248,7 +247,7 @@ class Webservice
         $data = $this->fetch($identifier, $forceRefresh);
 
         # HOOK: ISBN in data?
-        return Factory::factory($data, ['api' => $this, 'identifier' => $identifier]);
+        return Factory::factory($data, $api);
     }
 
 

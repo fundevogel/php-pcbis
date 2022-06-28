@@ -7,7 +7,6 @@ declare(strict_types=1);
  *
  * @link https://codeberg.org/Fundevogel/php-pcbis
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
- * @version 3.0.0-beta.2
  */
 
 namespace Fundevogel\Pcbis;
