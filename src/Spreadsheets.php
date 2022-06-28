@@ -122,7 +122,7 @@ class Spreadsheets
             'Kommentar'
         ];
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../data/binding_codes.json'), true);
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../data/codes.json'), true);
 
         foreach (self::csvOpen($file, $headers, $delimiter) as $array) {
             # Gathering & processing generic book information
