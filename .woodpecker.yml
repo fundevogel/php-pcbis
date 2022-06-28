@@ -1,13 +1,27 @@
 pipeline:
   build:
-    image: jitesoft/composer:${TAG}
+    image: php:${PHP}-alpine
     commands:
+      # Add SOAP extension
+      # (1) Install prerequisites
+      - set -ex && apk --no-cache add libxml2-dev
+
+      # (2) Install & configure SOAP
+      - docker-php-ext-install -j$(nproc) soap
+
+      # Install composer
+      - curl -sSL https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+      # Install dependencies
       - composer install
+
+      # Run PHPUnit tests
       - composer run test
+
     when:
       event: push
 
 matrix:
-  TAG:
-    - 8.0
-    - 8.1
+  PHP:
+    - 8.0  # EOL 2020-11-26, SS 2023-10-26
+    - 8.1  # EOL 2023-11-25, SS 2024-11-25
