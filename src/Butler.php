@@ -73,10 +73,10 @@ class Butler
     /**
      * Downloads cover images from the German National Library (DNB)
      *
-     * @param string $isbn - A given product's EAN/ISBN
-     * @param string $fileName - Filename for the image to be downloaded
-     * @param string $directory - Target download directory
-     * @param bool $overwrite - Whether existing file should be overwritten
+     * @param string $isbn A given product's EAN/ISBN
+     * @param string $fileName Filename for the image to be downloaded
+     * @param string $directory Target download directory
+     * @param bool $overwrite Whether existing file should be overwritten
      * @param string $ua User-Agent used when downloading cover images
      * @return bool Download status
      */
@@ -85,7 +85,7 @@ class Butler
         ?string $fileName = null,
         ?string $directory = null,
         bool $overwrite = false,
-        string $ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'
+        ?string $ua = null
     ): bool {
         # Build path to file
         $file = sprintf('%s/%s.jpg', $directory ?? __DIR__, $fileName ?? $isbn);
@@ -111,7 +111,7 @@ class Butler
 
                 # Start download
                 $response = $client->get($url, [
-                    'headers' => ['User-Agent' => $ua],
+                    'headers' => ['User-Agent' => $ua ?? 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
                     'sink' => $handle,
                 ]);
 

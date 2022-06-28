@@ -164,7 +164,7 @@ class Webservice
      * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
      * @return array
      */
-    private function query(string $identifier)
+    private function query(string $identifier): array
     {
         if ($this->offlineMode) {
             throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
@@ -247,6 +247,7 @@ class Webservice
         # Fetch raw data for given ISBN
         $data = $this->fetch($identifier, $forceRefresh);
 
+        # HOOK: ISBN in data?
         return Factory::factory($data, ['api' => $this, 'identifier' => $identifier]);
     }
 

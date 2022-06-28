@@ -2,6 +2,7 @@
 
 namespace Fundevogel\Pcbis\Products\Books;
 
+use Fundevogel\Pcbis\Butler;
 use Fundevogel\Pcbis\Products\Product;
 
 /**
@@ -185,5 +186,29 @@ class Book extends Product
                 'MitarbeiterIn' => $this->getRole('participant', $asArray),
             ]
         );
+    }
+
+
+    /**
+     * Helpers
+     */
+
+    /**
+     * Downloads cover images from the German National Library (DNB)
+     *
+     * @param string $isbn A given product's EAN/ISBN
+     * @param string $fileName Filename for the image to be downloaded
+     * @param string $directory Target download directory
+     * @param bool $overwrite Whether existing file should be overwritten
+     * @param string $ua User-Agent used when downloading cover images
+     * @return bool Download status
+     */
+    public function downloadCover(
+        ?string $fileName = null,
+        ?string $directory = null,
+        bool $overwrite = false,
+        ?string $ua = null
+    ): bool {
+        return Butler::downloadCover($this->isbn, $fileName, $directory, $overwrite, $ua);
     }
 }
