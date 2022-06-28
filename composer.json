@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Simple PHP wrapper for pcbis.de API, written in PHP",
     "keywords": ["pcbis", "knv", "api"],
-    "homepage": "https://codeberg.org/fundevogel/php-pcbis",
+    "homepage": "https://codeberg.org/Fundevogel/php-pcbis",
     "license": "GPL-3.0",
     "version": "3.0.0-beta.2",
     "scripts": {
@@ -27,8 +27,8 @@
     "support": {
         "email": "maschinenraum@fundevogel.de",
         "forum": "https://forum.getkirby.com",
-        "source": "https://codeberg.org/fundevogel/php-pcbis",
-        "issues": "https://codeberg.org/fundevogel/php-pcbis/issues"
+        "source": "https://codeberg.org/Fundevogel/php-pcbis",
+        "issues": "https://codeberg.org/Fundevogel/php-pcbis/issues"
     },
     "require": {
         "php": "^8.0",
