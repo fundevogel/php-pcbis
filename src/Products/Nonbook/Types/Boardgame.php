@@ -33,13 +33,13 @@ class Boardgame extends Item
     public function playerCount(): string
     {
         # TODO: Prevent subtitle containing player count!
-        if (!isset($this->source['Utitel'])) {
+        if (!isset($this->data['Utitel'])) {
             return '';
         }
 
         $playerCount = '';
 
-        if (preg_match('/Für\s(.*)\sSpieler/', $this->source['Utitel'], $matches)) {
+        if (preg_match('/Für\s(.*)\sSpieler/', $this->data['Utitel'], $matches)) {
             $playerCount = $matches[1];
         }
 
@@ -54,25 +54,25 @@ class Boardgame extends Item
      */
     public function playingTime(): string
     {
-        if (!isset($this->source['Utitel'])) {
+        if (!isset($this->data['Utitel'])) {
             return '';
         }
 
         $playingTime = '';
 
-        if (preg_match('/Spieldauer:\s(.*)\sMin/', $this->source['Utitel'], $matches)) {
+        if (preg_match('/Spieldauer:\s(.*)\sMin/', $this->data['Utitel'], $matches)) {
             $playingTime = $matches[1];
         }
 
         # Edge case: Subtitle string too long, playing could not be found
         if (empty($playingTime)) {
             # (1) Try looping over tags
-            if (isset($this->source['IndexStichw']) && is_array($this->source['IndexStichw'])) {
-                foreach ($this->source['IndexStichw'] as $index => $tag) {
+            if (isset($this->data['IndexStichw']) && is_array($this->data['IndexStichw'])) {
+                foreach ($this->data['IndexStichw'] as $index => $tag) {
                     # Match each tag for term 'playing time' ..
                     if (Str::contains(Str::lower($tag), 'spieldauer')) {
                         # .. which means the next entry contains playing time ..
-                        $playingTime = $this->source['IndexStichw'][$index + 1];
+                        $playingTime = $this->data['IndexStichw'][$index + 1];
 
                         # .. so stop looping
                         break;

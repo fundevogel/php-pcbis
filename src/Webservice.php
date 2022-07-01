@@ -302,7 +302,7 @@ class Webservice
 
         # Fetch raw data
         $data = $this->fetch($identifier, $forceRefresh);
-
+        var_dump(json_encode($data));
         # Determine type identifier
         $code = $data['Sortimentskennzeichen'];
 

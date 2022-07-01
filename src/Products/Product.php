@@ -50,11 +50,11 @@ class Product extends ProductAbstract
      * Global setter
      *
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @throws \Exception
      * @return void
      */
-    public function __set(string $key, string $value): void
+    public function __set(string $key, mixed $value): void
     {
         # If method exists ..
         if (method_exists($this, $key)) {
@@ -490,8 +490,7 @@ class Product extends ProductAbstract
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
-            'Reihe'               => $this->series(),
-            'Band'                => $this->volume(),
+            'Reihen'              => $this->series(),
             'Gewicht'             => $this->weight(),
             'Abmessungen'         => $this->dimensions(),
             'Sprachen'            => $this->languages(),

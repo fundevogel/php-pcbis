@@ -34,15 +34,15 @@ class Ebook extends Book
      */
     public function subtitle(): string
     {
-        if (!isset($this->source['Utitel'])) {
+        if (!isset($this->data['Utitel'])) {
             return '';
         }
 
-        if (Str::contains($this->source['Utitel'], 'Lesegerätegruppen')) {
+        if (Str::contains($this->data['Utitel'], 'Lesegerätegruppen')) {
             return '';
         }
 
-        return A::first(Str::split($this->source['Utitel'], '.'));
+        return A::first(Str::split($this->data['Utitel'], '.'));
     }
 
 
@@ -57,11 +57,11 @@ class Ebook extends Book
      */
     public function devices(): array
     {
-        if (!isset($this->source['Utitel'])) {
+        if (!isset($this->data['Utitel'])) {
             return [];
         }
 
-        $string = A::last(Str::split($this->source['Utitel'], 'Unterstützte Lesegerätegruppen:'));
+        $string = A::last(Str::split($this->data['Utitel'], 'Unterstützte Lesegerätegruppen:'));
 
         return Str::split(Str::replace($string, ['MAC', 'Tabl'], ['Mac', 'Tablet']), '/');
     }
@@ -74,11 +74,11 @@ class Ebook extends Book
      */
     public function printEdition(): string
     {
-        if (!isset($this->source['PrintISBN'])) {
+        if (!isset($this->data['PrintISBN'])) {
             return '';
         }
 
-        return $this->source['PrintISBN'];
+        return $this->data['PrintISBN'];
     }
 
 
@@ -89,11 +89,11 @@ class Ebook extends Book
      */
     public function fileSize(): string
     {
-        if (!isset($this->source['DateiGroesse'])) {
+        if (!isset($this->data['DateiGroesse'])) {
             return '';
         }
 
-        $kilobytes = (int) Str::replace($this->source['DateiGroesse'], ' KB', '');
+        $kilobytes = (int) Str::replace($this->data['DateiGroesse'], ' KB', '');
 
         return number_format($kilobytes / 1024, 2) . ' MB';
     }
@@ -106,12 +106,12 @@ class Ebook extends Book
      */
     public function fileFormat(): string
     {
-        if (!isset($this->source['DateiFormat'])) {
+        if (!isset($this->data['DateiFormat'])) {
             return '';
         }
 
         # Be safe, trim strings
-        return Str::lower(trim($this->source['DateiFormat']));
+        return Str::lower(trim($this->data['DateiFormat']));
     }
 
 
@@ -122,7 +122,7 @@ class Ebook extends Book
      */
     public function drm(): string
     {
-        if (!isset($this->source['DRMFlags'])) {
+        if (!isset($this->data['DRMFlags'])) {
             return '';
         }
 
@@ -134,7 +134,7 @@ class Ebook extends Book
         ];
 
         # Be safe, trim strings
-        return $flags[trim($this->source['DRMFlags'])];
+        return $flags[trim($this->data['DRMFlags'])];
     }
 
 

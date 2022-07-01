@@ -34,11 +34,11 @@ class Medium extends Product
     public function duration(): string
     {
         # TODO: Prevent subtitle containing duration
-        if (!isset($this->source['Utitel'])) {
+        if (!isset($this->data['Utitel'])) {
             return '';
         }
 
-        $array = Str::split($this->source['Utitel'], '.');
+        $array = Str::split($this->data['Utitel'], '.');
 
         return Str::replace(A::last($array), ' Min', '');
     }

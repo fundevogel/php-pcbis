@@ -26,7 +26,7 @@ class Role
      * @param string $role Role of involved people
      * @param array $people People of same role
      */
-    public function __construct(public string $role, public array $people)
+    public function __construct(public array $people)
     {
     }
 

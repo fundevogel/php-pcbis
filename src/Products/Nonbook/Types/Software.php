@@ -32,7 +32,7 @@ class Software extends Item
      */
     public function version(): string
     {
-        if (!isset($this->source['Abb'])) {
+        if (!isset($this->data['Abb'])) {
             return '';
         }
 
@@ -40,16 +40,16 @@ class Software extends Item
 
         # TODO: Improve regex for schema like 1.23.10
         # .. is that even a thing?
-        if (preg_match('/Version\s\d{0,2}(?:[.,]\d{1,2})?/', $this->source['Abb'], $matches)) {
+        if (preg_match('/Version\s\d{0,2}(?:[.,]\d{1,2})?/', $this->data['Abb'], $matches)) {
             $version = $matches[0];
         }
 
         # Check title for version if first approach fails
-        if (empty($version) && isset($this->source['Titel'])) {
-            $string = $this->source['Titel'];
+        if (empty($version) && isset($this->data['Titel'])) {
+            $string = $this->data['Titel'];
 
             # Remove strings indicating number of CDs/DVDs involved
-            if (preg_match('/\d{1,2}\s[A-Z]{2,3}-ROMs?/', $this->source['Titel'], $matches)) {
+            if (preg_match('/\d{1,2}\s[A-Z]{2,3}-ROMs?/', $this->data['Titel'], $matches)) {
                 $string = Str::replace($string, $matches[0], '');
             }
 
@@ -73,8 +73,8 @@ class Software extends Item
      */
     public function isEducational(): bool
     {
-        if (isset($this->source['SonstTxt'])) {
-            return Str::contains(Str::lower($this->source['SonstTxt']), '14 juschg');
+        if (isset($this->data['SonstTxt'])) {
+            return Str::contains(Str::lower($this->data['SonstTxt']), '14 juschg');
         }
 
         return false;

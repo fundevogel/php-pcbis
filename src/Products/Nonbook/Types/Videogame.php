@@ -32,13 +32,13 @@ class Videogame extends Item
      */
     public function age(): string
     {
-        if (!isset($this->source['SonstTxt'])) {
+        if (!isset($this->data['SonstTxt'])) {
             return '';
         }
 
         $age = '';
 
-        if (preg_match('/USK\s(.*)\sfreigegeben/', $this->source['SonstTxt'], $matches)) {
+        if (preg_match('/USK\s(.*)\sfreigegeben/', $this->data['SonstTxt'], $matches)) {
             $age = $matches[1] . ' Jahren';
         }
 
@@ -57,7 +57,7 @@ class Videogame extends Item
      */
     public function platforms(): array
     {
-        if (!isset($this->source['AutorSachtitel'])) {
+        if (!isset($this->data['AutorSachtitel'])) {
             return [];
         }
 
@@ -86,7 +86,7 @@ class Videogame extends Item
         # Detect platforms
         # (1) Check for console gaming
         foreach ($array as $key => $value) {
-            if (Str::contains($this->source['AutorSachtitel'], $key)) {
+            if (Str::contains($this->data['AutorSachtitel'], $key)) {
                 $platforms[] = $value;
             }
         }
