@@ -55,32 +55,7 @@ abstract class ProductAbstract
     public function __construct(public array $data, protected Webservice $api)
     {
         # Store product EAN/ISBN
-        $this->identifier = $this->data['isbn'];
-
-        # Extract tags & involved people early on
-        // $this->tags         = $this->separateTags();
-        // $this->people       = $this->separatePeople();
-
-        // # Build basic dataset
-        // $this->title        = $this->buildTitle();
-        // $this->subtitle     = $this->buildSubtitle();
-        // $this->publisher    = $this->buildPublisher();
-        // $this->description  = $this->buildDescription();
-        // $this->retailPrice  = $this->buildretailPrice();
-        // $this->releaseYear  = $this->buildreleaseYear();
-        // $this->age          = $this->buildAge();
-        // $this->series       = $this->buildSeries();
-        // $this->weight       = $this->buildWeight();
-        // $this->dimensions   = $this->buildDimensions();
-        // $this->languages    = $this->buildLanguages();
-
-        // # Build categories & topics from tags
-        // $this->categories   = $this->buildCategories();
-        // $this->topics       = $this->buildTopics();
-
-        // # Set OLA code & message
-        // $this->olaCode    = $this->buildOlaCode();
-        // $this->olaMessage = $this->buildOlaMessage();
+        $this->identifier = $this->data['EAN'];
     }
 
 

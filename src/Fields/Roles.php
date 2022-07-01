@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Api;
+namespace Fundevogel\Pcbis\Fields;
 
 use Fundevogel\Pcbis\Helpers\A;
 
@@ -73,8 +73,8 @@ class Roles
                 continue;
             }
 
-            # Create 'Role' object from people of same role
-            $obj = new Role($people);
+            # Create 'Role' instance
+            $obj = new Role($role, $people);
 
             # Format string, using role & people thereof
             $result[] = sprintf('%s: %s', $this->roles[$role], $obj->toString($peopleDelimiter));

@@ -2,8 +2,6 @@
 
 namespace Fundevogel\Pcbis\Helpers;
 
-use Fundevogel\Pcbis\Helpers\A;
-
 use Exception;
 
 if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));

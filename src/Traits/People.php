@@ -276,7 +276,7 @@ trait People
         if (!Str::contains($string, $groupDelimiter) && !Str::contains($string, $personDelimiter)) {
             if (isset($this->data['IndexAutor'])) {
                 if (is_array($this->data['IndexAutor'])) {
-                    $string = A::join(array_map(trim, $this->data['IndexAutor']), ';');
+                    $string = A::join(array_map('trim', $this->data['IndexAutor']), ';');
                 } elseif (is_string($this->data['IndexAutor'])) {
                     $string = trim($this->data['IndexAutor']);
                 } else {

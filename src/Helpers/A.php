@@ -2,8 +2,6 @@
 
 namespace Fundevogel\Pcbis\Helpers;
 
-use Fundevogel\Pcbis\Helpers\Str;
-
 use Exception;
 
 

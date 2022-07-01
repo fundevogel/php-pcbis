@@ -12,9 +12,10 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
-use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
+use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
+use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Products\Product;
 use Fundevogel\Pcbis\Products\Books\Types\Ebook;
@@ -66,7 +67,7 @@ class Webservice
      *
      * @var string
      */
-    private $sessionID;
+    private ?string $sessionID = null;
 
 
     /**
@@ -74,7 +75,7 @@ class Webservice
      *
      * @var \SoapClient
      */
-    private $client;
+    private SoapClient $client;
 
 
     /**
@@ -82,7 +83,7 @@ class Webservice
      *
      * @var \Symfony\Component\Cache\Adapter\FilesystemAdapter
      */
-    private $cache;
+    private FilesystemAdapter $cache;
 
 
     /**
@@ -91,11 +92,13 @@ class Webservice
      * @param array $credentials Login credentials
      * @param string $cachePath Cache directory
      * @param int $ttl Lifetime for cache items (in seconds)
-     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
+     * @return void
      */
     public function __construct(?array $credentials = null, ?string $cachePath = null, int $ttl = 0)
     {
+        # If credentials not specified ..
         if (is_null($credentials)) {
+            # .. activate offline mode
             $this->offlineMode = true;
         } else {
             # Attempt to ..
@@ -126,10 +129,12 @@ class Webservice
 
     /**
      * Destructor
+     *
+     * @return void
      */
     public function __destruct()
     {
-        if (!$this->offlineMode) {
+        if (!is_null($this->sessionID)) {
             $this->logOut();
         }
     }
@@ -143,12 +148,24 @@ class Webservice
      * Authenticates with KNV's API & generates session token
      *
      * @param array $credentials Login credentials
+     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
      * @return void
      */
     private function logIn(array $credentials): void
     {
-        # Log in & aquire session token
-        $this->sessionID = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
+        try {
+            # Log in & aquire session token
+            $this->sessionID = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
+        } catch (SoapFault $e) {
+            # If 'login error' code is present ..
+            if ($e?->detail?->TLDFehler?->errcode == '20000') {
+                # .. report back ..
+                throw new InvalidLoginException($e->getMessage());
+            }
+
+            # .. otherwise, invoke offline mode
+            throw $e;
+        }
     }
 
 
@@ -172,13 +189,13 @@ class Webservice
      * .. if product for given EAN/ISBN exists
      *
      * @param string $identifier Product EAN/ISBN
-     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
+     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException
      * @return array
      */
     private function query(string $identifier): array
     {
         if ($this->offlineMode) {
-            throw new InvalidLoginException('Offline mode enabled, API calls are not allowed.');
+            throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
         }
 
         # For getting started with KNV's (surprisingly well documented) german API,
@@ -347,12 +364,10 @@ class Webservice
      *
      * @param string $identifier Product EAN/ISBN
      * @param int $quantity Number of products to be delivered
+     * @return \Fundevogel\Pcbis\Api\Ola
      */
-    public function ola(string $identifier, int $quantity = 1): stdClass
+    public function ola(string $identifier, int $quantity = 1): Ola
     {
-        /**
-         * @var stdClass
-         */
         return new Ola($this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): stdClass {
             # Expire after one hour
             $item->expiresAfter(3600);
