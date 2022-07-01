@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Traits;
 
 use Fundevogel\Pcbis\Exceptions\UnknownRoleException;
+use Fundevogel\Pcbis\Fields\Role;
+use Fundevogel\Pcbis\Fields\Roles;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
@@ -31,7 +33,7 @@ trait People
      *
      * @var array
      */
-    protected $roles = [
+    private $roles = [
         'Vorlage'      => 'original',
         'Illustration' => 'illustrator',
         'Zeichnungen'  => 'drawer',
@@ -51,15 +53,7 @@ trait People
      *
      * @var array
      */
-    protected $people;
-
-
-    /**
-     * Delimiter between people when exported as string
-     *
-     * @var string
-     */
-    protected $delimiter = '; ';
+    public $people;
 
 
     /**
@@ -67,7 +61,7 @@ trait People
      */
 
     /**
-     * Extracts involved people from source array
+     * Extracts involved people from source data
      *
      * This includes a wide variety, such as
      * - `author`
@@ -91,21 +85,21 @@ trait People
         # whereas all other roles are always part of the 'Mitarb' string
         $people = [
             'author'       => $this->buildAuthor(),
-            'original'     => [],
-            'illustrator'  => [],
-            'drawer'       => [],
-            'photographer' => [],
-            'translator'   => [],
-            'editor'       => [],
-            'narrator'     => [],
-            'composer'     => [],
-            'director'     => [],
-            'producer'     => [],
-            'actor'        => [],
-            'participant'  => [],
+            'original'     => $this->buildOriginal(),
+            'illustrator'  => $this->buildIllustrator(),
+            'drawer'       => $this->buildDrawer(),
+            'photographer' => $this->buildPhotographer(),
+            'translator'   => $this->buildTranslator(),
+            'editor'       => $this->buildEditor(),
+            'narrator'     => $this->buildNarrator(),
+            'composer'     => $this->buildComposer(),
+            'director'     => $this->buildDirector(),
+            'producer'     => $this->buildProducer(),
+            'actor'        => $this->buildActor(),
+            'participant'  => $this->buildParticipant(),
         ];
 
-        if (!isset($this->source['Mitarb'])) {
+        if (!isset($this->data['Mitarb'])) {
             return $people;
         }
 
@@ -129,7 +123,7 @@ trait People
             'Aus dem Englischen von '     => 'translator',
         ];
 
-        $data = $this->source['Mitarb'];
+        $data = $this->data['Mitarb'];
 
         # Take care of delimiters with two or more dots
         if (Str::contains($data, 'Illustr. v. ')) {
@@ -201,17 +195,17 @@ trait People
      * Example:
      * 'Doe, John; Doe, Jane'
      *
-     * =>
+     * .. becomes ..
      *
      * [
-     *   [
-     *     'firstName' => 'John',
-     *     'lastName'  => 'Doe',
-     *   ],
-     *   [
-     *     'firstName' => 'Jane',
-     *     'lastName'  => 'Doe',
-     *   ],
+     *     [
+     *         'firstName' => 'John',
+     *         'lastName'  => 'Doe',
+     *     ],
+     *     [
+     *         'firstName' => 'Jane',
+     *         'lastName'  => 'Doe',
+     *     ],
      * ]
      *
      * @param string $string Involved people
@@ -246,34 +240,19 @@ trait People
 
 
     /**
-     * Exports involved people of a given role as string (or array)
+     * Exports people of given role
      *
-     * @param string $role Individual role
-     * @param bool $asArray Whether to export an array (rather than a string)
+     * @param string $role Role (= involvement)
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownRoleException
-     * @return array|string
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function getRole(string $role, bool $asArray = false): array|string
+    public function getRole(string $role): Role
     {
         if (!array_key_exists($role, $this->people)) {
-            throw new UnknownRoleException('Unknown role: "' . $role . '"');
+            throw new UnknownRoleException(sprintf('Unknown role: "%s"', $role));
         }
 
-        if (empty($this->people[$role])) {
-            return $asArray ? [] : '';
-        }
-
-        if ($asArray) {
-            return $this->people[$role];
-        }
-
-        $people = [];
-
-        foreach (array_values($this->people[$role]) as $person) {
-            $people[] = A::join($person, ' ');
-        }
-
-        return A::join($people, $this->delimiter);
+        return new Role(array_flip($this->roles)[$role], $this->people[$role]);
     }
 
 
@@ -284,24 +263,22 @@ trait People
      */
     protected function buildAuthor(): array
     {
-        if (!isset($this->source['AutorSachtitel'])) {
+        if (!isset($this->data['AutorSachtitel'])) {
             return [];
         }
 
-        $string = $this->source['AutorSachtitel'];
+        $string = $this->data['AutorSachtitel'];
 
         $groupDelimiter = ';';
         $personDelimiter = ',';
 
         # Edge case: `AutorSachtitel` contains something other than a person
         if (!Str::contains($string, $groupDelimiter) && !Str::contains($string, $personDelimiter)) {
-            if (isset($this->source['IndexAutor'])) {
-                if (is_array($this->source['IndexAutor'])) {
-                    $string = A::join(array_map(function ($string) {
-                        return trim($string);
-                    }, $this->source['IndexAutor']), ';');
-                } elseif (is_string($this->source['IndexAutor'])) {
-                    $string = trim($this->source['IndexAutor']);
+            if (isset($this->data['IndexAutor'])) {
+                if (is_array($this->data['IndexAutor'])) {
+                    $string = A::join(array_map(trim, $this->data['IndexAutor']), ';');
+                } elseif (is_string($this->data['IndexAutor'])) {
+                    $string = trim($this->data['IndexAutor']);
                 } else {
                     return [];
                 }
@@ -315,205 +292,291 @@ trait People
 
 
     /**
-     * Exports all involved people as string (or array)
+     * Builds original author(s)
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return array|string
+     * @return array
      */
-    public function people(bool $asArray = false): array|string
+    protected function buildOriginal(): array
     {
-        if ($asArray) {
-            return $this->people;
-        }
-
-        $all = $this->people;
-
-        # Available role identifiers
-        $roles = array_flip($this->roles);
-
-        # Remove author
-        unset($all['author']);
-
-        $result = [];
-
-        foreach ($all as $role => $people) {
-            if ($people === []) {
-                continue;
-            }
-
-            $array = [];
-
-            foreach ($people as $person) {
-                $array[] = A::join($person, ' ');
-            }
-
-            $result[] = $roles[$role] . ': ' . A::join($array, $this->delimiter);
-        }
-
-        return A::join($result, '. ');
+        return [];
     }
 
 
     /**
-     * Shortcuts
-     */
-
-    /**
-     * Exports author
+     * Builds illustrator(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function author(bool $asArray = false): array|string
+    protected function buildIllustrator(): array
     {
-        return $this->getRole('author', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports original author
+     * Builds drawer(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function original(bool $asArray = false): array|string
+    protected function buildDrawer(): array
     {
-        return $this->getRole('original', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports illustrator
+     * Builds photographer(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function illustrator(bool $asArray = false): array|string
+    protected function buildPhotographer(): array
     {
-        return $this->getRole('illustrator', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports drawer
+     * Builds translator(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function drawer(bool $asArray = false): array|string
+    protected function buildTranslator(): array
     {
-        return $this->getRole('drawer', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports photographer
+     * Builds editor(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function photographer(bool $asArray = false): array|string
+    protected function buildEditor(): array
     {
-        return $this->getRole('photographer', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports translator
+     * Builds narrator(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function translator(bool $asArray = false): array|string
+    protected function buildNarrator(): array
     {
-        return $this->getRole('translator', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports editor
+     * Builds composer(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function editor(bool $asArray = false): array|string
+    protected function buildComposer(): array
     {
-        return $this->getRole('editor', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports narrator
+     * Builds director(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function narrator(bool $asArray = false): array|string
+    protected function buildDirector(): array
     {
-        return $this->getRole('narrator', $asArray);
+        return [];
     }
 
 
     /**
-     * Export composer
+     * Builds producer(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function composer(bool $asArray = false): array|string
+    protected function buildProducer(): array
     {
-        return $this->getRole('composer', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports director
+     * Builds actor(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function director(bool $asArray = false): array|string
+    protected function buildActor(): array
     {
-        return $this->getRole('director', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports producer
+     * Builds participant(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function producer(bool $asArray = false): array|string
+    protected function buildParticipant(): array
     {
-        return $this->getRole('producer', $asArray);
+        return [];
     }
 
 
     /**
-     * Exports actor
-     *
-     * @return array|string
+     * Dataset methods
      */
-    public function actor(bool $asArray = false): array|string
+
+    /**
+     * Exports author(s)
+     *
+     * @return array
+     */
+    public function author(): array
     {
-        return $this->getRole('actor', $asArray);
+        return $this->getRole('author');
     }
 
 
     /**
-     * Exports participant
+     * Exports original author(s)
      *
-     * @return array|string
+     * @return array
      */
-    public function participant(bool $asArray = false): array|string
+    public function original(): array
     {
-        return $this->getRole('participant', $asArray);
+        return $this->getRole('original');
     }
 
 
     /**
-     * Setters & getters
+     * Exports illustrator(s)
      *
-     * @return void
+     * @return array
      */
-    public function setDelimiter(string $delimiter)
+    public function illustrator(): array
     {
-        $this->delimiter = $delimiter;
+        return $this->getRole('illustrator');
     }
 
 
-    public function getDelimiter(): string
+    /**
+     * Exports drawer(s)
+     *
+     * @return array
+     */
+    public function drawer(): array
     {
-        return $this->delimiter;
+        return $this->getRole('drawer');
+    }
+
+
+    /**
+     * Exports photographer(s)
+     *
+     * @return array
+     */
+    public function photographer(): array
+    {
+        return $this->getRole('photographer');
+    }
+
+
+    /**
+     * Exports translator(s)
+     *
+     * @return array
+     */
+    public function translator(): array
+    {
+        return $this->getRole('translator');
+    }
+
+
+    /**
+     * Exports editor(s)
+     *
+     * @return array
+     */
+    public function editor(): array
+    {
+        return $this->getRole('editor');
+    }
+
+
+    /**
+     * Exports narrator(s)
+     *
+     * @return array
+     */
+    public function narrator(): array
+    {
+        return $this->getRole('narrator');
+    }
+
+
+    /**
+     * Export composer(s)
+     *
+     * @return array
+     */
+    public function composer(): array
+    {
+        return $this->getRole('composer');
+    }
+
+
+    /**
+     * Exports director(s)
+     *
+     * @return array
+     */
+    public function director(): array
+    {
+        return $this->getRole('director');
+    }
+
+
+    /**
+     * Exports producer(s)
+     *
+     * @return array
+     */
+    public function producer(): array
+    {
+        return $this->getRole('producer');
+    }
+
+
+    /**
+     * Exports actor(s)
+     *
+     * @return array
+     */
+    public function actor(): array
+    {
+        return $this->getRole('actor');
+    }
+
+
+    /**
+     * Exports participant(s)
+     *
+     * @return array
+     */
+    public function participant(): array
+    {
+        return $this->getRole('participant');
+    }
+
+
+    /**
+     * Exports all involved people
+     *
+     * @return \Fundevogel\Pcbis\Fields\Roles
+     */
+    public function people(): Roles
+    {
+        return new Roles($this->roles, $this->people);
     }
 }
