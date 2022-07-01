@@ -29,26 +29,6 @@ trait People
      */
 
     /**
-     * Available roles
-     *
-     * @var array
-     */
-    private $roles = [
-        'Vorlage'      => 'original',
-        'Illustration' => 'illustrator',
-        'Zeichnungen'  => 'drawer',
-        'Fotos'        => 'photographer',
-        'Übersetzung'  => 'translator',
-        'Gesprochen'   => 'narrator',
-        'Komposition'  => 'composer',
-        'Regie'        => 'director',
-        'Produktion'   => 'producer',
-        'Besetzung'    => 'actor',
-        'Mitarbeit'    => 'participant',
-    ];
-
-
-    /**
      * Involved people (all roles)
      *
      * @var array
@@ -61,9 +41,9 @@ trait People
      */
 
     /**
-     * Extracts involved people from source data
+     * Extracts involved people from raw data
      *
-     * This includes a wide variety, such as
+     * This includes the following roles by default:
      * - `author`
      * - `original`
      * - `illustrator`
@@ -79,7 +59,7 @@ trait People
      *
      * @return array
      */
-    protected function separatePeople(): array
+    protected function setUpPeople(): array
     {
         # Isolate author detection as this may vary for each product,
         # whereas all other roles are always part of the 'Mitarb' string
@@ -155,6 +135,21 @@ trait People
             $data = Str::replace($data, $matches, $replacements);
         }
 
+        # Define types of involvement
+        $roles = [
+            'Vorlage'      => 'original',
+            'Illustration' => 'illustrator',
+            'Zeichnungen'  => 'drawer',
+            'Fotos'        => 'photographer',
+            'Übersetzung'  => 'translator',
+            'Gesprochen'   => 'narrator',
+            'Komposition'  => 'composer',
+            'Regie'        => 'director',
+            'Produktion'   => 'producer',
+            'Besetzung'    => 'actor',
+            'Mitarbeit'    => 'participant',
+        ];
+
         foreach (Str::split($data, '.') as $string) {
             # If dots were replaced, change them back
             $string = Str::replace($string, '#', '.');
@@ -175,8 +170,8 @@ trait People
                 # Otherwise, split role & people as usual
                 $array = Str::split($string, ':');
 
-                if (isset($this->roles[$array[0]])) {
-                    $role = $this->roles[$array[0]];
+                if (isset($roles[$array[0]])) {
+                    $role = $roles[$array[0]];
                 }
 
                 $group = $array[1];
@@ -252,7 +247,7 @@ trait People
             throw new UnknownRoleException(sprintf('Unknown role: "%s"', $role));
         }
 
-        return new Role(array_flip($this->roles)[$role], $this->people[$role]);
+        return new Role($this->people[$role]);
     }
 
 
@@ -571,12 +566,18 @@ trait People
 
 
     /**
-     * Exports all involved people
+     * Exports (just) involved people
      *
      * @return \Fundevogel\Pcbis\Fields\Roles
      */
     public function people(): Roles
     {
-        return new Roles($this->roles, $this->people);
+        # Fetch involved people
+        $people = $this->people;
+
+        # Remove author
+        unset($people['author']);
+
+        return new Roles($this->roles, $people);
     }
 }

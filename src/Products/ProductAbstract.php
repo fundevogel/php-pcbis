@@ -56,6 +56,21 @@ abstract class ProductAbstract
     {
         # Store product EAN/ISBN
         $this->identifier = $this->data['EAN'];
+
+        # Add startup hook
+        $this->setup();
+    }
+
+
+    /**
+     * Setup hook
+     *
+     * @return void
+     */
+    public function setup(): void
+    {
+        $this->people = $this->setUpPeople();
+        $this->tags   = $this->setUpTags();
     }
 
 

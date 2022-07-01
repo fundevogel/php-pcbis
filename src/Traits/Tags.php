@@ -30,23 +30,7 @@ trait Tags
      *
      * @var array
      */
-    protected $tags;
-
-
-    /**
-     * Categories
-     *
-     * @var array
-     */
-    protected $categories;
-
-
-    /**
-     * Topics
-     *
-     * @var array
-     */
-    protected $topics;
+    protected $public;
 
 
     /**
@@ -54,17 +38,21 @@ trait Tags
      */
 
     /**
-     * Extracts tags from source array
+     * Extracts tags from raw data
+     *
+     * This includes the following types by default:
+     * - `categories`
+     * - `topics`
      *
      * @return array
      */
-    protected function separateTags(): array
+    protected function setUpTags(): array
     {
-        if (!isset($this->source['IndexSchlagw'])) {
+        if (!isset($this->data['IndexSchlagw'])) {
             return [];
         }
 
-        $data = $this->source['IndexSchlagw'];
+        $data = $this->data['IndexSchlagw'];
 
         if (is_string($data)) {
             $data = Str::split(trim($data), ';');
@@ -81,11 +69,11 @@ trait Tags
 
 
     /**
-     * Builds categories
+     * Exports categories
      *
      * @return array
      */
-    protected function buildCategories(): array
+    protected function categories(): array
     {
         if (empty($this->tags)) {
             return [];
@@ -134,11 +122,11 @@ trait Tags
 
 
     /**
-     * Builds topics
+     * Exports topics
      *
      * @return array
      */
-    protected function buildTopics(): array
+    protected function topics(): array
     {
         # Store blocked topics
         $blockList = [
@@ -176,42 +164,5 @@ trait Tags
         }, $this->tags);
 
         return array_filter($topics);
-    }
-
-
-    /**
-     * Exports tag
-     *
-     * @return array|string
-     */
-    private function exportTag($property, bool $asArray, string $delimiter): array|string
-    {
-        if ($asArray) {
-            return $property;
-        }
-
-        return A::join($property, $delimiter);
-    }
-
-
-    /**
-     * Exports categories
-     *
-     * @return array|string
-     */
-    public function categories(bool $asArray = false, string $delimiter = ', '): array|string
-    {
-        return $this->exportTag($this->categories, $asArray, $delimiter);
-    }
-
-
-    /**
-     * Exports topics
-     *
-     * @return array|string
-     */
-    public function topics(bool $asArray = false, string $delimiter = ', '): array|string
-    {
-        return $this->exportTag($this->topics, $asArray, $delimiter);
     }
 }
