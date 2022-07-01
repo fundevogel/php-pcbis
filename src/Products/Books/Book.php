@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Products\Books;
 
 use Fundevogel\Pcbis\Butler;
+use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Product;
 
 /**
@@ -26,69 +28,32 @@ class Book extends Product
      */
 
     /**
-     * Binding
+     * Binding codes
      *
-     * @var string
+     * @var array
      */
-    protected $binding;
-
-
-    /**
-     * Page count
-     *
-     * @var string
-     */
-    protected $pageCount;
-
-
-    /**
-     * Antolin rating (suitable grade)
-     *
-     * @var string
-     */
-    protected $antolin;
+    protected $bindings;
 
 
     /**
      * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->publisher = $this->buildPublisher();
-        $this->binding   = $this->buildBinding();
-        $this->pageCount = $this->buildPageCount();
-        $this->antolin   = $this->buildAntolin();
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Builds binding
      *
-     * @return string
+     * @param array $data Source data fetched from KNV's API
+     * @param \Fundevogel\Pcbis\Webservice $api Object granting access to KNV's API
      */
-    protected function buildBinding(): string
+    public function __construct(public array $data, public Webservice $api)
     {
-        if (!isset($this->source['Einband'])) {
-            return '';
-        }
+        # Execute default constructor
+        parent::__construct($data, $api);
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../../../data/codes.json'), true);
-
-        if (!isset($bindings[$this->source['Einband']])) {
-            return $this->source['Einband'];
-        }
-
-        return $bindings[$this->source['Einband']];
+        # Load binding codes
+        $this->bindings = json_decode(file_get_contents(__DIR__ . '/../../../data/codes.json'), true);
     }
 
+
+    /**
+     * Dataset methods
+     */
 
     /**
      * Exports binding
@@ -97,22 +62,33 @@ class Book extends Product
      */
     public function binding(): string
     {
-        return $this->binding;
+        if (!isset($this->data['Einband'])) {
+            return '';
+        }
+
+        # Be safe, trim strings
+        $binding = trim($this->data['Einband']);
+
+        if (!array_key_exists($binding, $this->bindings)) {
+            return $binding;
+        }
+
+        return $this->bindings[$binding];
     }
 
 
     /**
-     * Builds page count
+     * Exports page count
      *
      * @return string
      */
-    protected function buildPageCount(): string
+    public function pageCount(): string
     {
-        if (!isset($this->source['Abb'])) {
+        if (!isset($this->data['Abb'])) {
             return '';
         }
 
-        $lines = Str::split($this->source['Abb'], '.');
+        $lines = Str::split($this->data['Abb'], '.');
 
         foreach ($lines as $line) {
             if (Str::substr($line, -1) === 'S') {
@@ -125,22 +101,11 @@ class Book extends Product
 
 
     /**
-     * Exports page count
+     * Exports Antolin rating
      *
      * @return string
      */
-    public function pageCount(): string
-    {
-        return $this->pageCount;
-    }
-
-
-    /**
-     * Builds Antolin rating
-     *
-     * @return string
-     */
-    protected function buildAntolin(): string
+    public function antolin(): string
     {
         if (empty($this->tags)) {
             return '';
@@ -157,49 +122,34 @@ class Book extends Product
 
 
     /**
-     * Exports Antolin rating
-     *
-     * @return string
-     */
-    public function antolin(): string
-    {
-        return $this->antolin;
-    }
-
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
-        return array_merge(
-            # Build dataset
-            parent::export($asArray),
-            [
-                # (1) 'Book' specific data
-                'Einband'       => $this->binding(),
-                'Seitenzahl'    => $this->pageCount(),
-                'Antolin'       => $this->antolin(),
+        # Build dataset
+        return array_merge(parent::export(), [
+            # (1) 'Book' specific data
+            'Einband'       => $this->binding(),
+            'Seitenzahl'    => $this->pageCount(),
+            'Antolin'       => $this->antolin(),
 
-                # (2) Extension 'People'
-                'AutorIn'       => $this->getRole('author', $asArray),
-                'Vorlage'       => $this->getRole('original', $asArray),
-                'IllustratorIn' => $this->getRole('illustrator', $asArray),
-                'ZeichnerIn'    => $this->getRole('drawer', $asArray),
-                'PhotographIn'  => $this->getRole('photographer', $asArray),
-                'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
-                'HerausgeberIn' => $this->getRole('editor', $asArray),
-                'MitarbeiterIn' => $this->getRole('participant', $asArray),
-            ]
-        );
+            # (2) Extension 'People'
+            'AutorIn'       => $this->getRole('author'),
+            'Vorlage'       => $this->getRole('original'),
+            'IllustratorIn' => $this->getRole('illustrator'),
+            'ZeichnerIn'    => $this->getRole('drawer'),
+            'PhotographIn'  => $this->getRole('photographer'),
+            'ÜbersetzerIn'  => $this->getRole('translator'),
+            'HerausgeberIn' => $this->getRole('editor'),
+            'MitarbeiterIn' => $this->getRole('participant'),
+        ]);
     }
 
 
     /**
-     * Helpers
+     * Methods
      */
 
     /**

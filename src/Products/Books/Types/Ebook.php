@@ -24,78 +24,40 @@ use Fundevogel\Pcbis\Helpers\Str;
 class Ebook extends Book
 {
     /**
-     * Properties
+     * Overrides
      */
 
     /**
-     * Supported devices
+     * Exports subtitle
      *
-     * @var array
+     * @return string
      */
-    protected $devices;
-
-
-    /**
-     * ISBN of print edition
-     *
-     * @var string
-     */
-    protected $print;
-
-
-    /**
-     * File size (in megabytes)
-     *
-     * @var string
-     */
-    protected $fileSize;
-
-
-    /**
-     * File format
-     *
-     * @var string
-     */
-    protected $fileFormat;
-
-
-    /**
-     * Digital Rights Management descriptor
-     *
-     * @var string
-     */
-    protected $drm;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
+    public function subtitle(): string
     {
-        parent::__construct($source, $props);
+        if (!isset($this->source['Utitel'])) {
+            return '';
+        }
 
-        # Extend dataset
-        $this->devices    = $this->buildDevices();
-        $this->print      = $this->buildPrint();
-        $this->fileSize   = $this->buildFileSize();
-        $this->fileFormat = $this->buildFileFormat();
-        $this->drm        = $this->buildDRM();
+        if (Str::contains($this->source['Utitel'], 'Lesegerätegruppen')) {
+            return '';
+        }
+
+        return A::first(Str::split($this->source['Utitel'], '.'));
     }
 
 
     /**
-     * Methods
+     * Dataset methods
      */
 
     /**
-     * Builds supported devices
+     * Exports supported devices
      *
      * @return array
      */
-    protected function buildDevices(): array
+    public function devices(): array
     {
-        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
+        if (!isset($this->source['Utitel'])) {
             return [];
         }
 
@@ -106,27 +68,11 @@ class Ebook extends Book
 
 
     /**
-     * Exports supported devices
-     *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return array|string
-     */
-    public function devices(bool $asArray = false): array|string
-    {
-        if ($asArray) {
-            return $this->devices;
-        }
-
-        return A::join($this->devices, ' / ');
-    }
-
-
-    /**
-     * Builds ISBN of print edition
+     * Exports print edition ISBN
      *
      * @return string
      */
-    protected function buildPrint(): string
+    public function printEdition(): string
     {
         if (!isset($this->source['PrintISBN'])) {
             return '';
@@ -137,22 +83,11 @@ class Ebook extends Book
 
 
     /**
-     * Exports ISBN of print edition
+     * Exports file size (in megabytes)
      *
      * @return string
      */
-    public function print(): string
-    {
-        return $this->print;
-    }
-
-
-    /**
-     * Builds file size (in megabytes)
-     *
-     * @return string
-     */
-    protected function buildFileSize(): string
+    public function fileSize(): string
     {
         if (!isset($this->source['DateiGroesse'])) {
             return '';
@@ -165,48 +100,27 @@ class Ebook extends Book
 
 
     /**
-     * Exports file size
-     *
-     * @return string
-     */
-    public function fileSize(): string
-    {
-        return $this->fileSize;
-    }
-
-
-    /**
-     * Builds file format
-     *
-     * @return string
-     */
-    protected function buildFileFormat(): string
-    {
-        if (!isset($this->source['DateiFormat'])) {
-            return '';
-        }
-
-        return Str::lower($this->source['DateiFormat']);
-    }
-
-
-    /**
      * Exports file format
      *
      * @return string
      */
     public function fileFormat(): string
     {
-        return $this->fileFormat;
+        if (!isset($this->source['DateiFormat'])) {
+            return '';
+        }
+
+        # Be safe, trim strings
+        return Str::lower(trim($this->source['DateiFormat']));
     }
 
 
     /**
-     * Builds DRM descriptor
+     * Exports DRM descriptor
      *
      * @return string
      */
-    protected function buildDRM(): string
+    public function drm(): string
     {
         if (!isset($this->source['DRMFlags'])) {
             return '';
@@ -225,59 +139,20 @@ class Ebook extends Book
 
 
     /**
-     * Exports DRM descriptor
-     *
-     * @return string
-     */
-    public function drm(): string
-    {
-        return $this->drm;
-    }
-
-
-    /**
-     * Overrides
-     */
-
-    /**
-     * Builds subtitle
-     *
-     * @return string
-     */
-    protected function buildSubtitle(): string
-    {
-        if (!isset($this->source['Utitel']) || $this->source['Utitel'] == null) {
-            return '';
-        }
-
-        if (Str::startsWith($this->source['Utitel'], 'Unterstützte Lesegerätegruppen')) {
-            return '';
-        }
-
-        return A::first(Str::split($this->source['Utitel'], '.'));
-    }
-
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Book' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Ebook' specific data
-                'Lesegeräte'   => $this->devices(),
-                'Printausgabe' => $this->print(),
-                'Dateigröße'   => $this->fileSize(),
-                'Dateiformat'  => $this->fileFormat(),
-                'DRM'          => $this->drm(),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Ebook' specific data
+            'Lesegeräte'   => $this->devices(),
+            'Printausgabe' => $this->printEdition(),
+            'Dateigröße'   => $this->fileSize(),
+            'Dateiformat'  => $this->fileFormat(),
+            'DRM'          => $this->drm(),
+        ]);
     }
 }

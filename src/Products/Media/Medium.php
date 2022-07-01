@@ -23,57 +23,17 @@ use Fundevogel\Pcbis\Products\Product;
 class Medium extends Product
 {
     /**
-     * Properties
+     * Dataset methods
      */
 
     /**
-     * Director
-     *
-     * @var array
-     */
-    protected $director;
-
-
-    /**
-     * Producer
-     *
-     * @var array
-     */
-    protected $producer;
-
-
-    /**
-     * Duration (in minutes)
-     *
-     * @var string
-     */
-    protected $duration;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->duration = $this->buildDuration();
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Builds duration
+     * Exports duration
      *
      * @return string
      */
-    protected function buildDuration(): string
+    public function duration(): string
     {
+        # TODO: Prevent subtitle containing duration
         if (!isset($this->source['Utitel'])) {
             return '';
         }
@@ -85,44 +45,29 @@ class Medium extends Product
 
 
     /**
-     * Exports duration
-     *
-     * @return string
-     */
-    public function duration(): string
-    {
-        return $this->duration;
-    }
-
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
-        return array_merge(
-            # Build dataset
-            parent::export($asArray),
-            [
-                # (1) 'Media' specific data
-                'Dauer'         => $this->duration(),
-                'KomponistIn'   => $this->getRole('composer', $asArray),
-                'RegisseurIn'   => $this->getRole('director', $asArray),
-                'ProduzentIn'   => $this->getRole('producer', $asArray),
+        # Build dataset
+        return array_merge(parent::export(), [
+            # (1) 'Media' specific data
+            'Dauer'         => $this->duration(),
+            'KomponistIn'   => $this->getRole('composer'),
+            'RegisseurIn'   => $this->getRole('director'),
+            'ProduzentIn'   => $this->getRole('producer'),
 
-                # (2) Extension 'People'
-                'AutorIn'       => $this->getRole('author', $asArray),
-                'Vorlage'       => $this->getRole('original', $asArray),
-                'IllustratorIn' => $this->getRole('illustrator', $asArray),
-                'ZeichnerIn'    => $this->getRole('drawer', $asArray),
-                'PhotographIn'  => $this->getRole('photographer', $asArray),
-                'ÜbersetzerIn'  => $this->getRole('translator', $asArray),
-                'HerausgeberIn' => $this->getRole('editor', $asArray),
-                'MitarbeiterIn' => $this->getRole('participant', $asArray),
-            ]
-        );
+            # (2) Extension 'People'
+            'AutorIn'       => $this->getRole('author'),
+            'Vorlage'       => $this->getRole('original'),
+            'IllustratorIn' => $this->getRole('illustrator'),
+            'ZeichnerIn'    => $this->getRole('drawer'),
+            'PhotographIn'  => $this->getRole('photographer'),
+            'ÜbersetzerIn'  => $this->getRole('translator'),
+            'HerausgeberIn' => $this->getRole('editor'),
+            'MitarbeiterIn' => $this->getRole('participant'),
+        ]);
     }
 }

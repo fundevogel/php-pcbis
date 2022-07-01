@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products\Books\Types;
 
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Books\Book;
 
 /**
@@ -21,64 +22,40 @@ use Fundevogel\Pcbis\Products\Books\Book;
 class Schoolbook extends Book
 {
     /**
-     * Properties
+     * Dataset methods
      */
 
     /**
-     * School subject
-     *
-     * @var string
-     */
-    protected $subject;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->subject = $this->buildSubject();
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Builds school subject
+     * Exports school subject
      *
      * @return string
      */
-    protected function buildSubject(): string
+    public function subject(): string
     {
-        # Store typical subjects
+        # Maps (partial) strings to subjects
+        # TODO: Multiple subjects possible?
         $subjects = [
             # Languages
-            'englisch'    => 'Englisch',
-            'französisch' => 'Französisch',
-            'russisch'    => 'Russisch',
-            'spanisch'    => 'Spanisch',
-            'italienisch' => 'Italienisch',
-            'latein'      => 'Latein',
-            'griechisch'  => 'Griechisch',
-            'deutsch'     => 'Deutsch',
+            'englisch'       => 'Englisch',
+            'französisch'    => 'Französisch',
+            'russisch'       => 'Russisch',
+            'spanisch'       => 'Spanisch',
+            'italienisch'    => 'Italienisch',
+            'latein'         => 'Latein',
+            'griechisch'     => 'Griechisch',
+            'deutsch'        => 'Deutsch',
 
             # Natural sciences
-            'mathe'       => 'Mathematik',
-            'biologie'    => 'Biologie',
-            'chemie'      => 'Chemie',
-            'physik'      => 'Physik',
-            'informatik'  => 'Informatik',
-            'erdkunde'    => 'Geographie',
-            'geografie'   => 'Geographie',
-            'geographie'  => 'Geographie',
-            'heimatkunde' => 'Sachunterricht',
-            'sachunterr'  => 'Sachunterricht',
+            'mathe'          => 'Mathematik',
+            'biologie'       => 'Biologie',
+            'chemie'         => 'Chemie',
+            'physik'         => 'Physik',
+            'informatik'     => 'Informatik',
+            'erdkunde'       => 'Geographie',
+            'geografie'      => 'Geographie',
+            'geographie'     => 'Geographie',
+            'heimatkunde'    => 'Sachunterricht',
+            'sachunterr'     => 'Sachunterricht',
 
             # Social sciences
             'geschichte'     => 'Geschichte',
@@ -90,76 +67,48 @@ class Schoolbook extends Book
             'hauswirtschaft' => 'Hauswirtschaft',
 
             # Fine arts
-            'musik'    => 'Musik',
-            'kunsterz' => 'Kunst',
-            'kunstunt' => 'Kunst',
+            'musik'          => 'Musik',
+            'kunsterz'       => 'Kunst',
+            'kunstunt'       => 'Kunst',
 
             # Ethics & religions
-            'ethik'       => 'Ethik',
-            'philosophie' => 'Philosophie',
-            'religion'    => 'Religion',
-            'islam'       => 'Religion',
-            'christl'     => 'Religion',
-            'evangel'     => 'Religion',
-            'kathol'      => 'Religion',
+            'ethik'          => 'Ethik',
+            'philosophie'    => 'Philosophie',
+            'religion'       => 'Religion',
+            'islam'          => 'Religion',
+            'christl'        => 'Religion',
+            'evangel'        => 'Religion',
+            'kathol'         => 'Religion',
         ];
 
-        # Include different sources (by likeliness of giving away the subject)
+        # Create data array
         $array = [];
 
-        # (1) Full title
-        if (isset($this->source['Titel'])) {
-            $array[] = $this->source['Titel'];
-        }
+        # Define sources likely giving away the subject
+        # (1) Single values
+        $sources = [
+            'Titel',
+            'Kurztitel',
+            'AutorSachtitel',
+            'Utitel',
+            'Abb',
+        ];
 
-        # (2) Short title
-        if (isset($this->source['Kurztitel'])) {
-            $array[] = $this->source['Kurztitel'];
-        }
-
-        # (3) Author (may contain full title)
-        if (isset($this->source['AutorSachtitel'])) {
-            $array[] = $this->source['AutorSachtitel'];
-        }
-
-        # (4) Subtitle
-        if (isset($this->source['Utitel'])) {
-            $array[] = $this->source['Utitel'];
-        }
-
-        # (5) Tags
-        if (isset($this->source['IndexSchlagw'])) {
-            # Differentiate between tags being an array ..
-            $tags = $this->source['IndexSchlagw'];
-
-            if (is_string($tags) === true) {
-                # .. or a string, in which case turn them into an array ..
-                $tags = (array)$this->source['IndexSchlagw'];
+        foreach ($sources as $source) {
+            if (isset($this->data[$source])) {
+                $array[] = $this->data[$source];
             }
-
-            # .. in order to merge with the other candidates
-            $array = array_merge($array, $tags);
         }
 
-        if (isset($this->source['IndexStichw'])) {
-            # Differentiate between tags being an array ..
-            $tags = $this->source['IndexStichw'];
-
-            if (is_string($tags) === true) {
-                # .. or a string, in which case turn them into an array ..
-                $tags = (array)$this->source['IndexStichw'];
+        # (2) Multiple values
+        foreach (['IndexSchlagw', 'IndexStichw'] as $source) {
+            if (isset($this->data[$source])) {
+                # .. in order to merge with the other candidates
+                $array = array_merge($array, (array) $this->data[$source]);
             }
-
-            # .. in order to merge with the other candidates
-            $array = array_merge($array, $tags);
         }
 
-        # (4) Miscellaneous
-        if (isset($this->source['Abb'])) {
-            $array[] = $this->source['Abb'];
-        }
-
-        # Determine subject by looping over collected strings ..
+        # Iterate over collected sources ..
         foreach ($array as $string) {
             # .. as well as known subjects ..
             foreach ($subjects as $key => $value) {
@@ -175,36 +124,16 @@ class Schoolbook extends Book
 
 
     /**
-     * Exports school subject
-     *
-     * @return string
-     */
-    public function subject(): string
-    {
-        return $this->subject;
-    }
-
-
-    /**
-     * Overrides
-     */
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Book' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Schoolbook' specific data
-                'Schulfach' => $this->subject(),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Schoolbook' specific data
+            'Schulfach' => $this->subject(),
+        ]);
     }
 }

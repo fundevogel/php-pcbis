@@ -11,319 +11,75 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products;
 
-use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Butler;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
-use Fundevogel\Pcbis\Interfaces\Exportable;
-use Fundevogel\Pcbis\Interfaces\Sociable;
-use Fundevogel\Pcbis\Interfaces\Taggable;
-use Fundevogel\Pcbis\Traits\OlaStatus;
-use Fundevogel\Pcbis\Traits\People;
-use Fundevogel\Pcbis\Traits\Tags;
-use Fundevogel\Pcbis\Traits\Type;
 
 use DOMDocument;
 
 /**
  * Class Product
  *
- * Serves as template for products
+ * Generic base class
  */
-abstract class Product implements Exportable, Sociable, Taggable
+class Product extends ProductAbstract
 {
-    /**
-     * Traits
-     */
-
-    use OlaStatus;
-    use People;
-    use Tags;
-    use Type;
-
-
-    /**
-     * Properties
-     */
-
-    /**
-     * Object granting access to KNV's API
-     *
-     * @var \Fundevogel\Pcbis\Webservice
-     */
-    private $api;
-
-
-    /**
-     * International Standard Book Number
-     *
-     * @var string
-     */
-    protected $isbn;
-
-
-    /**
-     * Source data fetched from KNV's API
-     *
-     * @var array
-     */
-    protected $source;
-
-
-    /**
-     * Dataset properties
-     */
-
-    /**
-     * Title
-     *
-     * @var string
-     */
-    protected $title;
-
-
-    /**
-     * Subtitle
-     *
-     * @var string
-     */
-    protected $subtitle;
-
-
-    /**
-     * Publisher
-     *
-     * @var array
-     */
-    protected $publisher;
-
-
-    /**
-     * Description
-     *
-     * @var array
-     */
-    protected $description;
-
-
-    /**
-     * Retail price (in €)
-     *
-     * @var string
-     */
-    protected $retailPrice;
-
-
-    /**
-     * Release year
-     *
-     * @var string
-     */
-    protected $releaseYear;
-
-
-    /**
-     * Minimum age recommendation (in years)
-     *
-     * @var string
-     */
-    protected $age;
-
-
-    /**
-     * All series & volumes
-     *
-     * @var array
-     */
-    protected $series;
-
-
-    /**
-     * Weight (in g)
-     *
-     * @var string
-     */
-    protected $weight;
-
-
-    /**
-     * Dimensions (in cm)
-     *
-     * @var string
-     */
-    protected $dimensions;
-
-
-    /**
-     * Available languages
-     *
-     * @var array
-     */
-    protected $languages;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        # Store source data
-        $this->source = $source;
-
-        # Store API proxy
-        $this->api = $props['api'];
-
-        # Store valid ISBN
-        $this->isbn = $props['identifier'];
-
-        # Store product type
-        $this->type = $props['type'];
-
-        # Extract tags & involved people early on
-        $this->tags         = $this->separateTags();
-        $this->people       = $this->separatePeople();
-
-        # Build basic dataset
-        $this->title        = $this->buildTitle();
-        $this->subtitle     = $this->buildSubtitle();
-        $this->publisher    = $this->buildPublisher();
-        $this->description  = $this->buildDescription();
-        $this->retailPrice  = $this->buildretailPrice();
-        $this->releaseYear  = $this->buildreleaseYear();
-        $this->age          = $this->buildAge();
-        $this->series       = $this->buildSeries();
-        $this->weight       = $this->buildWeight();
-        $this->dimensions   = $this->buildDimensions();
-        $this->languages    = $this->buildLanguages();
-
-        # Build categories & topics from tags
-        $this->categories   = $this->buildCategories();
-        $this->topics       = $this->buildTopics();
-
-        # Set OLA code & message
-        $this->olaCode    = $this->buildOlaCode();
-        $this->olaMessage = $this->buildOlaMessage();
-    }
-
-
     /**
      * Magic methods
      */
 
     /**
-     * Export author & title when echoing object
+     * Print author & title when casting to string
      *
      * @return string
      */
     public function __toString(): string
     {
-        if (empty($this->author)) {
+        if (empty($this->author())) {
             return $this->title();
         }
 
-        return $this->author(true) . ': ' . $this->title();
+        # TODO: Fix this
+        # return $this->author() . ': ' . $this->title();
+        return '';
     }
 
 
     /**
-     * Methods
-     */
-
-    /**
-     * Shows source data fetched from KNV's API
+     * Global setter
      *
-     * @return array
+     * @param string $key
+     * @param string $value
+     * @throws \Exception
+     * @return void
      */
-    public function showSource(): array
+    public function __set(string $key, string $value): void
     {
-        return $this->source;
-    }
-
-
-    /**
-     * Checks whether source data was fetched from cache
-     *
-     * @return bool
-     */
-    public function fromCache(): bool
-    {
-        return $this->fromCache;
-    }
-
-
-    /**
-     * Checks whether product has a predecessor
-     *
-     * @return bool
-     */
-    public function hasDowngrade(): bool
-    {
-        return isset($this->source['VorherigeAuflageGtin']);
-    }
-
-
-    /**
-     * Loads & returns predecessor
-     *
-     * @return self
-     */
-    public function downgrade()
-    {
-        if (!isset($this->source['VorherigeAuflageGtin'])) {
-            return $this;
+        # If method exists ..
+        if (method_exists($this, $key)) {
+            # .. fail request
+            throw new Exception('Access read-only!');
         }
 
-        return $this->api->load($this->source['VorherigeAuflageGtin']);
+        $this->{$key} = $value;
     }
 
 
     /**
-     * Checks whether product has a successor
+     * Global getter
      *
-     * @return bool
+     * @param string $key
+     * @return array|string
      */
-    public function hasUpgrade(): bool
+    public function __get(string $key): array|string
     {
-        return isset($this->source['NeueAuflageGtin']);
-    }
-
-
-    /**
-     * Loads & returns successor
-     *
-     * @return self
-     */
-    public function upgrade()
-    {
-        if (!isset($this->source['NeueAuflageGtin'])) {
-            return $this;
+        # If method exists ..
+        if (method_exists($this, $key)) {
+            # .. use it
+            return $this->{$key}();
         }
 
-        return $this->api->load($this->source['NeueAuflageGtin']);
-    }
-
-
-    /**
-     * Exports OLA record
-     *
-     * @param int $quantity Number of products to be delivered
-     * @return \Fundevogel\Pcbis\Api\Ola
-     */
-    public function ola(int $quantity = 1): Ola
-    {
-        return $this->api->ola($this->isbn, $quantity);
-    }
-
-
-    /**
-     * Exports ISBN
-     *
-     * @return string
-     */
-    public function isbn(): string
-    {
-        return $this->isbn;
+        return $this->{$key};
     }
 
 
@@ -332,47 +88,21 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
 
     /**
-     * Builds title
-     *
-     * @return string
-     */
-    protected function buildTitle(): string
-    {
-        if (!isset($this->source['Titel'])) {
-            if (isset($this->source['AutorSachtitel'])) {
-                return $this->source['AutorSachtitel'];
-            }
-
-            return '';
-        }
-
-        return $this->source['Titel'];
-    }
-
-
-    /**
      * Exports title
      *
      * @return string
      */
     public function title(): string
     {
-        return $this->title;
-    }
+        if (!isset($this->data['Titel'])) {
+            if (isset($this->data['AutorSachtitel'])) {
+                return $this->data['AutorSachtitel'];
+            }
 
-
-    /**
-     * Builds subtitle
-     *
-     * @return string
-     */
-    protected function buildSubtitle(): string
-    {
-        if (!isset($this->source['Utitel']) || is_null($this->source['Utitel']) == null) {
             return '';
         }
 
-        return $this->source['Utitel'];
+        return $this->data['Titel'];
     }
 
 
@@ -383,25 +113,29 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
     public function subtitle(): string
     {
-        return $this->subtitle;
+        if (!isset($this->data['Utitel'])) {
+            return '';
+        }
+
+        return $this->data['Utitel'];
     }
 
 
     /**
-     * Builds publisher
+     * Exports publisher(s)
      *
-     * @return array
+     * @return array|string
      */
-    protected function buildPublisher(): array
+    public function publisher(): array|string
     {
-        if (!isset($this->source['IndexVerlag'])) {
+        if (!isset($this->data['IndexVerlag'])) {
             return [];
         }
 
-        if (is_array($this->source['IndexVerlag'])) {
+        if (is_array($this->data['IndexVerlag'])) {
             $publisher = [];
 
-            foreach ($this->source['IndexVerlag'] as $string) {
+            foreach ($this->data['IndexVerlag'] as $string) {
                 # Skip variations
                 if (Str::contains($string, ' # ')) {
                     continue;
@@ -413,38 +147,18 @@ abstract class Product implements Exportable, Sociable, Taggable
             return $publisher;
         }
 
-        return (array)trim($this->source['IndexVerlag']);
+        return trim($this->data['IndexVerlag']);
     }
 
 
     /**
-     * Exports publisher(s)
-     *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return array|string
-     */
-    public function publisher(bool $asArray = false): array|string
-    {
-        if (empty($this->publisher)) {
-            return $asArray ? [] : '';
-        }
-
-        if ($asArray) {
-            return $this->publisher;
-        }
-
-        return A::first($this->publisher);
-    }
-
-
-    /**
-     * Builds description(s)
+     * Exports description(s)
      *
      * @return array
      */
-    protected function buildDescription(): array
+    public function description(): array
     {
-        if (!isset($this->source['Text1'])) {
+        if (!isset($this->data['Text1'])) {
             return [];
         }
 
@@ -452,7 +166,8 @@ abstract class Product implements Exportable, Sociable, Taggable
         # (1) Avoid `htmlParseStartTag: invalid element name in Entity` warnings
         # Sometimes, KNV uses '>>' & '<<' instead of quotation marks, leading to broken texts
         # See 978-3-8373-9003-2
-        $text = Str::replace($this->source['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
+        $text = Str::replace($this->data['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
+        # TODO: Use additional text fields?
 
         # (2) Convert HTML elements
         $text = html_entity_decode($text);
@@ -486,117 +201,69 @@ abstract class Product implements Exportable, Sociable, Taggable
 
 
     /**
-     * Exports description
+     * Exports retail price (in €)
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return array|string
-     */
-    public function description(bool $asArray = false): array|string
-    {
-        if (empty($this->description)) {
-            return $asArray ? [] : '';
-        }
-
-        if ($asArray) {
-            return $this->description;
-        }
-
-        return A::first($this->description);
-    }
-
-
-    /**
-     * Builds retail price (in €)
-     *
-     * @return string
-     */
-    protected function buildRetailPrice(): string
-    {
-        // Input: XX(.YY)
-        // Output: XX,YY
-        if (!isset($this->source['PreisEurD'])) {
-            return '';
-        }
-
-        $retailPrice = (float) $this->source['PreisEurD'];
-
-        return number_format($retailPrice, 2, ',', '');
-    }
-
-
-    /**
-     * Exports retail price
+     * Examples:
+     * - XX    => XX,00
+     * - XX.YY => XX,YY
      *
      * @return string
      */
     public function retailPrice(): string
     {
-        return $this->retailPrice;
+        if (!isset($this->data['PreisEurD'])) {
+            return '';
+        }
+
+        return number_format((float)$this->data['PreisEurD'], 2, ',', '');
     }
 
 
     /**
-     * Builds release year
+     * Exports release year
      *
      * @return string
      */
-    protected function buildReleaseYear(): string
-    {
-        if (!isset($this->source['Erschjahr'])) {
-            return '';
-        }
-
-        return $this->source['Erschjahr'];
-    }
-
-
     public function releaseYear(): string
     {
-        return $this->releaseYear;
-    }
-
-
-    /**
-     * Builds minimum age recommendation (in years)
-     * TODO: Cater for months
-     *
-     * @return string
-     */
-    protected function buildAge(): string
-    {
-        if (!isset($this->source['Alter'])) {
+        if (!isset($this->data['Erschjahr'])) {
             return '';
         }
 
-        $age = Str::substr($this->source['Alter'], 0, 2);
-
-        if (Str::substr($age, 0, 1) === '0') {
-            $age = Str::substr($age, 1, 1);
-        }
-
-        return 'ab ' . $age . ' Jahren';
+        return $this->data['Erschjahr'];
     }
 
 
     /**
-     * Exports age recommendation
+     * Exports recommended minimum age (in years)
      *
      * @return string
      */
     public function age(): string
     {
-        return $this->age;
+        if (!isset($this->data['Alter'])) {
+            return '';
+        }
+
+        $age = Str::substr($this->data['Alter'], 0, 2);
+
+        if (Str::substr($age, 0, 1) === '0') {
+            $age = Str::substr($age, 1, 1);
+        }
+
+        # TODO: Add support for months
+        return 'ab ' . $age . ' Jahren';
     }
 
 
     /**
-     * Builds series
+     * Exports series & volume(s)
      *
      * @return array
      */
-    protected function buildSeries(): array
+    public function series(): array
     {
-        $array = [
+        $data = [
             'VerwieseneReihe1' => 'BandnrVerwieseneReihe1',
             'VerwieseneReihe2' => 'BandnrVerwieseneReihe2',
             'VerwieseneReihe3' => 'BandnrVerwieseneReihe3',
@@ -605,112 +272,46 @@ abstract class Product implements Exportable, Sociable, Taggable
             'VerwieseneReihe6' => 'BandnrVerwieseneReihe6',
         ];
 
-        $series = [];
+        $array = [];
 
-        foreach ($array as $key => $value) {
-            if (isset($this->source[$key]) && isset($this->source[$value])) {
-                $series[trim($this->source[$key])] = trim($this->source[$value]);
+        foreach ($data as $series => $volume) {
+            # Upon first series not being present ..
+            if (!isset($this->data[$series])) {
+                # .. abort loop
+                break;
             }
+
+            $array[trim($this->data[$series])] = trim($this->data[$volume]);
         }
 
-        return $series;
+        return $array;
     }
 
 
     /**
-     * Whether product is part of one (or more) series
+     * Checks whether product is part of one (or more) series
      *
      * @return bool
      */
     public function isSeries(): bool
     {
-        return empty($this->series) === false;
+        return !empty($this->series());
     }
 
 
     /**
-     * Exports series
-     *
-     * @return string
-     */
-    public function series(): string
-    {
-        if (empty($this->series)) {
-            return '';
-        }
-
-        return A::first(array_keys($this->series));
-    }
-
-
-    /**
-     * Exports volume
-     *
-     * @return string
-     */
-    public function volume(): string
-    {
-        if (empty($this->series)) {
-            return '';
-        }
-
-        return A::first(array_values($this->series));
-    }
-
-
-    /**
-     * Exports all series & volumes
-     *
-     * @return array
-     */
-    public function allSeries(): array
-    {
-        if (empty($this->series)) {
-            return [];
-        }
-
-        return $this->series;
-    }
-
-
-    /**
-     * Builds weight (in g)
-     *
-     * @return string
-     */
-    protected function buildWeight(): string
-    {
-        if (!isset($this->source['Gewicht'])) {
-            return '';
-        }
-
-        return $this->source['Gewicht'];
-    }
-
-
-    /**
-     * Exports weight
+     * Exports weight  (in g)
      *
      * @return string
      */
     public function weight(): string
     {
-        return $this->weight;
-    }
-
-
-    /**
-     * Exports height (in cm)
-     *
-     * @return string
-     */
-    public function height(): string
-    {
-        if (!isset($this->source['Höhe'])) {
+        if (!isset($this->data['Gewicht'])) {
             return '';
         }
 
-        return Butler::convertMM($this->source['Höhe']);
+        # TODO: Always grams?
+        return $this->data['Gewicht'];
     }
 
 
@@ -721,11 +322,26 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
     public function width(): string
     {
-        if (!isset($this->source['Breite'])) {
+        if (!isset($this->data['Breite'])) {
             return '';
         }
 
-        return Butler::convertMM($this->source['Breite']);
+        return Butler::convertMM($this->data['Breite']);
+    }
+
+
+    /**
+     * Exports height (in cm)
+     *
+     * @return string
+     */
+    public function height(): string
+    {
+        if (!isset($this->data['Höhe'])) {
+            return '';
+        }
+
+        return Butler::convertMM($this->data['Höhe']);
     }
 
 
@@ -736,51 +352,43 @@ abstract class Product implements Exportable, Sociable, Taggable
      */
     public function depth(): string
     {
-        if (!isset($this->source['Tiefe'])) {
+        if (!isset($this->data['Tiefe'])) {
             return '';
         }
 
-        return Butler::convertMM($this->source['Tiefe']);
+        return Butler::convertMM($this->data['Tiefe']);
     }
 
 
     /**
-     * Builds dimensions (in cm)
+     * Exports dimensions (in cm)
      *
      * Examples:
-     * - height / width
-     * - height x width
-     * - height x width x depth
+     * - 'width'
+     * - 'height'
+     * - 'width x height'
+     * - 'width x height x depth'
+     *
+     * @return string
      */
-    protected function buildDimensions(): string
+    public function dimensions(): string
     {
         return A::join(array_filter([
-            $this->height(),
             $this->width(),
+            $this->height(),
             $this->depth(),
         ]), 'x');
     }
 
 
     /**
-     * Exports dimensions
+     * Exports language(s)
      *
-     * @return string
+     * @return array|string
      */
-    public function dimensions(): string
+    public function languages(): array|string
     {
-        return $this->dimensions;
-    }
-
-
-    /**
-     * Builds languages
-     *
-     * @return array
-     */
-    protected function buildLanguages(): array
-    {
-        if (!isset($this->source['Sprachschl'])) {
+        if (!isset($this->data['Sprachschl'])) {
             return [];
         }
 
@@ -832,124 +440,44 @@ abstract class Product implements Exportable, Sociable, Taggable
             '99' => 'Esperanto',
         ];
 
-        if (is_array($this->source['Sprachschl'])) {
+        if (is_array($this->data['Sprachschl'])) {
             return array_map(function (string $languageCode) use ($languageCodes) {
                 # Be safe, trim strings
                 return $languageCodes[trim($languageCode)];
-            }, $this->source['Sprachschl']);
+            }, $this->data['Sprachschl']);
         }
 
         # Be safe, trim strings
-        return (array)$languageCodes[trim($this->source['Sprachschl'])];
-    }
-
-
-    /**
-     * Exports language(s)
-     *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return string|array
-     */
-    public function languages(bool $asArray = false)
-    {
-        if (empty($this->languages)) {
-            return $asArray ? [] : '';
-        }
-
-        if ($asArray) {
-            return $this->languages;
-        }
-
-        return A::join($this->languages, ', ');
-    }
-
-
-    /**
-     * Builds OLA code
-     *
-     * @return string
-     */
-    protected function buildOlaCode(): string
-    {
-        if (isset($this->source['Mnr'])) {
-            return $this->source['Mnr'];
-        }
-
-        return '';
-    }
-
-
-    /**
-     * Builds OLA message
-     *
-     * @return string
-     */
-    protected function buildOlaMessage(): string
-    {
-        if (array_key_exists($this->olaCode, $this->olaMessages)) {
-            return $this->olaMessages[$this->olaCode];
-        }
-
-        return '';
-    }
-
-
-    /**
-     * Checks if product is available / may be purchased
-     *
-     * @return bool
-     */
-    public function isAvailable(): bool
-    {
-        if ($this->hasOlaCode()) {
-            return in_array($this->olaCode, $this->available);
-        }
-
-        return $this->ola()->isAvailable();
-    }
-
-
-    /**
-     * Checks if product is permanently unavailable
-     *
-     * @return bool
-     */
-    public function isUnavailable(): bool
-    {
-        if ($this->hasOlaCode()) {
-            return in_array($this->olaCode, $this->unavailable);
-        }
-
-        return !$this->isAvailable();
+        return $languageCodes[trim($this->data['Sprachschl'])];
     }
 
 
     /**
      * Exports type of value added tax (VAT)
      *
-     * '0' = zero
-     * '1' = half
-     * '2' = full
+     * Examples:
+     * - '0' = none
+     * - '1' = half
+     * - '2' = full
      *
      * @return string
      */
     public function vat(): string
     {
-        if (!isset($this->source['Mwstknz'])) {
+        if (!isset($this->data['Mwstknz'])) {
             return '';
         }
 
-        return $this->source['Mwstknz'];
+        return $this->data['Mwstknz'];
     }
 
 
     /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
         return [
@@ -957,7 +485,7 @@ abstract class Product implements Exportable, Sociable, Taggable
             'Titel'               => $this->title(),
             'Untertitel'          => $this->subtitle(),
             'Verlag'              => $this->publisher(),
-            'Inhaltsbeschreibung' => $this->description($asArray),
+            'Inhaltsbeschreibung' => $this->description(),
             'Preis'               => $this->retailPrice(),
             'Erscheinungsjahr'    => $this->releaseYear(),
             'Altersempfehlung'    => $this->age(),
@@ -965,11 +493,12 @@ abstract class Product implements Exportable, Sociable, Taggable
             'Band'                => $this->volume(),
             'Gewicht'             => $this->weight(),
             'Abmessungen'         => $this->dimensions(),
-            'Sprachen'            => $this->languages($asArray),
+            'Sprachen'            => $this->languages(),
+            'Mehrwehrtsteuersatz' => $this->vat(),
 
             # (2) Extension 'Tags'
-            'Kategorien'          => $this->categories($asArray),
-            'Themen'              => $this->topics($asArray),
+            'Kategorien'          => $this->categories(),
+            'Themen'              => $this->topics(),
         ];
     }
 }

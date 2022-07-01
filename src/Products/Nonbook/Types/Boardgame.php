@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 /**
@@ -21,50 +22,17 @@ use Fundevogel\Pcbis\Products\Nonbook\Item;
 class Boardgame extends Item
 {
     /**
-     * Properties
+     * Dataset methods
      */
 
     /**
-     * Number of players
-     *
-     * @var string
-     */
-    protected $playerCount;
-
-
-    /**
-     * Estimated playing time (in minutes)
-     *
-     * @var string
-     */
-    protected $playingTime;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->playerCount = $this->buildPlayerCount();
-        $this->playingTime = $this->buildPlayingTime();
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Builds number of players
+     * Exports number of players
      *
      * @return string
      */
-    protected function buildPlayerCount(): string
+    public function playerCount(): string
     {
+        # TODO: Prevent subtitle containing player count!
         if (!isset($this->source['Utitel'])) {
             return '';
         }
@@ -80,22 +48,11 @@ class Boardgame extends Item
 
 
     /**
-     * Exports number of players
+     * Exports estimated playing time
      *
      * @return string
      */
-    public function playerCount(): string
-    {
-        return $this->playerCount;
-    }
-
-
-    /**
-     * Builds estimated playing time
-     *
-     * @return string
-     */
-    protected function buildPlayingTime(): string
+    public function playingTime(): string
     {
         if (!isset($this->source['Utitel'])) {
             return '';
@@ -110,7 +67,7 @@ class Boardgame extends Item
         # Edge case: Subtitle string too long, playing could not be found
         if (empty($playingTime)) {
             # (1) Try looping over tags
-            if (isset($this->source['IndexStichw']) && is_array($this->source['IndexStichw']) === true) {
+            if (isset($this->source['IndexStichw']) && is_array($this->source['IndexStichw'])) {
                 foreach ($this->source['IndexStichw'] as $index => $tag) {
                     # Match each tag for term 'playing time' ..
                     if (Str::contains(Str::lower($tag), 'spieldauer')) {
@@ -130,37 +87,17 @@ class Boardgame extends Item
 
 
     /**
-     * Exports estimated playing time
-     *
-     * @return string
-     */
-    public function playingTime()
-    {
-        return $this->playingTime;
-    }
-
-
-    /**
-     * Overrides
-     */
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Item' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Boardgame' specific data
-                'Spieleranzahl' => $this->playerCount(),
-                'Spieldauer'    => $this->playingTime(),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Boardgame' specific data
+            'Spieleranzahl' => $this->playerCount(),
+            'Spieldauer'    => $this->playingTime(),
+        ]);
     }
 }

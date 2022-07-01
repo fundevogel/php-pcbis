@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products\Media\Types;
 
+use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Media\Medium;
 
 /**
@@ -25,13 +26,13 @@ class Movie extends Medium
      */
 
     /**
-     * Builds author(s)
+     * Exports author(s)
      *
      * @return array
      */
-    protected function buildAuthor(): array
+    public function author(): array
     {
-        if (!isset($this->source['AutorSachtitel'])) {
+        if (!isset($this->data['AutorSachtitel'])) {
             return [];
         }
 
@@ -43,30 +44,30 @@ class Movie extends Medium
         # Loop over suspicious strings ..
         foreach ($array as $string) {
             # .. and in case of a match ..
-            if (Str::contains($this->source['AutorSachtitel'], $string)) {
+            if (Str::contains($this->data['AutorSachtitel'], $string)) {
                 # .. reset author
                 return [];
             }
         }
 
-        return parent::buildAuthor();
+        return parent::author();
     }
 
 
     /**
-     * Builds minimum age recommendation (in years)
+     * Exports recommended minimum age (in years)
      *
      * @return string
      */
-    protected function buildAge(): string
+    public function age(): string
     {
-        if (!isset($this->source['SonstTxt'])) {
+        if (!isset($this->data['SonstTxt'])) {
             return '';
         }
 
         $age = '';
 
-        if (preg_match('/FSK\s(.*)\sfreigegeben/', $this->source['SonstTxt'], $matches)) {
+        if (preg_match('/FSK\s(.*)\sfreigegeben/', $this->data['SonstTxt'], $matches)) {
             $age = $matches[1] . ' Jahren';
         }
 
@@ -75,21 +76,20 @@ class Movie extends Medium
 
 
     /**
+     * Dataset methods
+     */
+
+    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Medium' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Movie' specific data
-                'SchauspielerIn' => $this->getRole('actor', $asArray),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Movie' specific data
+            'SchauspielerIn' => $this->getRole('actor'),
+        ]);
     }
 }

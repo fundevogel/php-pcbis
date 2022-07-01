@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
@@ -23,40 +22,40 @@ use Fundevogel\Pcbis\Products\Nonbook\Item;
 class Videogame extends Item
 {
     /**
-     * Properties
+     * Overrides
      */
 
     /**
-     * Supported platforms
+     * Exports recommended minimum age (in years)
      *
-     * @var array
+     * @return string
      */
-    protected $platforms;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
+    public function age(): string
     {
-        parent::__construct($source, $props);
+        if (!isset($this->source['SonstTxt'])) {
+            return '';
+        }
 
-        # Extend dataset
-        $this->platforms = $this->buildPlatforms();
+        $age = '';
+
+        if (preg_match('/USK\s(.*)\sfreigegeben/', $this->source['SonstTxt'], $matches)) {
+            $age = $matches[1] . ' Jahren';
+        }
+
+        return $age;
     }
 
 
     /**
-     * Methods
+     * Dataset methods
      */
 
     /**
-     * Builds supported platforms
+     * Exports supported platforms
      *
      * @return array
      */
-    protected function buildPlatforms(): array
+    public function platforms(): array
     {
         if (!isset($this->source['AutorSachtitel'])) {
             return [];
@@ -105,62 +104,16 @@ class Videogame extends Item
 
 
     /**
-     * Exports supported platforms
-     *
-     * @param bool $asArray Whether to export an array (rather than a string)
-     * @return string|array
-     */
-    public function platforms(bool $asArray = false)
-    {
-        if ($asArray) {
-            return $this->platforms;
-        }
-
-        return A::join($this->platforms, '; ');
-    }
-
-
-    /**
-     * Overrides
-     */
-
-    /**
-     * Builds minimum age recommendation (in years)
-     *
-     * @return string
-     */
-    protected function buildAge(): string
-    {
-        if (!isset($this->source['SonstTxt'])) {
-            return '';
-        }
-
-        $age = '';
-
-        if (preg_match('/USK\s(.*)\sfreigegeben/', $this->source['SonstTxt'], $matches)) {
-            $age = $matches[1] . ' Jahren';
-        }
-
-        return $age;
-    }
-
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Item' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Videogame' specific data
-                'Plattformen' => $this->platforms($asArray),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Videogame' specific data
+            'Plattformen' => $this->platforms(),
+        ]);
     }
 }

@@ -12,11 +12,28 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
-use Fundevogel\Pcbis\Exceptions\IncompatibleClientException;
 use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
+use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
 use Fundevogel\Pcbis\Helpers\A;
-use Fundevogel\Pcbis\Products\Factory;
+use Fundevogel\Pcbis\Products\Product;
+use Fundevogel\Pcbis\Products\Books\Types\Ebook;
+use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
+use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
+use Fundevogel\Pcbis\Products\Books\Types\Softcover;
+use Fundevogel\Pcbis\Products\Media\Types\Audiobook;
+use Fundevogel\Pcbis\Products\Media\Types\Movie;
+use Fundevogel\Pcbis\Products\Media\Types\Music;
+use Fundevogel\Pcbis\Products\Media\Types\Sound;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Boardgame;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Calendar;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Map;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Nonbook;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Notes;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
+use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -74,35 +91,36 @@ class Webservice
      * @param array $credentials Login credentials
      * @param string $cachePath Cache directory
      * @param int $ttl Lifetime for cache items (in seconds)
+     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
      */
-    public function __construct(?array $credentials = null, string $cachePath = './.cache', int $ttl = 0)
+    public function __construct(?array $credentials = null, ?string $cachePath = null, int $ttl = 0)
     {
-        try {
-            # Fire up SOAP client
-            $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
-                'soap_version' => SOAP_1_2,
-                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-                'cache_wsdl' => WSDL_CACHE_BOTH,
-                'trace' => true,
-                'exceptions' => true,
-            ]);
-
-            # Check API compatibility
-            if ($this->client->CheckVersion('2.0') === '2') {
-                throw new IncompatibleClientException('Your client is outdated, please update to newer version.');
-            }
-
-            # Authenticate with API (if necessary)
-            if (!is_null($credentials)) {
-                $this->sessionID = $this->logIn($credentials);
-            }
-        } catch (SoapFault $e) {
-            # Activate offline mode on network error
+        if (is_null($credentials)) {
             $this->offlineMode = true;
+        } else {
+            # Attempt to ..
+            try {
+                # .. fire up SOAP client
+                $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
+                    'soap_version' => SOAP_1_2,
+                    'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
+                    'cache_wsdl' => WSDL_CACHE_BOTH,
+                    'trace' => true,
+                    'exceptions' => true,
+                ]);
+
+                # Authenticate with API
+                $this->logIn($credentials);
+
+                # If network errors out ..
+            } catch (SoapFault $e) {
+                # .. activate offline mode
+                $this->offlineMode = true;
+            }
         }
 
         # Initialize cache
-        $this->cache = new FilesystemAdapter('pcbis', $ttl, $cachePath);
+        $this->cache = new FilesystemAdapter('pcbis', $ttl, $cachePath ?? __DIR__ . '/.cache');
     }
 
 
@@ -122,21 +140,15 @@ class Webservice
      */
 
     /**
-     * Uses credentials to log into KNV's API & generates a sessionID
+     * Authenticates with KNV's API & generates session token
      *
      * @param array $credentials Login credentials
-     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
-     * @return string
+     * @return void
      */
-    private function logIn(array $credentials): string
+    private function logIn(array $credentials): void
     {
-        try {
-            $query = $this->client->WSCall(['LoginInfo' => $credentials]);
-        } catch (SoapFault $e) {
-            throw new InvalidLoginException($e->getMessage());
-        }
-
-        return $query->SessionID;
+        # Log in & aquire session token
+        $this->sessionID = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
     }
 
 
@@ -223,7 +235,9 @@ class Webservice
      */
     public function fetch(string $identifier, bool $forceRefresh = false): array
     {
+        # If specified ..
         if ($forceRefresh) {
+            # .. clear cache beforehand
             $this->cache->delete($identifier);
         }
 
@@ -238,16 +252,93 @@ class Webservice
      *
      * @param string $identifier Product EAN/ISBN
      * @param bool $forceRefresh Whether to update cached data
-     *
+     * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
      * @return \Fundevogel\Pcbis\Products\Product
      */
-    public function load(string $identifier, bool $forceRefresh = false)
+    public function load(string $identifier, bool $forceRefresh = false): Product
     {
-        # Fetch raw data for given ISBN
+        # Define available product types
+        $types = [
+            # (1) Books
+            'AG' => 'ePublikation',
+            'HC' => 'Hardcover',
+            'SB' => 'Schulbuch',
+            'TB' => 'Taschenbuch',
+
+            # (2) Media
+            'AC' => 'Hörbuch',
+            'AD' => 'Film',
+            'AF' => 'Tonträger',
+            'AK' => 'Musik',
+
+            # (3) Nonbook
+            'AB' => 'Nonbook',
+            'AE' => 'Software',
+            'AH' => 'Games',
+            'AI' => 'Kalender',
+            'AJ' => 'Landkarte/Globus',
+            'AL' => 'Noten',
+            'AM' => 'Papeterie/PBS',
+            'AN' => 'Spiel',
+            'AO' => 'Spielzeug',
+        ];
+
+        # Fetch raw data
         $data = $this->fetch($identifier, $forceRefresh);
 
-        # HOOK: ISBN in data?
-        return Factory::factory($data, $api);
+        # Determine type identifier
+        $code = $data['Sortimentskennzeichen'];
+
+        # If product type is unknown ..
+        if (!array_key_exists($code, $types)) {
+            # .. fail early
+            throw new UnknownTypeException(sprintf('Unknown type identifier: "%s"', $code));
+        }
+
+        # Create instance based on product type
+        $type = $types[$code];
+
+        switch ($type) {
+            # Books
+            case 'ePublikation':
+                return new Ebook($data, $this);
+            case 'Hardcover':
+                return new Hardcover($data, $this);
+            case 'Schulbuch':
+                return new Schoolbook($data, $this);
+            case 'Taschenbuch':
+                return new Softcover($data, $this);
+
+            # Media
+            case 'Film':
+                return new Movie($data, $this);
+            case 'Hörbuch':
+                return new Audiobook($data, $this);
+            case 'Musik':
+                return new Music($data, $this);
+            case 'Tonträger':
+                return new Sound($data, $this);
+
+            # Nonbook
+            case 'Games':
+                return new Videogame($data, $this);
+            case 'Kalender':
+                return new Calendar($data, $this);
+            case 'Landkarte/Globus':
+                return new Map($data, $this);
+            case 'Nonbook':
+                return new Nonbook($data, $this);
+            case 'Noten':
+                return new Notes($data, $this);
+            case 'Papeterie/PBS':
+                return new Stationery($data, $this);
+            case 'Software':
+                return new Software($data, $this);
+            case 'Spiel':
+                return new Boardgame($data, $this);
+            case 'Spielzeug':
+                return new Toy($data, $this);
+        }
     }
 
 

@@ -22,40 +22,15 @@ use Fundevogel\Pcbis\Products\Nonbook\Item;
 class Software extends Item
 {
     /**
-     * Properties
+     * Dataset methods
      */
 
     /**
-     * Version schema
-     *
-     * @var array
-     */
-    protected $version;
-
-
-    /**
-     * Constructor
-     */
-
-    public function __construct(array $source, array $props)
-    {
-        parent::__construct($source, $props);
-
-        # Extend dataset
-        $this->version = $this->buildVersion();
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Builds version schema
+     * Exports version schema
      *
      * @return string
      */
-    protected function buildVersion(): string
+    public function version(): string
     {
         if (!isset($this->source['Abb'])) {
             return '';
@@ -92,18 +67,9 @@ class Software extends Item
 
 
     /**
-     * Exports version schema
+     * Checks whether software is educational
      *
-     * @return string
-     */
-    public function version(): string
-    {
-        return $this->version;
-    }
-
-
-    /**
-     * Whether software is educational
+     * @return bool
      */
     public function isEducational(): bool
     {
@@ -116,25 +82,16 @@ class Software extends Item
 
 
     /**
-     * Overrides
-     */
-
-    /**
      * Exports all data
      *
-     * @param bool $asArray Whether to export an array (rather than a string)
      * @return array
      */
-    public function export(bool $asArray = false): array
+    public function export(): array
     {
         # Build dataset
-        return array_merge(
-            # (1) 'Item' dataset
-            parent::export($asArray),
-            [
-                # (2) 'Software' specific data
-                'Version' => $this->version(),
-            ]
-        );
+        return array_merge(parent::export(), [
+            # 'Software' specific data
+            'Version' => $this->version(),
+        ]);
     }
 }

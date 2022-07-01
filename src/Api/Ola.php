@@ -9,8 +9,6 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-declare(strict_types=1);
-
 namespace Fundevogel\Pcbis\Api;
 
 use Fundevogel\Pcbis\Traits\OlaStatus;
@@ -32,12 +30,8 @@ class Ola
 
 
     /**
-     * OLAResponseRecord (as returned by an OLA call)
-     *
-     * @var \stdClass
+     * Properties
      */
-    private $data;
-
 
     /**
      * Whether current OLA query was successful
@@ -116,9 +110,10 @@ class Ola
 
     /**
      * Constructor
+     *
+     * @param \stdClass $data OLA response ('Online-Lieferabfrage')
      */
-
-    public function __construct(\stdClass $data)
+    public function __construct(public stdClass $data)
     {
         $this->data = $data->OLAResponse->OLAResponseRecord;
 
@@ -156,26 +151,20 @@ class Ola
      * Magic methods
      */
 
+    /**
+     * Print availability when casting to string
+     *
+     * @return string
+     */
     public function __toString(): string
     {
-        return $this->isAvailable() ? 'Verfügbar' : 'Nicht verfügbar';
+        return $this->isAvailable() ? 'verfügbar' : 'nicht verfügbar';
     }
 
 
     /**
      * Methods
      */
-
-    /**
-     * Shows original OLA query fetched from KNV's API
-     *
-     * @return \stdClass
-     */
-    public function showSource(): stdClass
-    {
-        return $this->data;
-    }
-
 
     /**
      * Checks if KNV 'Fehlernummer' is available
