@@ -64,7 +64,7 @@ class Role
         # (3) Separate each person using delimiter
         return A::join(array_map(function (array $person): string {
             return A::join($person, ' ');
-        }, array_values($this->people)), $this->delimiter);
+        }, array_values($this->people)), $delimiter);
     }
 
 

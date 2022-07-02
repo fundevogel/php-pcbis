@@ -425,20 +425,20 @@ trait People
     /**
      * Exports author(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function author(): array
+    public function author(): Role
     {
         return $this->getRole('author');
     }
 
 
     /**
-     * Exports original author(s)
+     * Exports original author(s
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role)
      */
-    public function original(): array
+    public function original(): Role
     {
         return $this->getRole('original');
     }
@@ -447,9 +447,9 @@ trait People
     /**
      * Exports illustrator(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function illustrator(): array
+    public function illustrator(): Role
     {
         return $this->getRole('illustrator');
     }
@@ -458,9 +458,9 @@ trait People
     /**
      * Exports drawer(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function drawer(): array
+    public function drawer(): Role
     {
         return $this->getRole('drawer');
     }
@@ -469,9 +469,9 @@ trait People
     /**
      * Exports photographer(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function photographer(): array
+    public function photographer(): Role
     {
         return $this->getRole('photographer');
     }
@@ -480,9 +480,9 @@ trait People
     /**
      * Exports translator(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function translator(): array
+    public function translator(): Role
     {
         return $this->getRole('translator');
     }
@@ -491,9 +491,9 @@ trait People
     /**
      * Exports editor(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function editor(): array
+    public function editor(): Role
     {
         return $this->getRole('editor');
     }
@@ -502,9 +502,9 @@ trait People
     /**
      * Exports narrator(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function narrator(): array
+    public function narrator(): Role
     {
         return $this->getRole('narrator');
     }
@@ -513,9 +513,9 @@ trait People
     /**
      * Export composer(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function composer(): array
+    public function composer(): Role
     {
         return $this->getRole('composer');
     }
@@ -524,9 +524,9 @@ trait People
     /**
      * Exports director(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function director(): array
+    public function director(): Role
     {
         return $this->getRole('director');
     }
@@ -535,9 +535,9 @@ trait People
     /**
      * Exports producer(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function producer(): array
+    public function producer(): Role
     {
         return $this->getRole('producer');
     }
@@ -546,9 +546,9 @@ trait People
     /**
      * Exports actor(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function actor(): array
+    public function actor(): Role
     {
         return $this->getRole('actor');
     }
@@ -557,9 +557,9 @@ trait People
     /**
      * Exports participant(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Fields\Role
      */
-    public function participant(): array
+    public function participant(): Role
     {
         return $this->getRole('participant');
     }
@@ -572,12 +572,6 @@ trait People
      */
     public function people(): Roles
     {
-        # Fetch involved people
-        $people = $this->people;
-
-        # Remove author
-        unset($people['author']);
-
-        return new Roles($this->roles, $people);
+        return new Roles($this->people);
     }
 }

@@ -21,12 +21,37 @@ use Fundevogel\Pcbis\Helpers\A;
 class Roles
 {
     /**
+     * Properties
+     */
+
+    /**
+     * Types of involvement
+     *
+     * @var array
+     */
+    protected array $roles = [
+        'author'       => 'Autorenschaft',
+        'original'     => 'Vorlage',
+        'illustrator'  => 'Illustration',
+        'drawer'       => 'Zeichnungen',
+        'photographer' => 'Fotos',
+        'translator'   => 'Übersetzung',
+        'narrator'     => 'Gesprochen',
+        'composer'     => 'Komposition',
+        'director'     => 'Regie',
+        'producer'     => 'Produktion',
+        'actor'        => 'Besetzung',
+        'participant'  => 'Mitarbeit',
+    ];
+
+
+    /**
      * Constructor
      *
-     * @param array $roles Available roles
      * @param array $people Roles, each holding involved people thereof
+     * @return void
      */
-    public function __construct(public array $roles, public array $people)
+    public function __construct(public array $people)
     {
     }
 
@@ -74,7 +99,7 @@ class Roles
             }
 
             # Create 'Role' instance
-            $obj = new Role($role, $people);
+            $obj = new Role($people);
 
             # Format string, using role & people thereof
             $result[] = sprintf('%s: %s', $this->roles[$role], $obj->toString($peopleDelimiter));
