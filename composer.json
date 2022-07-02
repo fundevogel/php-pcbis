@@ -33,8 +33,7 @@
     "require": {
         "php": "^8.0",
         "ext-mbstring": "*",
-        "guzzlehttp/guzzle": "^7.4",
-        "symfony/cache": "^6.0"
+        "guzzlehttp/guzzle": "^7.4"
     },
     "require-dev": {
         "laravel/pint": "^0.2",
@@ -43,7 +42,8 @@
         "vimeo/psalm": "^4.23"
     },
     "suggest": {
-        "nicebooks/isbn": "Provides ISBN functionality such as validation, formatting & more."
+        "nicebooks/isbn": "Provides ISBN functionality such as validation & formatting",
+        "symfony/cache": "When passed to 'Webservice', this provides caching functionality"
     },
     "autoload": {
         "psr-4": {

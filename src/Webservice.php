@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
+use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
 use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
-use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Products\Product;
 use Fundevogel\Pcbis\Products\Books\Types\Ebook;
@@ -36,12 +36,8 @@ use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-
 use SoapClient;
 use SoapFault;
-use stdClass;
 
 /**
  * Class Webservice
@@ -79,22 +75,13 @@ class Webservice
 
 
     /**
-     * Cache storing data fetched from KNV's API
-     *
-     * @var \Symfony\Component\Cache\Adapter\FilesystemAdapter
-     */
-    private FilesystemAdapter $cache;
-
-
-    /**
      * Constructor
      *
      * @param array $credentials Login credentials
-     * @param string $cachePath Cache directory
-     * @param int $ttl Lifetime for cache items (in seconds)
+     * @param string $cache Cache object
      * @return void
      */
-    public function __construct(?array $credentials = null, ?string $cachePath = null, int $ttl = 0)
+    public function __construct(?array $credentials = null, public mixed $cache = null)
     {
         # If credentials not specified ..
         if (is_null($credentials)) {
@@ -121,9 +108,6 @@ class Webservice
                 $this->offlineMode = true;
             }
         }
-
-        # Initialize cache
-        $this->cache = new FilesystemAdapter('pcbis', $ttl, $cachePath ?? __DIR__ . '/.cache');
     }
 
 
@@ -252,15 +236,26 @@ class Webservice
      */
     public function fetch(string $identifier, bool $forceRefresh = false): array
     {
-        # If specified ..
-        if ($forceRefresh) {
-            # .. clear cache beforehand
-            $this->cache->delete($identifier);
+        $value = null;
+
+        if (!is_null($this->cache)) {
+            # If specified ..
+            if ($forceRefresh) {
+                # .. clear cache beforehand
+                $this->cache->delete($identifier);
+            }
+
+            # Retrieve from cache
+            $value = $this->cache->get($identifier, function() use($identifier) {
+                return $this->query($identifier);
+            });
         }
 
-        return $this->cache->get($identifier, function (ItemInterface $item) use ($identifier): array {
-            return $this->query($identifier);
-        });
+        if (is_null($value)) {
+            $value = $this->query($identifier);
+        }
+
+        return $value;
     }
 
 
@@ -364,25 +359,25 @@ class Webservice
      *
      * @param string $identifier Product EAN/ISBN
      * @param int $quantity Number of products to be delivered
+     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException
      * @return \Fundevogel\Pcbis\Api\Ola
      */
     public function ola(string $identifier, int $quantity = 1): Ola
     {
-        return new Ola($this->cache->get('ola-' . $identifier, function (ItemInterface $item) use ($identifier, $quantity): stdClass {
-            # Expire after one hour
-            $item->expiresAfter(3600);
+        if ($this->offlineMode) {
+            throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
+        }
 
-            return $this->client->WSCall([
-                # Log in using sessionID
-                'SessionID' => $this->sessionID,
-                'OLA' => [
-                    'Art' => 'Abfrage',
-                    'OLAItem' => [
-                        'Bestellnummer' => ['ISBN' => $identifier],
-                        'Menge' => $quantity,
-                    ],
+        return new Ola($this->client->WSCall([
+            # Log in using sessionID
+            'SessionID' => $this->sessionID,
+            'OLA' => [
+                'Art' => 'Abfrage',
+                'OLAItem' => [
+                    'Bestellnummer' => ['ISBN' => $identifier],
+                    'Menge' => $quantity,
                 ],
-            ]);
-        }));
+            ],
+        ]));
     }
 }
