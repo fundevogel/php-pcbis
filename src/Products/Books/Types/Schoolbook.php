@@ -42,6 +42,7 @@ class Schoolbook extends Book
             'spanisch'       => 'Spanisch',
             'italienisch'    => 'Italienisch',
             'latein'         => 'Latein',
+            'altgriechisch'  => 'Altgriechisch',
             'griechisch'     => 'Griechisch',
             'deutsch'        => 'Deutsch',
 
@@ -85,7 +86,15 @@ class Schoolbook extends Book
         $array = [];
 
         # Define sources likely giving away the subject
-        # (1) Single values
+        # (1) Multiple values
+        foreach (['IndexSchlagw', 'IndexStichw'] as $source) {
+            if (isset($this->data[$source])) {
+                # .. in order to merge with the other candidates
+                $array = array_merge($array, (array) $this->data[$source]);
+            }
+        }
+
+        # (2) Single values
         $sources = [
             'Titel',
             'Kurztitel',
@@ -97,14 +106,6 @@ class Schoolbook extends Book
         foreach ($sources as $source) {
             if (isset($this->data[$source])) {
                 $array[] = $this->data[$source];
-            }
-        }
-
-        # (2) Multiple values
-        foreach (['IndexSchlagw', 'IndexStichw'] as $source) {
-            if (isset($this->data[$source])) {
-                # .. in order to merge with the other candidates
-                $array = array_merge($array, (array) $this->data[$source]);
             }
         }
 

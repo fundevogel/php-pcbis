@@ -26,11 +26,11 @@ class Movie extends Medium
      */
 
     /**
-     * Exports author(s)
+     * Builds author(s)
      *
      * @return array
      */
-    public function author(): array
+    protected function buildAuthor(): array
     {
         if (!isset($this->data['AutorSachtitel'])) {
             return [];
@@ -50,7 +50,7 @@ class Movie extends Medium
             }
         }
 
-        return parent::author();
+        return parent::buildAuthor();
     }
 
 
