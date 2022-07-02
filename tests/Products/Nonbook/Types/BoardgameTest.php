@@ -29,4 +29,24 @@ class BoardgameTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isBoardgame());
     }
+
+
+    public function testPlayerCount(): void
+    {
+        # Run function
+        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->playerCount(), '1-4');
+    }
+
+
+    public function testPlayingTime(): void
+    {
+        # Run function
+        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->playingTime(), '60-90');
+    }
 }

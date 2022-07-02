@@ -32,17 +32,11 @@ class Videogame extends Item
      */
     public function age(): string
     {
-        if (!isset($this->data['SonstTxt'])) {
-            return '';
+        if (isset($this->data['SonstTxt']) && preg_match('/USK\s(.*)\sfreigegeben/', $this->data['SonstTxt'], $matches)) {
+            return $matches[1] . ' Jahren';
         }
 
-        $age = '';
-
-        if (preg_match('/USK\s(.*)\sfreigegeben/', $this->data['SonstTxt'], $matches)) {
-            $age = $matches[1] . ' Jahren';
-        }
-
-        return $age;
+        return parent::age();
     }
 
 

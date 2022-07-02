@@ -29,4 +29,20 @@ class SoftwareTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isSoftware());
     }
+
+
+    public function testVersion(): void
+    {
+        # Run function #1
+        $obj = new Software(['EAN' => 'xxx', 'Titel' => 'Fritz & Fertig, Sonderedition 2 in 1, 2 CD-ROMs', 'Abb' => '2015. 192 x 139 mm'], new Webservice());
+
+        # Assert result #1
+        $this->assertEquals($obj->version(), '');
+
+        # Run function #2
+        $obj = new Software(['EAN' => 'xxx', 'Abb' => 'Version 28.00 2020. 19,5 cm'], new Webservice());
+
+        # Assert result #2
+        $this->assertEquals($obj->version(), '28.00');
+    }
 }

@@ -40,8 +40,8 @@ class Software extends Item
 
         # TODO: Improve regex for schema like 1.23.10
         # .. is that even a thing?
-        if (preg_match('/Version\s\d{0,2}(?:[.,]\d{1,2})?/', $this->data['Abb'], $matches)) {
-            $version = $matches[0];
+        if (preg_match('/Version\s(\d{0,2}(?:[.,]\d{1,2})?)/', $this->data['Abb'], $matches)) {
+            $version = $matches[1];
         }
 
         # Check title for version if first approach fails

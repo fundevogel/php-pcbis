@@ -29,4 +29,14 @@ class MovieTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isMedia());
         $this->assertTrue($obj->isMovie());
     }
+
+
+    public function testAge(): void
+    {
+        # Run function
+        $obj = new Movie(['EAN' => 'xxx', 'SonstTxt' => 'FSK ab 16 freigegeben'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->age(), 'ab 16 Jahren');
+    }
 }

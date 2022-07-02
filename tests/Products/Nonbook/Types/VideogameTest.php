@@ -29,4 +29,24 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isVideogame());
     }
+
+
+    public function testAge(): void
+    {
+        # Run function
+        $obj = new Videogame(['EAN' => 'xxx', 'SonstTxt' => 'USK ab 12 freigegeben. 2520040'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->age(), 'ab 12 Jahren');
+    }
+
+
+    public function testPlatforms(): void
+    {
+        # Run function
+        $obj = new Videogame(['EAN' => 'xxx', 'AutorSachtitel' => 'The Legend of Zelda, Breath of the Wild, 1 Nintendo Switch-Spiel'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->platforms(), ['Nintendo Switch']);
+    }
 }

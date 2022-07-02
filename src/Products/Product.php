@@ -287,13 +287,17 @@ class Product extends ProductAbstract
         $array = [];
 
         foreach ($data as $series => $volume) {
-            # Upon first series not being present ..
-            if (!isset($this->data[$series])) {
-                # .. abort loop
-                break;
-            }
+            # If series is present ..
+            if (isset($this->data[$series])) {
+                # .. store it, along with empty volume
+                $array[trim($this->data[$series])] = '';
 
-            $array[trim($this->data[$series])] = trim($this->data[$volume]);
+                # If volume is also present ..
+                if (isset($this->data[$volume])) {
+                    # .. add it to its series
+                    $array[trim($this->data[$series])] = trim($this->data[$volume]);
+                }
+            }
         }
 
         return $array;

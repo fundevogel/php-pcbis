@@ -48,7 +48,7 @@ class Boardgame extends Item
 
 
     /**
-     * Exports estimated playing time
+     * Exports estimated playing time (in minutes)
      *
      * @return string
      */

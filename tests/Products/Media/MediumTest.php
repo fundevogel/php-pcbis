@@ -28,4 +28,14 @@ class MediumTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertTrue($obj->isMedia());
     }
+
+
+    public function testDuration(): void
+    {
+        # Run function
+        $obj = new Medium(['EAN' => 'xxx', 'Utitel' => '104 Min.'], new Webservice());
+
+        # Assert result
+        $this->assertEquals($obj->duration(), '104');
+    }
 }
