@@ -15,9 +15,6 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Dir;
 use Fundevogel\Pcbis\Helpers\Str;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-
 /**
  * Class Butler
  *
@@ -87,6 +84,11 @@ class Butler
      */
     public static function downloadCover(string $isbn, mixed $file = null, ?string $ua = null): bool
     {
+        # Fail early if dependency is not installed
+        if (!class_exists('GuzzleHttp\Client')) {
+            return false;
+        }
+
         # If not specified ..
         if (is_null($file)) {
             # .. provide fallback
@@ -102,7 +104,7 @@ class Butler
         # Attempt to ..
         try {
             # .. download cover image
-            $response = (new Client())->get(sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn), [
+            $response = (new \GuzzleHttp\Client())->get(sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn), [
                 'headers' => ['User-Agent' => $ua ?? 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
                 'sink' => $file,
             ]);
@@ -110,7 +112,7 @@ class Butler
             # .. report back
             return true;
             # .. otherwise ..
-        } catch (ClientException $e) {
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
         }
 
         # .. report failure

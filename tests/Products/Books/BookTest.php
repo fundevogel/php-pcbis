@@ -93,8 +93,11 @@ class BookTest extends \PHPUnit\Framework\TestCase
         $result = $obj->downloadCover($path);
 
         # Assert result
-        $this->assertTrue($result);
-        $this->assertFileExists($path);
-        $this->assertFileEquals($fixture, $path);
+        if (class_exists('GuzzleHttp\Client')) {
+            $this->assertTrue($result);
+            $this->assertFileEquals($fixture, $path);
+        } else {
+            $this->assertFalse($result);
+        }
     }
 }
