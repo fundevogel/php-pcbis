@@ -89,6 +89,17 @@ class Product extends ProductAbstract
      */
 
     /**
+     * Exports European Article Number (EAN)
+     *
+     * @return string
+     */
+    public function ean(): string
+    {
+        return $this->identifier;
+    }
+
+
+    /**
      * Exports title
      *
      * @return string
@@ -483,6 +494,7 @@ class Product extends ProductAbstract
         # Build dataset
         return [
             # (1) Base
+            'EAN'                 => $this->ean(),
             'Titel'               => $this->title(),
             'Untertitel'          => $this->subtitle(),
             'Verlag'              => $this->publisher(),

@@ -15,7 +15,7 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Dir;
 use Fundevogel\Pcbis\Helpers\Str;
 
-use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 /**
@@ -63,10 +63,8 @@ class Butler
      * Converts millimeters to centimeters
      *
      * @param string $string Millimeter information
-     *
-     * @return string
      */
-    public static function convertMM(string $string): string
+    public static function convertMM(string $string): array|string
     {
         # TODO: Messing up some other values, needs fixing
         # Edge case: string already contains width/height in centimeters
@@ -83,53 +81,39 @@ class Butler
      * Downloads cover images from the German National Library (DNB)
      *
      * @param string $isbn A given product's EAN/ISBN
-     * @param string $fileName Filename for the image to be downloaded
-     * @param string $directory Target download directory
-     * @param bool $overwrite Whether existing file should be overwritten
+     * @param mixed $file Path to download file OR file-like object
      * @param string $ua User-Agent used when downloading cover images
      * @return bool Download status
      */
-    public static function downloadCover(
-        string $isbn,
-        ?string $fileName = null,
-        ?string $directory = null,
-        bool $overwrite = false,
-        ?string $ua = null
-    ): bool {
-        # Build path to file
-        $file = sprintf('%s/%s.jpg', $directory ?? __DIR__, $fileName ?? $isbn);
+    public static function downloadCover(string $isbn, mixed $file = null, ?string $ua = null): bool
+    {
+        # If not specified ..
+        if (is_null($file)) {
+            # .. provide fallback
+            $file = sprintf('%s/%s.jpg', __DIR__, $isbn);
+        }
 
-        # Skip if file exists & overwriting it is disabled
-        if (file_exists($file) && !$overwrite) {
+        # If string was passed ..
+        if (is_string($file)) {
+            # .. create directory (if needed)
+            Dir::make(dirname($file));
+        }
+
+        # Attempt to ..
+        try {
+            # .. download cover image
+            $response = (new Client())->get(sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn), [
+                'headers' => ['User-Agent' => $ua ?? 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
+                'sink' => $file,
+            ]);
+
+            # .. report back
             return true;
+            # .. otherwise ..
+        } catch (ClientException $e) {
         }
 
-        # Create directory (if needed)
-        Dir::make(dirname($file));
-
-        # Download cover image
-        $success = false;
-
-        if ($handle = fopen($file, 'w')) {
-            # Determine image URL
-            $url = sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn);
-
-            try {
-                # Initialize client
-                $client = new GuzzleClient();
-
-                # Start download
-                $response = $client->get($url, [
-                    'headers' => ['User-Agent' => $ua ?? 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
-                    'sink' => $handle,
-                ]);
-
-                # Report back
-                $success = true;
-            } catch (ClientException $e) {
-            }
-        }
-
-        return $success;
+        # .. report failure
+        return false;
     }
 }

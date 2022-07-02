@@ -56,6 +56,17 @@ class Book extends Product
      */
 
     /**
+     * Exports International Standard Book Number (ISBN)
+     *
+     * @return string
+     */
+    public function isbn(): string
+    {
+        return $this->identifier;
+    }
+
+
+    /**
      * Exports binding
      *
      * @return string
@@ -131,6 +142,7 @@ class Book extends Product
         # Build dataset
         return array_merge(parent::export(), [
             # (1) 'Book' specific data
+            'ISBN'          => $this->isbn(),
             'Einband'       => $this->binding(),
             'Seitenzahl'    => $this->pageCount(),
             'Antolin'       => $this->antolin(),
@@ -155,19 +167,12 @@ class Book extends Product
     /**
      * Downloads cover images from the German National Library (DNB)
      *
-     * @param string $isbn A given product's EAN/ISBN
-     * @param string $fileName Filename for the image to be downloaded
-     * @param string $directory Target download directory
-     * @param bool $overwrite Whether existing file should be overwritten
+     * @param mixed $file Path to download file OR file-like object
      * @param string $ua User-Agent used when downloading cover images
      * @return bool Download status
      */
-    public function downloadCover(
-        ?string $fileName = null,
-        ?string $directory = null,
-        bool $overwrite = false,
-        ?string $ua = null
-    ): bool {
-        return Butler::downloadCover($this->isbn, $fileName, $directory, $overwrite, $ua);
+    public function downloadCover(mixed $file = null, ?string $ua = null): bool
+    {
+        return Butler::downloadCover($this->isbn(), $file, $ua);
     }
 }
