@@ -36,51 +36,17 @@ class Product extends ProductAbstract
      */
     public function __toString(): string
     {
-        if (empty($this->author())) {
-            return $this->title();
+        # Fetch author object
+        $author = $this->author();
+
+        # If present ..
+        if ($author->exists()) {
+            # .. print author(s) & product title
+            return sprintf('%s: %s', $author->toString(', '), $this->title());
         }
 
-        # TODO: Fix this
-        # return $this->author() . ': ' . $this->title();
-        return '';
-    }
-
-
-    /**
-     * Global setter
-     *
-     * @param string $key
-     * @param mixed $value
-     * @throws \Exception
-     * @return void
-     */
-    public function __set(string $key, mixed $value): void
-    {
-        # If method exists ..
-        if (method_exists($this, $key)) {
-            # .. fail request
-            throw new Exception('Access read-only!');
-        }
-
-        $this->{$key} = $value;
-    }
-
-
-    /**
-     * Global getter
-     *
-     * @param string $key
-     * @return array|string
-     */
-    public function __get(string $key): array|string
-    {
-        # If method exists ..
-        if (method_exists($this, $key)) {
-            # .. use it
-            return $this->{$key}();
-        }
-
-        return $this->{$key};
+        # .. otherwise, only product title
+        return $this->title();
     }
 
 
@@ -199,13 +165,14 @@ class Product extends ProductAbstract
         # Load prepared HTML text
         $dom->loadHtml($text);
 
-        # Extract individual texts by ..
+        # Create data array
         $description = [];
 
-        # (1) .. iterating over `<span>` elements and ..
+        # Iterate over `span` elements ..
         foreach ($dom->getElementsByTagName('span') as $node) {
-            # (2) .. storing their content
-            $description[] = utf8_decode($node->nodeValue);
+            # (1) .. decoding them as UTF-8
+            # (2) .. removing unnecessary whitespaces
+            $description[] = trim(utf8_decode($node->nodeValue));
         }
 
         return $description;
@@ -484,7 +451,13 @@ class Product extends ProductAbstract
             return '';
         }
 
-        return $this->data['Mwstknz'];
+        $vatCodes = [
+            '0' => 'kein',
+            '1' => 'halb',
+            '2' => 'voll',
+        ];
+
+        return $vatCodes[$this->data['Mwstknz']];
     }
 
 

@@ -77,4 +77,15 @@ class Role
     {
         return $this->people;
     }
+
+
+    /**
+     * Checks whether role is vacant
+     *
+     * @return bool
+     */
+    public function exists(): bool
+    {
+        return !empty($this->people);
+    }
 }
