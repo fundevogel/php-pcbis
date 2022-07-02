@@ -49,11 +49,6 @@ class RoleTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    /**
-     * Setup ('testSave')
-     *
-     * @return void
-     */
     public function setUp(): void
     {
         # Start output buffer

@@ -265,7 +265,7 @@ class Webservice
 
 
     /**
-     * Instantiates `Product` object from single EAN/ISBN
+     * Instantiates 'Product' object from single EAN/ISBN
      *
      * @param string $identifier Product EAN/ISBN
      * @param bool $forceRefresh Whether to update cached data
@@ -302,7 +302,7 @@ class Webservice
 
         # Fetch raw data
         $data = $this->fetch($identifier, $forceRefresh);
-        var_dump(json_encode($data));
+
         # Determine type identifier
         $code = $data['Sortimentskennzeichen'];
 
