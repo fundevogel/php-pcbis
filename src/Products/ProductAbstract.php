@@ -138,7 +138,7 @@ abstract class ProductAbstract
      */
     public function ola(int $quantity = 1): Ola
     {
-        return $this->api->ola($this->isbn, $quantity);
+        return $this->api->ola($this->identifier, $quantity);
     }
 
 
