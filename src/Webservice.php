@@ -246,7 +246,7 @@ class Webservice
             }
 
             # Retrieve from cache
-            $value = $this->cache->get($identifier, function() use($identifier) {
+            $value = $this->cache->get($identifier, function () use ($identifier) {
                 return $this->query($identifier);
             });
         }

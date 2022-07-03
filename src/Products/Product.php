@@ -16,7 +16,6 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
 use DOMDocument;
-use Exception;
 
 /**
  * Class Product
