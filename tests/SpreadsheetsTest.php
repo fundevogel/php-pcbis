@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * Testing PHPCBIS - pcbis.de helper library
+ * Testing php-pcbis - simple PHP wrapper for pcbis.de API
  *
- * @link https://github.com/Fundevogel/php-pcbis
- * @license GPL v3
+ * @link https://codeberg.org/Fundevogel/php-pcbis
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Pcbis\Tests;
+namespace Fundevogel\Pcbis\Tests;
 
-use Pcbis\Spreadsheets;
+use Fundevogel\Pcbis\Spreadsheets;
 
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-
 
 class SpreadsheetsTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +36,7 @@ class SpreadsheetsTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         # Define fixture directory
-        self::$fixturePath = __DIR__ . '/fixtures/SpreadsheetsTest';
+        self::$fixturePath = __DIR__ . '/fixtures';
     }
 
 

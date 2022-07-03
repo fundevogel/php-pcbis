@@ -4,7 +4,7 @@
 
 ## What
 
-This small library is a PHP wrapper for [pcbis.de](https://pcbis.de), gathering information about books through wholesale book distributor [KNV](http://knv.de)'s API. For the documentation on their [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language) interface, see [here](https://zeitfracht-medien.de/wp-content/uploads/2022/05/ZF-Webservice_3.0-1.pdf).
+This small library is a PHP wrapper for [pcbis.de](https://pcbis.de), gathering information about books through wholesale book distributor [KNV](http://knv.de)'s API. For the documentation on their [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language) interface, see [here](docs/Webservice_2.0.19.pdf).
 
 
 ## Why
@@ -30,7 +30,7 @@ Getting started is pretty straight-forward:
 
 require_once('vendor/autoload.php');
 
-$object = new Pcbis\Webservice;
+$object = new Fundevogel\Pcbis\Webservice;
 
 try {
     // After loading a book, you might want to ..
@@ -52,33 +52,12 @@ try {
 }
 ```
 
-If you want to load multiple books at once, you may pass their ISBNs to `loadBooks()`, like this:
+**Note**: Starting with v3, ISBN validation is no longer part of this project. If you need to validate and/or format (= hyphenate) ISBNs beforehand, please have a look at [`biblys/isbn`](https://github.com/biblys/isbn) and [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn):
 
 ```php
-<?php
+use Nicebooks\Isbn\Isbn;
 
-require_once('vendor/autoload.php');
-
-$object = new Pcbis\Webservice;
-
-try {
-    $isbns = [
-        '978-3-522-20255-8',
-        '978-3-522-20072-1',
-        '978-3-12-674104-0',
-        '978-0-14-031753-4',
-        '978-3-522-20210-7',
-        '978-3-95751-338-0',
-    ];
-
-    $books = $object->loadBooks($isbns);
-
-    foreach ($books as $book) {
-        echo $book->title();
-    }
-} catch (\Exception $e) {
-    echo 'Error: ' . $e->getMessage(), "\n";
-}
+$isbn = Isbn::of($isbn)->to13()->format();
 ```
 
 
