@@ -18,6 +18,8 @@ use Fundevogel\Pcbis\Traits\OlaStatus;
 use Fundevogel\Pcbis\Traits\People;
 use Fundevogel\Pcbis\Traits\Tags;
 
+use Exception;
+
 /**
  * Class ProductAbstract
  *
@@ -56,6 +58,16 @@ abstract class ProductAbstract
     {
         # Store product EAN/ISBN
         $this->identifier = $this->data['EAN'];
+
+        # If present ..
+        if (class_exists('Nicebooks\Isbn\Isbn')) {
+            # .. attempt to ..
+            try {
+                # .. format product EAN/ISBN using third-party tools
+                $this->identifier = \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
+            } catch (Exception $e) {
+            }
+        }
 
         # Add startup hook
         $this->setup();
