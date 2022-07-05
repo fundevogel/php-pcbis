@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Book;
 
 use org\bovigo\vfs\vfsStream;
@@ -25,7 +25,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Book(['EAN' => 'xxx'], new Webservice());
+        $obj = new Book(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isBook());
@@ -38,7 +38,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
         $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
 
         # Run function
-        $obj = new Book(['EAN' => $isbn], new Webservice());
+        $obj = new Book(['EAN' => $isbn]);
 
         # Assert result
         $this->assertEquals($obj->isbn(), $isbn);
@@ -48,7 +48,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
     public function testBinding(): void
     {
         # Run function
-        $obj = new Book(['EAN' => 'xxx', 'Einband' => 'GEB'], new Webservice());
+        $obj = new Book(['EAN' => 'xxx', 'Einband' => 'GEB']);
 
         # Assert result
         $this->assertEquals($obj->binding(), 'gebunden');
@@ -58,7 +58,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
     public function testPageCount(): void
     {
         # Run function
-        $obj = new Book(['EAN' => 'xxx', 'Abb' => '1. Auflage 2021. 48 S. durchgehend farbig illustriert 28 cm'], new Webservice());
+        $obj = new Book(['EAN' => 'xxx', 'Abb' => '1. Auflage 2021. 48 S. durchgehend farbig illustriert 28 cm']);
 
         # Assert result
         $this->assertEquals($obj->pageCount(), '48');
@@ -68,7 +68,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
     public function testAntolin(): void
     {
         # Run function
-        $obj = new Book(['EAN' => 'xxx', 'IndexSchlagw' => ['Antolin (3. Klasse)']], new Webservice());
+        $obj = new Book(['EAN' => 'xxx', 'IndexSchlagw' => ['Antolin (3. Klasse)']]);
 
         # Assert result
         $this->assertEquals($obj->antolin(), '3. Klasse');
@@ -89,7 +89,7 @@ class BookTest extends \PHPUnit\Framework\TestCase
         $path = $root->url() . '/example.jpg';
 
         # Run function
-        $obj = new Book(['EAN' => $isbn], new Webservice());
+        $obj = new Book(['EAN' => $isbn]);
         $result = $obj->downloadCover($path);
 
         # Assert result

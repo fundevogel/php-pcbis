@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Nonbook;
 
 class NonbookTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class NonbookTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Nonbook(['EAN' => 'xxx'], new Webservice());
+        $obj = new Nonbook(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isItem());

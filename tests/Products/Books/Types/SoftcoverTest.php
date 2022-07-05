@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Types\Softcover;
 
 class SoftcoverTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class SoftcoverTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Softcover(['EAN' => 'xxx'], new Webservice());
+        $obj = new Softcover(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isBook());

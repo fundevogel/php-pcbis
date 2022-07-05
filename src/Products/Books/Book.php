@@ -11,10 +11,10 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products\Books;
 
-use Fundevogel\Pcbis\Butler;
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Products\Product;
+use Fundevogel\Pcbis\Utilities\Butler;
 
 /**
  * Class Book
@@ -39,9 +39,9 @@ class Book extends Product
      * Constructor
      *
      * @param array $data Source data fetched from KNV's API
-     * @param \Fundevogel\Pcbis\Webservice $api Object granting access to KNV's API
+     * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
      */
-    public function __construct(public array $data, public Webservice $api)
+    public function __construct(array $data, ?Webservice $api = null)
     {
         # Execute default constructor
         parent::__construct($data, $api);

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Traits\OlaStatus;
@@ -52,10 +52,16 @@ abstract class ProductAbstract
      * Constructor
      *
      * @param array $data Source data fetched from KNV's API
-     * @param \Fundevogel\Pcbis\Webservice $api Object granting access to KNV's API
+     * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
      */
-    public function __construct(public array $data, protected Webservice $api)
+    public function __construct(public array $data, protected ?Webservice $api = null)
     {
+        # If not specified ..
+        if (is_null($this->api)) {
+            # .. invoke API client in offline mode
+            $this->api = new Webservice();
+        }
+
         # Store product EAN/ISBN
         $this->identifier = $this->data['EAN'];
 

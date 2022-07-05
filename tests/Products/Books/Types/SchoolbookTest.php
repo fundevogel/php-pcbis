@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
 
 class SchoolbookTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class SchoolbookTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Schoolbook(['EAN' => 'xxx'], new Webservice());
+        $obj = new Schoolbook(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isBook());
@@ -59,7 +59,7 @@ class SchoolbookTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function
-        $obj = new Schoolbook($data, new Webservice());
+        $obj = new Schoolbook($data);
 
         # Assert result
         $this->assertEquals($obj->subject(), 'Altgriechisch');

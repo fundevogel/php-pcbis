@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Media;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Media\Medium;
 
 class MediumTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class MediumTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Medium(['EAN' => 'xxx'], new Webservice());
+        $obj = new Medium(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isMedia());
@@ -33,7 +33,7 @@ class MediumTest extends \PHPUnit\Framework\TestCase
     public function testDuration(): void
     {
         # Run function
-        $obj = new Medium(['EAN' => 'xxx', 'Utitel' => '104 Min.'], new Webservice());
+        $obj = new Medium(['EAN' => 'xxx', 'Utitel' => '104 Min.']);
 
         # Assert result
         $this->assertEquals($obj->duration(), '104');

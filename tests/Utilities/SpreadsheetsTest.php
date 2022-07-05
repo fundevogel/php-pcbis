@@ -9,9 +9,9 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Tests;
+namespace Fundevogel\Pcbis\Tests\Utilities;
 
-use Fundevogel\Pcbis\Spreadsheets;
+use Fundevogel\Pcbis\Utilities\Spreadsheets;
 
 use org\bovigo\vfs\vfsStream;
 
@@ -36,7 +36,7 @@ class SpreadsheetsTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         # Define fixture directory
-        self::$fixturePath = __DIR__ . '/fixtures';
+        self::$fixturePath = __DIR__ . '/../fixtures';
     }
 
 

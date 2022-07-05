@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis;
+namespace Fundevogel\Pcbis\Api;
 
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
@@ -35,9 +35,10 @@ use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
+use Fundevogel\Pcbis\Utilities\Butler;
 
-use SoapClient;
-use SoapFault;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * Class Webservice
@@ -59,29 +60,28 @@ class Webservice
 
 
     /**
-     * Session identifier retrieved when first connecting to KNV's API
+     * Token retrieved when first connecting to KNV's API
      *
      * @var string
      */
-    private ?string $sessionID = null;
+    private ?string $token = null;
 
 
     /**
-     * SOAP client used when connecting to KNV's API
+     * HTTP client used for connecting to KNV's API
      *
-     * @var \SoapClient
+     * @var \GuzzleHttp\Client
      */
-    private SoapClient $client;
+    private Client $client;
 
 
     /**
      * Constructor
      *
      * @param array $credentials Login credentials
-     * @param string $cache Cache object
      * @return void
      */
-    public function __construct(?array $credentials = null, public mixed $cache = null)
+    public function __construct(?array $credentials = null)
     {
         # If credentials not specified ..
         if (is_null($credentials)) {
@@ -90,36 +90,17 @@ class Webservice
         } else {
             # Attempt to ..
             try {
-                # .. fire up SOAP client
-                $this->client = new SoapClient('http://ws.pcbis.de/knv-2.0/services/KNVWebService?wsdl', [
-                    'soap_version' => SOAP_1_2,
-                    'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
-                    'cache_wsdl' => WSDL_CACHE_BOTH,
-                    'trace' => true,
-                    'exceptions' => true,
-                ]);
+                # .. fire up HTTP client
+                $this->client = new Client();
 
                 # Authenticate with API
                 $this->logIn($credentials);
 
                 # If network errors out ..
-            } catch (SoapFault $e) {
+            } catch (ClientException) {
                 # .. activate offline mode
                 $this->offlineMode = true;
             }
-        }
-    }
-
-
-    /**
-     * Destructor
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        if (!is_null($this->sessionID)) {
-            $this->logOut();
         }
     }
 
@@ -139,7 +120,7 @@ class Webservice
     {
         try {
             # Log in & aquire session token
-            $this->sessionID = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
+            $this->token = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
         } catch (SoapFault $e) {
             # If 'login error' code is present ..
             if ($e?->detail?->TLDFehler?->errcode == '20000') {
@@ -154,17 +135,13 @@ class Webservice
 
 
     /**
-     * Uses sessionID to log out of KNV's API
-     *
-     * @return void
+     * Authenticates with KNV's API & returns token
      */
-    private function logOut(): void
+    public function logn(array $credentials): string
     {
-        $this->client->WSCall([
-            'SessionID' => $this->sessionID,
-            'Logout' => true,
-        ]);
+        return '';
     }
+
 
 
     /**

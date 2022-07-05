@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis;
+namespace Fundevogel\Pcbis\Utilities;
 
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
@@ -121,7 +121,7 @@ class Spreadsheets
             'Kommentar'
         ];
 
-        $bindings = json_decode(file_get_contents(__DIR__ . '/../data/codes.json'), true);
+        $bindings = json_decode(file_get_contents(__DIR__ . '/../../data/codes.json'), true);
 
         foreach (self::csvOpen($file, $headers, $delimiter) as $array) {
             # Gathering & processing generic book information

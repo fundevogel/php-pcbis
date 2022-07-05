@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Types\Ebook;
 
 class EbookTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isBook());
@@ -34,7 +34,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testSubtitle(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet']);
 
         # Assert result
         $this->assertEquals($obj->subtitle(), '');
@@ -44,7 +44,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testDevices(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet']);
 
         # Assert result
         $this->assertEquals($obj->devices(), ['PC', 'Mac', 'eReader', 'Tablet']);
@@ -54,7 +54,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testPrintEdition(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'PrintISBN' => '9783522202107'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'PrintISBN' => '9783522202107']);
 
         # Assert result
         $this->assertEquals($obj->printEdition(), '9783522202107');
@@ -64,7 +64,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testFileSize(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'DateiGroesse' => '10229 KB'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'DateiGroesse' => '10229 KB']);
 
         # Assert result
         $this->assertEquals($obj->fileSize(), '9.99 MB');
@@ -74,7 +74,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testFileFormat(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'DateiFormat' => 'EPUB'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'DateiFormat' => 'EPUB']);
 
         # Assert result
         $this->assertEquals($obj->fileFormat(), 'epub');
@@ -84,7 +84,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
     public function testDRM(): void
     {
         # Run function
-        $obj = new Ebook(['EAN' => 'xxx', 'DRMFlags' => '02'], new Webservice());
+        $obj = new Ebook(['EAN' => 'xxx', 'DRMFlags' => '02']);
 
         # Assert result
         $this->assertEquals($obj->drm(), 'Digitales Wasserzeichen');

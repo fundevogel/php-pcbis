@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Media\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Media\Types\Movie;
 
 class MovieTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class MovieTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Movie(['EAN' => 'xxx'], new Webservice());
+        $obj = new Movie(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isMedia());
@@ -34,7 +34,7 @@ class MovieTest extends \PHPUnit\Framework\TestCase
     public function testAge(): void
     {
         # Run function
-        $obj = new Movie(['EAN' => 'xxx', 'SonstTxt' => 'FSK ab 16 freigegeben'], new Webservice());
+        $obj = new Movie(['EAN' => 'xxx', 'SonstTxt' => 'FSK ab 16 freigegeben']);
 
         # Assert result
         $this->assertEquals($obj->age(), 'ab 16 Jahren');

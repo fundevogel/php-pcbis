@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Product;
 
 class ProductTest extends \PHPUnit\Framework\TestCase
@@ -30,7 +30,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testCast2String(): void
     {
         # Run function
-        echo new Product(['EAN' => 'xxx', 'AutorSachtitel' => 'Doe, John', 'Titel' => 'Title'], new Webservice());
+        echo new Product(['EAN' => 'xxx', 'AutorSachtitel' => 'Doe, John', 'Titel' => 'Title']);
 
         # Assert result
         $this->assertEquals(ob_get_contents(), 'John Doe: Title');
@@ -50,7 +50,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $ean = '978-3-314-10561-6';  # Die Tode meiner Mutter
 
         # Run function
-        $obj = new Product(['EAN' => $ean], new Webservice());
+        $obj = new Product(['EAN' => $ean]);
 
         # Assert result
         $this->assertEquals($obj->ean(), $ean);
@@ -60,7 +60,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testTitle(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Titel' => 'Title'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Titel' => 'Title']);
 
         # Assert result
         $this->assertEquals($obj->title(), 'Title');
@@ -70,7 +70,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testSubtitle(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Utitel' => 'Subtitle'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Utitel' => 'Subtitle']);
 
         # Assert result
         $this->assertEquals($obj->subtitle(), 'Subtitle');
@@ -80,13 +80,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testPublisher(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'IndexVerlag' => 'Verlag'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'IndexVerlag' => 'Verlag']);
 
         # Assert result #1
         $this->assertEquals($obj->publisher(), 'Verlag');
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx', 'IndexVerlag' => ['Verlag  ', '  Verlagsgruppe']], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'IndexVerlag' => ['Verlag  ', '  Verlagsgruppe']]);
 
         # Assert result #2
         $this->assertEquals($obj->publisher(), ['Verlag', 'Verlagsgruppe']);
@@ -96,7 +96,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testDescription(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'Text1' => 'º06º&lt;span class="TextSchwarz"&gt;Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen. &lt;/span&gt;º15º&lt;span class="TextSchwarz"&gt;Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen. &lt;/span&gt;º15º&lt;span class="TextSchwarz"&gt;Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.&lt;/span&gt;'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Text1' => 'º06º&lt;span class="TextSchwarz"&gt;Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen. &lt;/span&gt;º15º&lt;span class="TextSchwarz"&gt;Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen. &lt;/span&gt;º15º&lt;span class="TextSchwarz"&gt;Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.&lt;/span&gt;']);
 
         # Assert result #1
         $this->assertEquals($obj->description(), [
@@ -114,7 +114,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
 
         foreach ($retailPrices as $retailPrice) {
             # Run function
-            $obj = new Product(['EAN' => 'xxx', 'PreisEurD' => $retailPrice], new Webservice());
+            $obj = new Product(['EAN' => 'xxx', 'PreisEurD' => $retailPrice]);
 
             # Assert result
             $this->assertEquals($obj->retailPrice(), '15,00');
@@ -125,7 +125,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testReleaseYear(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Erschjahr' => '2018'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Erschjahr' => '2018']);
 
         # Assert result
         $this->assertEquals($obj->releaseYear(), '2018');
@@ -135,13 +135,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testAge(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'Alter' => '12'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Alter' => '12']);
 
         # Assert result #1
         $this->assertEquals($obj->age(), 'ab 12 Jahren');
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx', 'Alter' => '06'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Alter' => '06']);
 
         # Assert result #2
         $this->assertEquals($obj->age(), 'ab 6 Jahren');
@@ -151,13 +151,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testSeries(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter']);
 
         # Assert result #1
         $this->assertEquals($obj->series(), ['Harry Potter' => '']);
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter', 'BandnrVerwieseneReihe1' => '3: Der Gefangene von Askaban'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter', 'BandnrVerwieseneReihe1' => '3: Der Gefangene von Askaban']);
 
         # Assert result #2
         $this->assertEquals($obj->series(), ['Harry Potter' => '3: Der Gefangene von Askaban']);
@@ -167,13 +167,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testIsSeries(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter']);
 
         # Assert result #1
         $this->assertTrue($obj->isSeries());
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx']);
 
         # Assert result #2
         $this->assertFalse($obj->isSeries());
@@ -183,7 +183,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testWeight(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Gewicht' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Gewicht' => '80']);
 
         # Assert result
         $this->assertEquals($obj->weight(), '80');
@@ -193,7 +193,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testWidth(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80']);
 
         # Assert result
         $this->assertEquals($obj->width(), '8');
@@ -203,7 +203,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testHeight(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Höhe' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Höhe' => '80']);
 
         # Assert result
         $this->assertEquals($obj->height(), '8');
@@ -213,7 +213,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testDepth(): void
     {
         # Run function
-        $obj = new Product(['EAN' => 'xxx', 'Tiefe' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Tiefe' => '80']);
 
         # Assert result
         $this->assertEquals($obj->depth(), '8');
@@ -223,25 +223,25 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testDimensions(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80']);
 
         # Assert result #1
         $this->assertEquals($obj->dimensions(), '8');
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx', 'Höhe' => '80'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Höhe' => '80']);
 
         # Assert result #2
         $this->assertEquals($obj->dimensions(), '8');
 
         # Run function #3
-        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80', 'Höhe' => '50'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80', 'Höhe' => '50']);
 
         # Assert result #3
         $this->assertEquals($obj->dimensions(), '8x5');
 
         # Run function #4
-        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80', 'Höhe' => '50', 'Tiefe' => '25'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Breite' => '80', 'Höhe' => '50', 'Tiefe' => '25']);
 
         # Assert result #4
         $this->assertEquals($obj->dimensions(), '8x5x2,5');
@@ -251,13 +251,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     public function testLanguages(): void
     {
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx', 'Sprachschl' => '02'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Sprachschl' => '02']);
 
         # Assert result #1
         $this->assertEquals($obj->languages(), 'Englisch');
 
         # Run function #2
-        $obj = new Product(['EAN' => 'xxx', 'Sprachschl' => ['01', '02']], new Webservice());
+        $obj = new Product(['EAN' => 'xxx', 'Sprachschl' => ['01', '02']]);
 
         # Assert result #2
         $this->assertEquals($obj->languages(), ['Deutsch', 'Englisch']);
@@ -274,14 +274,14 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function #1
-        $obj = new Product(['EAN' => 'xxx'], new Webservice());
+        $obj = new Product(['EAN' => 'xxx']);
 
         # Assert result #1
         $this->assertEquals($obj->vat(), '');
 
         foreach ($vatCodes as $vatCode => $expected) {
             # Run function #2
-            $obj = new Product(['EAN' => 'xxx', 'Mwstknz' => $vatCode], new Webservice());
+            $obj = new Product(['EAN' => 'xxx', 'Mwstknz' => $vatCode]);
 
             # Assert result #2
             $this->assertEquals($obj->vat(), $expected);

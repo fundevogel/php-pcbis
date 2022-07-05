@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
 
 class SoftwareTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class SoftwareTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Software(['EAN' => 'xxx'], new Webservice());
+        $obj = new Software(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isItem());
@@ -34,13 +34,13 @@ class SoftwareTest extends \PHPUnit\Framework\TestCase
     public function testVersion(): void
     {
         # Run function #1
-        $obj = new Software(['EAN' => 'xxx', 'Titel' => 'Fritz & Fertig, Sonderedition 2 in 1, 2 CD-ROMs', 'Abb' => '2015. 192 x 139 mm'], new Webservice());
+        $obj = new Software(['EAN' => 'xxx', 'Titel' => 'Fritz & Fertig, Sonderedition 2 in 1, 2 CD-ROMs', 'Abb' => '2015. 192 x 139 mm']);
 
         # Assert result #1
         $this->assertEquals($obj->version(), '');
 
         # Run function #2
-        $obj = new Software(['EAN' => 'xxx', 'Abb' => 'Version 28.00 2020. 19,5 cm'], new Webservice());
+        $obj = new Software(['EAN' => 'xxx', 'Abb' => 'Version 28.00 2020. 19,5 cm']);
 
         # Assert result #2
         $this->assertEquals($obj->version(), '28.00');

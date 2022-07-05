@@ -1,17 +1,7 @@
 pipeline:
   build:
-    image: php:${PHP}-alpine
+    image: jitesoft/composer:${PHP}
     commands:
-      # Add SOAP extension
-      # (1) Install prerequisites
-      - set -ex && apk --no-cache add libxml2-dev
-
-      # (2) Install & configure SOAP
-      - docker-php-ext-install -j$(nproc) soap
-
-      # Install composer
-      - curl -sSL https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
       # Install dependencies
       - composer install
 

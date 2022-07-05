@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Boardgame;
 
 class BoardgameTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class BoardgameTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Boardgame(['EAN' => 'xxx'], new Webservice());
+        $obj = new Boardgame(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isItem());
@@ -34,7 +34,7 @@ class BoardgameTest extends \PHPUnit\Framework\TestCase
     public function testPlayerCount(): void
     {
         # Run function
-        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.'], new Webservice());
+        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.']);
 
         # Assert result
         $this->assertEquals($obj->playerCount(), '1-4');
@@ -44,7 +44,7 @@ class BoardgameTest extends \PHPUnit\Framework\TestCase
     public function testPlayingTime(): void
     {
         # Run function
-        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.'], new Webservice());
+        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.']);
 
         # Assert result
         $this->assertEquals($obj->playingTime(), '60-90');

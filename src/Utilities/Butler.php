@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis;
+namespace Fundevogel\Pcbis\Utilities;
 
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Dir;
@@ -84,11 +84,6 @@ class Butler
      */
     public static function downloadCover(string $isbn, mixed $file = null, ?string $ua = null): bool
     {
-        # Fail early if dependency is not installed
-        if (!class_exists('GuzzleHttp\Client')) {
-            return false;
-        }
-
         # If not specified ..
         if (is_null($file)) {
             # .. provide fallback

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
 class VideogameTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Videogame(['EAN' => 'xxx'], new Webservice());
+        $obj = new Videogame(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isItem());
@@ -34,7 +34,7 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
     public function testAge(): void
     {
         # Run function
-        $obj = new Videogame(['EAN' => 'xxx', 'SonstTxt' => 'USK ab 12 freigegeben. 2520040'], new Webservice());
+        $obj = new Videogame(['EAN' => 'xxx', 'SonstTxt' => 'USK ab 12 freigegeben. 2520040']);
 
         # Assert result
         $this->assertEquals($obj->age(), 'ab 12 Jahren');
@@ -44,7 +44,7 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
     public function testPlatforms(): void
     {
         # Run function
-        $obj = new Videogame(['EAN' => 'xxx', 'AutorSachtitel' => 'The Legend of Zelda, Breath of the Wild, 1 Nintendo Switch-Spiel'], new Webservice());
+        $obj = new Videogame(['EAN' => 'xxx', 'AutorSachtitel' => 'The Legend of Zelda, Breath of the Wild, 1 Nintendo Switch-Spiel']);
 
         # Assert result
         $this->assertEquals($obj->platforms(), ['Nintendo Switch']);

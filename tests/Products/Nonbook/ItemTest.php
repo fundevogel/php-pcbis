@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Item;
 
 class ItemTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Item(['EAN' => 'xxx'], new Webservice());
+        $obj = new Item(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isItem());

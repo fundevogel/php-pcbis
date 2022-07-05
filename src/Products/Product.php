@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products;
 
-use Fundevogel\Pcbis\Butler;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Utilities\Butler;
 
 use DOMDocument;
 

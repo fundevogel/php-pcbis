@@ -9,9 +9,9 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Pcbis\Tests;
+namespace Pcbis\Tests\Utilities;
 
-use Fundevogel\Pcbis\Butler;
+use Fundevogel\Pcbis\Utilities\Butler;
 
 use org\bovigo\vfs\vfsStream;
 
@@ -108,7 +108,7 @@ class ButlerTest extends \PHPUnit\Framework\TestCase
 
         # (2) Fixture file path
         $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
-        $fixture = sprintf('%s/fixtures/%s.jpg', __DIR__, $isbn);
+        $fixture = sprintf('%s/../fixtures/%s.jpg', __DIR__, $isbn);
 
         # (3) Output file path
         $path = $root->url() . '/example.jpg';

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Media\Types;
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Media\Types\Sound;
 
 class SoundTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +23,7 @@ class SoundTest extends \PHPUnit\Framework\TestCase
     public function testType(): void
     {
         # Run function
-        $obj = new Sound(['EAN' => 'xxx'], new Webservice());
+        $obj = new Sound(['EAN' => 'xxx']);
 
         # Assert result
         $this->assertTrue($obj->isMedia());
