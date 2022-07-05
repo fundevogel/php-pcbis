@@ -17,39 +17,46 @@ use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
 use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
 use Fundevogel\Pcbis\Helpers\A;
-use Fundevogel\Pcbis\Products\Product;
-use Fundevogel\Pcbis\Products\Books\Types\Ebook;
-use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
-use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
-use Fundevogel\Pcbis\Products\Books\Types\Softcover;
-use Fundevogel\Pcbis\Products\Media\Types\Audiobook;
-use Fundevogel\Pcbis\Products\Media\Types\Movie;
-use Fundevogel\Pcbis\Products\Media\Types\Music;
-use Fundevogel\Pcbis\Products\Media\Types\Sound;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Boardgame;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Calendar;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Map;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Nonbook;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Notes;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 use Fundevogel\Pcbis\Utilities\Butler;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Class Webservice
  *
- * Retrieves information from KNV's API & caches the resulting data
+ * Authenticates with & retrieves data from KNV's API
  */
-class Webservice
+final class Webservice
 {
     /**
      * Properties
      */
+
+    /**
+     * HTTP client used for connecting to KNV's API
+     *
+     * @var \GuzzleHttp\Client
+     */
+    private Client $client;
+
+
+    /**
+     * HTTP request headers
+     *
+     * @var array
+     */
+    public $headers = [];
+
+
+    /**
+     * Base URL
+     *
+     * @var string
+     */
+    public $url = 'https://wstest.pcbis.de/ws30';
+
 
     /**
      * Whether to work offline (cached books only)
@@ -64,15 +71,7 @@ class Webservice
      *
      * @var string
      */
-    private ?string $token = null;
-
-
-    /**
-     * HTTP client used for connecting to KNV's API
-     *
-     * @var \GuzzleHttp\Client
-     */
-    private Client $client;
+    public ?string $token = null;
 
 
     /**
@@ -83,25 +82,24 @@ class Webservice
      */
     public function __construct(?array $credentials = null)
     {
-        # If credentials not specified ..
-        if (is_null($credentials)) {
+        # If credentials passed ..
+        if (is_array($credentials)) {
+            # (1) .. fire up HTTP client
+            $this->client = new Client();
+
+            # (2) .. authenticate with API
+            $this->login($credentials);
+        }
+
+        # If token not set ..
+        if (is_null($this->token)) {
             # .. activate offline mode
             $this->offlineMode = true;
-        } else {
-            # Attempt to ..
-            try {
-                # .. fire up HTTP client
-                $this->client = new Client();
-
-                # Authenticate with API
-                $this->logIn($credentials);
-
-                # If network errors out ..
-            } catch (ClientException) {
-                # .. activate offline mode
-                $this->offlineMode = true;
-            }
         }
+
+        # Note: Since offline mode is only useful when data has been cached before and
+        # there's no way determining what to do in case of a 'ClientException', we let
+        # developers handle any client-side error thrown along the way
     }
 
 
@@ -109,43 +107,99 @@ class Webservice
      * Methods
      */
 
+
+    /**
+     * Makes API calls
+     *
+     * @param string $resource API resource being called
+     * @param array $data Data being sent as JSON object
+     * @param string $type Request type (mostly 'POST')
+     * @throws \Exception|\Fundevogel\Pcbis\Exceptions\OfflineModeException
+     * @return \stdClass Response body as JSON object
+     */
+    private function call(string $resource, array $data, string $type = 'POST'): \stdClass
+    {
+        if ($this->offlineMode) {
+            throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
+        }
+
+        # Determine target URL
+        $url = sprintf('%s/%s', $this->url, $resource);
+
+        # Define payload
+        $payload = ['json' => $data, 'headers' => $this->headers];
+
+        if (is_string($this->token)) {
+            $payload['headers'] = ['Authorization' => sprintf('Bearer %s', $this->token)];
+        }
+
+        # Make the call
+        $response = $this->client->request($type, $url, $payload);
+
+        # If response checks out ..
+        if ($response->getStatusCode() == 200) {
+            # .. report back
+            return json_decode((string) $response->getBody());
+        }
+
+        # .. otherwise everything goes south
+        throw new \Exception((string) $response->getBody());
+    }
+
+
     /**
      * Authenticates with KNV's API & generates session token
      *
      * @param array $credentials Login credentials
-     * @throws \Fundevogel\Pcbis\Exceptions\InvalidLoginException
-     * @return void
+     * @throws \Fundevogel\Pcbis\Exceptions\KNVException
+     * @return bool
      */
-    private function logIn(array $credentials): void
+    public function login(array $credentials): bool
     {
-        try {
-            # Log in & aquire session token
-            $this->token = $this->client->WSCall(['LoginInfo' => $credentials])->SessionID;
-        } catch (SoapFault $e) {
-            # If 'login error' code is present ..
-            if ($e?->detail?->TLDFehler?->errcode == '20000') {
-                # .. report back ..
-                throw new InvalidLoginException($e->getMessage());
-            }
+        # If API call succeeds ..
+        if ($response = $this->call('login', $credentials)) {
+            # .. receive token
+            $this->token = $response?->token;
 
-            # .. otherwise, invoke offline mode
-            throw $e;
+            # .. report back
+            return true;
         }
+
+        # TODO: Exception handling?
+        return false;
     }
 
 
     /**
-     * Authenticates with KNV's API & returns token
+     * Fetches raw product data from KNV's API
+     *
+     * @param string $identifier Product EAN/ISBN
+     * @return \stdClass
      */
-    public function logn(array $credentials): string
+    public function suche(string $identifier): \stdClass
     {
-        return '';
+        # Determine search parameters
+        # TODO: Make it fully configurable
+        $query = [
+            'suche' => [
+                # Search across all databases
+                'datenbanken' => ['ZF', 'ZFBG'],
+                'zfSuche' => $identifier,
+            ],
+            # Read results of the query & return first result
+            'lesen' => [
+                'satzVon' => 1,
+                'satzBis' => 1,
+                'satzFormat' => 'LANGTEXT',
+            ],
+        ];
+
+        # Send query & report back
+        return $this->call('suche', $query);
     }
 
 
-
     /**
-     * Fetches raw product data from KNV
      *
      * .. if product for given EAN/ISBN exists
      *
@@ -155,10 +209,6 @@ class Webservice
      */
     private function query(string $identifier): array
     {
-        if ($this->offlineMode) {
-            throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
-        }
-
         # For getting started with KNV's (surprisingly well documented) german API,
         # see https://zeitfracht-medien.de/wp-content/uploads/2022/05/ZF-Webservice_3.0-1.pdf
         $query = $this->client->WSCall([
@@ -200,134 +250,6 @@ class Webservice
         }
 
         throw new NoRecordFoundException(sprintf('No database record found for "%s".', $identifier));
-    }
-
-
-    /**
-     * Fetches information from cache if they exist,
-     * otherwise loads them & saves to cache
-     *
-     * @param string $identifier Product EAN/ISBN
-     * @param bool $forceRefresh Whether to update cached data
-     * @return array
-     */
-    public function fetch(string $identifier, bool $forceRefresh = false): array
-    {
-        $value = null;
-
-        if (!is_null($this->cache)) {
-            # If specified ..
-            if ($forceRefresh) {
-                # .. clear cache beforehand
-                $this->cache->delete($identifier);
-            }
-
-            # Retrieve from cache
-            $value = $this->cache->get($identifier, function () use ($identifier) {
-                return $this->query($identifier);
-            });
-        }
-
-        if (is_null($value)) {
-            $value = $this->query($identifier);
-        }
-
-        return $value;
-    }
-
-
-    /**
-     * Instantiates 'Product' object from single EAN/ISBN
-     *
-     * @param string $identifier Product EAN/ISBN
-     * @param bool $forceRefresh Whether to update cached data
-     * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
-     * @return \Fundevogel\Pcbis\Products\Product
-     */
-    public function load(string $identifier, bool $forceRefresh = false): Product
-    {
-        # Define available product types
-        $types = [
-            # (1) Books
-            'AG' => 'ePublikation',
-            'HC' => 'Hardcover',
-            'SB' => 'Schulbuch',
-            'TB' => 'Taschenbuch',
-
-            # (2) Media
-            'AC' => 'Hörbuch',
-            'AD' => 'Film',
-            'AF' => 'Tonträger',
-            'AK' => 'Musik',
-
-            # (3) Nonbook
-            'AB' => 'Nonbook',
-            'AE' => 'Software',
-            'AH' => 'Games',
-            'AI' => 'Kalender',
-            'AJ' => 'Landkarte/Globus',
-            'AL' => 'Noten',
-            'AM' => 'Papeterie/PBS',
-            'AN' => 'Spiel',
-            'AO' => 'Spielzeug',
-        ];
-
-        # Fetch raw data
-        $data = $this->fetch($identifier, $forceRefresh);
-
-        # Determine type identifier
-        $code = $data['Sortimentskennzeichen'];
-
-        # If product type is unknown ..
-        if (!array_key_exists($code, $types)) {
-            # .. fail early
-            throw new UnknownTypeException(sprintf('Unknown type identifier: "%s"', $code));
-        }
-
-        # Create instance based on product type
-        $type = $types[$code];
-
-        switch ($type) {
-            # Books
-            case 'ePublikation':
-                return new Ebook($data, $this);
-            case 'Hardcover':
-                return new Hardcover($data, $this);
-            case 'Schulbuch':
-                return new Schoolbook($data, $this);
-            case 'Taschenbuch':
-                return new Softcover($data, $this);
-
-            # Media
-            case 'Film':
-                return new Movie($data, $this);
-            case 'Hörbuch':
-                return new Audiobook($data, $this);
-            case 'Musik':
-                return new Music($data, $this);
-            case 'Tonträger':
-                return new Sound($data, $this);
-
-            # Nonbook
-            case 'Games':
-                return new Videogame($data, $this);
-            case 'Kalender':
-                return new Calendar($data, $this);
-            case 'Landkarte/Globus':
-                return new Map($data, $this);
-            case 'Nonbook':
-                return new Nonbook($data, $this);
-            case 'Noten':
-                return new Notes($data, $this);
-            case 'Papeterie/PBS':
-                return new Stationery($data, $this);
-            case 'Software':
-                return new Software($data, $this);
-            case 'Spiel':
-                return new Boardgame($data, $this);
-            case 'Spielzeug':
-                return new Toy($data, $this);
-        }
     }
 
 

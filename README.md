@@ -30,10 +30,10 @@ Getting started is pretty straight-forward:
 
 require_once('vendor/autoload.php');
 
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Pcbis;
 
-# Create API object, passing credentials as first parameter
-$object = new Webservice([/* ... */]);
+# Create API object, passing credentials as first parameter (for caching, see below)
+$object = new Pcbis([/* ... */]);
 
 try {
     # After loading a book, you might want to ..
@@ -71,27 +71,27 @@ composer require symfony/cache
 For a standard file cache, your setup might then look something like this:
 
 ```php
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Pcbis;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 # Initialize cache object
 $cache = new FilesystemAdapter();
 
 # Create API object, passing credentials & cache object as parameters
-$object = new Webservice([/* ... */], $cache);
+$object = new Pcbis([/* ... */], $cache);
 ```
 
 **Note**: Since we use [KirbyCMS](https://getkirby.com/docs/guide/cache) on our website, we included a cache driver to make it work nicely with `php-pcbis`:
 
 ```php
-use Fundevogel\Pcbis\Webservice;
+use Fundevogel\Pcbis\Pcbis;
 use Fundevogel\Pcbis\Cache\KirbyCache;
 
 # Initialize cache object
 $cache = new KirbyCache(kirby()->cache('my-cache'));
 
 # Create API object, passing credentials & cache object as parameters
-$object = new Webservice([/* ... */], $cache);
+$object = new Pcbis([/* ... */], $cache);
 ```
 
 

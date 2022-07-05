@@ -15,6 +15,9 @@ use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Dir;
 use Fundevogel\Pcbis\Helpers\Str;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+
 /**
  * Class Butler
  *
@@ -22,25 +25,6 @@ use Fundevogel\Pcbis\Helpers\Str;
  */
 class Butler
 {
-    /**
-     * Converts XML to PHP array
-     *
-     * @param string $data Response object from KNV's API
-     * @return array
-     */
-    public static function loadXML(string $data): array
-    {
-        # Prepare raw XML response to be loaded by SimpleXML
-        $data = Str::replace($data, '&', '&amp;');
-
-        # Convert XML to JSON to PHP array
-        $xml = simplexml_load_string($data);
-        $json = json_encode($xml);
-
-        return json_decode($json, true);
-    }
-
-
     /**
      * Reverses name, going from 'Doe, John' to 'John Doe'
      *
@@ -99,7 +83,7 @@ class Butler
         # Attempt to ..
         try {
             # .. download cover image
-            $response = (new \GuzzleHttp\Client())->get(sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn), [
+            $response = (new Client())->get(sprintf('https://portal.dnb.de/opac/mvb/cover?isbn=%s', $isbn), [
                 'headers' => ['User-Agent' => $ua ?? 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
                 'sink' => $file,
             ]);
@@ -107,10 +91,28 @@ class Butler
             # .. report back
             return true;
             # .. otherwise ..
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
+        } catch (ClientException $e) {
         }
 
         # .. report failure
         return false;
+    }
+
+
+    /**
+     *
+     */
+    public static function pluck(array $array): array
+    {
+        $output = [];
+
+        foreach ($array as $item) {
+            $output[$item['feldName']] = count($item['werte']) > 1
+                ? $item['werte']
+                : $item['werte'][0]
+            ;
+        }
+
+        return $output;
     }
 }
