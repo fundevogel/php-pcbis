@@ -115,56 +115,26 @@ class Str
 
 
     /**
-     * Tries to detect the string encoding
+     * Convert a string to 7-bit ASCII.
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
-    public static function encoding(string $string): string
+    public static function ascii(string $string): string
     {
-        return mb_detect_encoding($string, 'UTF-8, ISO-8859-1, windows-1251', true);
-    }
+        $string  = str_replace(
+            array_keys(static::$language),
+            array_values(static::$language),
+            $string
+        );
 
+        $string  = preg_replace(
+            array_keys(static::$ascii),
+            array_values(static::$ascii),
+            $string
+        );
 
-    /**
-     * An UTF-8 safe version of substr()
-     *
-     * @param  string  $str
-     * @param  int     $start
-     * @param  int     $length
-     * @return string
-     */
-    public static function substr($str, $start, $length = null)
-    {
-        $length = $length === null ? static::length($str) : $length;
-        return MB ? mb_substr($str, $start, $length, 'UTF-8') : substr($str, $start, $length);
-    }
-
-
-    /**
-     * An UTF-8 safe version of strtolower()
-     *
-     * @param  string  $str
-     * @return string
-     */
-    public static function lower($str)
-    {
-        return MB ? mb_strtolower($str, 'UTF-8') : strtolower($str);
-    }
-
-
-    /**
-     * An UTF-8 safe version of strlen()
-     *
-     * @param string  $str
-     *
-     * @return int
-     *
-     * @psalm-return 0|positive-int
-     */
-    public static function length($str)
-    {
-        return MB ? mb_strlen($str, 'UTF-8') : strlen($str);
+        return preg_replace('/[^\x09\x0A\x0D\x20-\x7E]/', '', $string);
     }
 
 
@@ -187,44 +157,41 @@ class Str
 
 
     /**
-     * Replaces all or some occurrences of the search string with the replacement string
-     * Extension of the str_replace() function in PHP with an additional $limit parameter
+     * Tries to detect the string encoding
      *
-     * @param  string|array $string  String being replaced on (haystack);
-     *                               can be an array of multiple subject strings
-     * @param  string|array $search  Value being searched for (needle)
-     * @param  string|array $replace Value to replace matches with
-     * @param  int|array    $limit   Maximum possible replacements for each search value;
-     *                               multiple limits for each search value are supported;
-     *                               defaults to no limit
-     * @return string|array          String with replaced values;
-     *                               if $string is an array, array of strings
+     * @param string $string
+     * @return string
      */
-    public static function replace($string, $search, $replace, $limit = -1)
+    public static function encoding(string $string): string
     {
-        // without a limit we might as well use the built-in function
-        if($limit === -1) return str_replace($search, $replace, $string);
+        return mb_detect_encoding($string, 'UTF-8, ISO-8859-1, windows-1251', true);
+    }
 
-        // if the limit is zero, the result will be no replacements at all
-        if($limit === 0) return $string;
 
-        // multiple subjects are run separately through this method
-        if(is_array($string)) {
-            $result = [];
-            foreach($string as $s) {
-                $result[] = static::replace($s, $search, $replace, $limit);
-            }
+    /**
+     * An UTF-8 safe version of strlen()
+     *
+     * @param string  $str
+     *
+     * @return int
+     *
+     * @psalm-return 0|positive-int
+     */
+    public static function length($str)
+    {
+        return MB ? mb_strlen($str, 'UTF-8') : strlen($str);
+    }
 
-            return $result;
-        }
 
-        // build an array of replacements
-        // we don't use an associative array because otherwise you couldn't
-        // replace the same string with different replacements
-        $replacements = static::makeReplacements($search, $replace, $limit);
-
-        // run the string and the replacement array through the replacer
-        return static::replaceReplacements($string, $replacements);
+    /**
+     * An UTF-8 safe version of strtolower()
+     *
+     * @param  string  $str
+     * @return string
+     */
+    public static function lower($str)
+    {
+        return MB ? mb_strtolower($str, 'UTF-8') : strtolower($str);
     }
 
 
@@ -279,6 +246,68 @@ class Str
     }
 
 
+   /**
+     * Returns the position of a needle in a string
+     * if it can be found
+     *
+     * @param string $string
+     * @param string $needle
+     * @param bool $caseInsensitive
+     * @return int|bool
+     */
+    public static function position(string $string = null, string $needle, bool $caseInsensitive = false)
+    {
+        if ($caseInsensitive === true) {
+            $string = static::lower($string);
+            $needle = static::lower($needle);
+        }
+
+        return mb_strpos($string, $needle, 0, 'UTF-8');
+    }
+
+
+    /**
+     * Replaces all or some occurrences of the search string with the replacement string
+     * Extension of the str_replace() function in PHP with an additional $limit parameter
+     *
+     * @param  string|array $string  String being replaced on (haystack);
+     *                               can be an array of multiple subject strings
+     * @param  string|array $search  Value being searched for (needle)
+     * @param  string|array $replace Value to replace matches with
+     * @param  int|array    $limit   Maximum possible replacements for each search value;
+     *                               multiple limits for each search value are supported;
+     *                               defaults to no limit
+     * @return string|array          String with replaced values;
+     *                               if $string is an array, array of strings
+     */
+    public static function replace($string, $search, $replace, $limit = -1)
+    {
+        // without a limit we might as well use the built-in function
+        if($limit === -1) return str_replace($search, $replace, $string);
+
+        // if the limit is zero, the result will be no replacements at all
+        if($limit === 0) return $string;
+
+        // multiple subjects are run separately through this method
+        if(is_array($string)) {
+            $result = [];
+            foreach($string as $s) {
+                $result[] = static::replace($s, $search, $replace, $limit);
+            }
+
+            return $result;
+        }
+
+        // build an array of replacements
+        // we don't use an associative array because otherwise you couldn't
+        // replace the same string with different replacements
+        $replacements = static::makeReplacements($search, $replace, $limit);
+
+        // run the string and the replacement array through the replacer
+        return static::replaceReplacements($string, $replacements);
+    }
+
+
     /**
      * Takes a replacement array and processes the replacements
      *
@@ -319,79 +348,6 @@ class Str
 
 
     /**
-     * Better alternative for explode()
-     * It takes care of removing empty values
-     * and it has a built-in way to skip values
-     * which are too short.
-     *
-     * @param  string  $string The string to split
-     * @param  string  $separator The string to split by
-     * @param  int     $length The min length of values.
-     * @return array   An array of found values
-     */
-    public static function split($string, $separator = ',', $length = 1)
-    {
-
-        if(is_array($string)) return $string;
-
-        $string = trim($string, $separator);
-        $parts  = explode($separator, $string);
-        $out    = array();
-
-        foreach($parts AS $p) {
-            $p = trim($p);
-            if(static::length($p) > 0 && static::length($p) >= $length) $out[] = $p;
-        }
-
-        return $out;
-    }
-
-
-    /**
-     * Convert a string to 7-bit ASCII.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    public static function ascii(string $string): string
-    {
-        $string  = str_replace(
-            array_keys(static::$language),
-            array_values(static::$language),
-            $string
-        );
-
-        $string  = preg_replace(
-            array_keys(static::$ascii),
-            array_values(static::$ascii),
-            $string
-        );
-
-        return preg_replace('/[^\x09\x0A\x0D\x20-\x7E]/', '', $string);
-    }
-
-
-   /**
-     * Returns the position of a needle in a string
-     * if it can be found
-     *
-     * @param string $string
-     * @param string $needle
-     * @param bool $caseInsensitive
-     * @return int|bool
-     */
-    public static function position(string $string = null, string $needle, bool $caseInsensitive = false)
-    {
-        if ($caseInsensitive === true) {
-            $string = static::lower($string);
-            $needle = static::lower($needle);
-        }
-
-        return mb_strpos($string, $needle, 0, 'UTF-8');
-    }
-
-
-    /**
      * Convert a string to a safe version to be used in a URL
      *
      * @param  string  $string The unsafe string
@@ -426,6 +382,35 @@ class Str
 
 
     /**
+     * Better alternative for explode()
+     * It takes care of removing empty values
+     * and it has a built-in way to skip values
+     * which are too short.
+     *
+     * @param  string  $string The string to split
+     * @param  string  $separator The string to split by
+     * @param  int     $length The min length of values.
+     * @return array   An array of found values
+     */
+    public static function split($string, $separator = ',', $length = 1)
+    {
+
+        if(is_array($string)) return $string;
+
+        $string = trim($string, $separator);
+        $parts  = explode($separator, $string);
+        $out    = array();
+
+        foreach($parts AS $p) {
+            $p = trim($p);
+            if(static::length($p) > 0 && static::length($p) >= $length) $out[] = $p;
+        }
+
+        return $out;
+    }
+
+
+    /**
      * Checks if a string starts with the passed needle
      *
      * @param string $string
@@ -444,21 +429,16 @@ class Str
 
 
     /**
-     * Removes all html tags and encoded chars from a string
+     * An UTF-8 safe version of substr()
      *
-     * <code>
-     *
-     * echo str::unhtml('some <em>crazy</em> stuff');
-     * // output: some uber crazy stuff
-     *
-     * </code>
-     *
-     * @param  string  $string
-     * @return string  The html string
+     * @param  string  $str
+     * @param  int     $start
+     * @param  int     $length
+     * @return string
      */
-    public static function unhtml($string)
+    public static function substr($str, $start, $length = null)
     {
-        $string = strip_tags($string);
-        return html_entity_decode($string, ENT_COMPAT, 'utf-8');
+        $length = $length === null ? static::length($str) : $length;
+        return MB ? mb_substr($str, $start, $length, 'UTF-8') : substr($str, $start, $length);
     }
 }

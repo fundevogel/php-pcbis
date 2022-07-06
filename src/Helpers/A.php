@@ -21,6 +21,35 @@ use Exception;
 class A
 {
     /**
+     * Returns the first element of an array
+     *
+     * I always have to lookup the names of that function
+     * so I decided to make this shortcut which is
+     * easier to remember.
+     *
+     * <code>
+     *
+     * $array = array(
+     *   'cat',
+     *   'dog',
+     *   'bird',
+     * );
+     *
+     * $first = a::first($array);
+     * // first: 'cat'
+     *
+     * </code>
+     *
+     * @param   array  $array The source array
+     * @return  mixed  The first element
+     */
+    public static function first($array)
+    {
+        return array_shift($array);
+    }
+
+
+    /**
      * Better alternative for implode()
      *
      * @param string  $value The value to join
@@ -40,111 +69,30 @@ class A
 
 
     /**
-     * Update an array with a second array
-     * The second array can contain callbacks as values,
-     * which will get the original values as argument
+     * Returns the last element of an array
      *
-     * @param array $array
-     * @param array $update
-     */
-    public static function update($array, $update): array
-    {
-        foreach($update as $key => $value) {
-            $array[$key] = $value;
-        }
-
-        return $array;
-    }
-
-
-    /**
-     * Checks for missing elements in an array
-     *
-     * This is very handy to check for missing
-     * user values in a request for example.
-     *
-     * <code>
-     *
-     * $array = [
-     *   'cat' => 'miao',
-     *   'dog' => 'wuff',
-     *   'bird' => 'tweet',
-     *   'hippo' => null
-     * ];
-     *
-     * $required = ['cat', 'elephant', 'hippo'];
-     *
-     * $missing = a::missing($array, $required);
-     * // missing: ['elephant', 'hippo'];
-     *
-     * </code>
-     *
-     * @param   array  $array The source array
-     * @param   array  $required An array of required keys
-     * @return  array  An array of missing fields. If this is empty, nothing is missing.
-     */
-    public static function missing($array, $required = [])
-    {
-        $missing = [];
-
-        foreach($required as $r) {
-            if(!isset($array[$r])) $missing[] = $r;
-        }
-
-        return $missing;
-    }
-
-
-    /**
-     * Gets an element of an array by key
+     * I always have to lookup the names of that function
+     * so I decided to make this shortcut which is
+     * easier to remember.
      *
      * <code>
      *
      * $array = array(
-     *   'cat'  => 'miao',
-     *   'dog'  => 'wuff',
-     *   'bird' => 'tweet'
+     *   'cat',
+     *   'dog',
+     *   'bird',
      * );
      *
-     * echo a::get($array, 'cat');
-     * // output: 'miao'
-     *
-     * echo a::get($array, 'elephant', 'shut up');
-     * // output: 'shut up'
-     *
-     * $catAndDog = a::get(array('cat', 'dog'));
-     * // result: array(
-     * //   'cat' => 'miao',
-     * //   'dog' => 'wuff'
-     * // );
+     * $last = a::last($array);
+     * // first: 'bird'
      *
      * </code>
      *
      * @param   array  $array The source array
-     * @param   mixed  $key The key to look for
-     * @param   mixed  $default Optional default value, which should be returned if no element has been found
-     * @return  mixed
+     * @return  mixed  The last element
      */
-    public static function get($array, $key, $default = null)
-    {
-        // get an array of keys
-        if(is_array($key)) {
-            $result = array();
-            foreach($key as $k) $result[$k] = static::get($array, $k);
-            return $result;
-
-        // get a single
-        } else if(isset($array[$key])) {
-            return $array[$key];
-
-        // return the entire array if the key is null
-        } else if(is_null($key)) {
-            return $array;
-
-        // get the default value if nothing else worked out
-        } else {
-            return $default;
-        }
+    public static function last($array) {
+        return array_pop($array);
     }
 
 
@@ -223,58 +171,19 @@ class A
 
 
     /**
-     * Returns the first element of an array
+     * Update an array with a second array
+     * The second array can contain callbacks as values,
+     * which will get the original values as argument
      *
-     * I always have to lookup the names of that function
-     * so I decided to make this shortcut which is
-     * easier to remember.
-     *
-     * <code>
-     *
-     * $array = array(
-     *   'cat',
-     *   'dog',
-     *   'bird',
-     * );
-     *
-     * $first = a::first($array);
-     * // first: 'cat'
-     *
-     * </code>
-     *
-     * @param   array  $array The source array
-     * @return  mixed  The first element
+     * @param array $array
+     * @param array $update
      */
-    public static function first($array)
+    public static function update($array, $update): array
     {
-        return array_shift($array);
-    }
+        foreach($update as $key => $value) {
+            $array[$key] = $value;
+        }
 
-
-    /**
-     * Returns the last element of an array
-     *
-     * I always have to lookup the names of that function
-     * so I decided to make this shortcut which is
-     * easier to remember.
-     *
-     * <code>
-     *
-     * $array = array(
-     *   'cat',
-     *   'dog',
-     *   'bird',
-     * );
-     *
-     * $last = a::last($array);
-     * // first: 'bird'
-     *
-     * </code>
-     *
-     * @param   array  $array The source array
-     * @return  mixed  The last element
-     */
-    public static function last($array) {
-        return array_pop($array);
+        return $array;
     }
 }
