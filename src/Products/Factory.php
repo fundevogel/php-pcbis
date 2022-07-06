@@ -13,7 +13,6 @@ namespace Fundevogel\Pcbis\Products;
 
 use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
-use Fundevogel\Pcbis\Products\Product;
 use Fundevogel\Pcbis\Products\Books\Types\Ebook;
 use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
 use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;

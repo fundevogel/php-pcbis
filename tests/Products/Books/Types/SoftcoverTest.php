@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books\Types;
 
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Types\Softcover;
 
 class SoftcoverTest extends \PHPUnit\Framework\TestCase

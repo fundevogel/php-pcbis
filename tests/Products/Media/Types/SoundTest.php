@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Media\Types;
 
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Media\Types\Sound;
 
 class SoundTest extends \PHPUnit\Framework\TestCase

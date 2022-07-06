@@ -57,7 +57,7 @@ class Ola
      */
 
     /**
-     * Print availability when casting to string
+     * Exports availability when casting to string
      *
      * @return string
      */

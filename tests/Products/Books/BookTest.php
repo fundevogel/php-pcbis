@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Books;
 
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Books\Book;
 
 use org\bovigo\vfs\vfsStream;

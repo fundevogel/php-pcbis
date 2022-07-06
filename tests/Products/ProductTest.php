@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products;
 
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Product;
 
 class ProductTest extends \PHPUnit\Framework\TestCase

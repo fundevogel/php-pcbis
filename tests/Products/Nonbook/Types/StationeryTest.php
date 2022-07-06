@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Products\Nonbook\Types;
 
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
 
 class StationeryTest extends \PHPUnit\Framework\TestCase
