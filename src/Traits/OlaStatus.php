@@ -26,19 +26,18 @@ trait OlaStatus
      * Status codes of available products
      *
      * Preorder always:
-     *
-     * 18 Wird besorgt – nicht remittierbar/nicht stornierbar
-     * 97 Print on Demand (ggf. mit Angabe der Lieferzeit) – nicht remittierbar/nicht stornierbar
+     * - 18 Wird besorgt – nicht remittierbar/nicht stornierbar
+     * - 97 Print on Demand (ggf. mit Angabe der Lieferzeit) – nicht remittierbar/nicht stornierbar
      *
      * Preorder possible:
-     * 11 Erscheint laut Verlag/Lieferant .../... in neuer Auflage/als Nachfolgeprodukt
-     * 12 Nachdruck/wird nachproduziert. Folgt laut Verlag/Lieferant .../...
-     * 15 Fehlt kurzfristig am Lager
-     * 21 Noch nicht erschienen. Erscheint laut Verlag/Lieferant ...
-     * 23 Titel wegen Lieferverzug des Verlags/der Verlagsauslieferung derzeit nicht lieferbar
-     * 25 Artikel neu aufgenommen. Noch nicht am Lager
-     * 80 Fehlt, da der Verlag/Lieferant derzeit nicht liefern kann
-     * 98 Folgt mit nächster Lieferung
+     * - 11 Erscheint laut Verlag/Lieferant .../... in neuer Auflage/als Nachfolgeprodukt
+     * - 12 Nachdruck/wird nachproduziert. Folgt laut Verlag/Lieferant .../...
+     * - 15 Fehlt kurzfristig am Lager
+     * - 21 Noch nicht erschienen. Erscheint laut Verlag/Lieferant ...
+     * - 23 Titel wegen Lieferverzug des Verlags/der Verlagsauslieferung derzeit nicht lieferbar
+     * - 25 Artikel neu aufgenommen. Noch nicht am Lager
+     * - 80 Fehlt, da der Verlag/Lieferant derzeit nicht liefern kann
+     * - 98 Folgt mit nächster Lieferung
      *
      * @var array
      */
@@ -59,19 +58,20 @@ trait OlaStatus
     /**
      * Status codes of unavailable products
      *
-     * 07 Vergriffen, keine Neuauflage, Bestellung abgelegt
-     * 17 Führen wir nicht bzw. nicht mehr
-     * 19 Ladenpreis aufgehoben. Führen wir nicht mehr
-     * 20 Noch nicht erschienen. Bestellung nicht vorgemerkt
-     * 24 Erscheint nicht laut Verlag/Lieferant
-     * 28 Titelnummer unbekannt
-     * 29 ISBN oder EAN unbekannt
-     * 43 Vergriffen – Neuauflage/Nachfolgeprodukt unbestimmt – Bestellung wird nicht vorgemerkt
-     * 60 Indiziert. Führen wir nicht mehr
-     * 62 Artikel infolge rechtlicher Auseinandersetzungen zur Zeit nicht lieferbar. Bestellung nicht vorgemerkt
-     * 88 Konditionsänderung durch den Verlag/Lieferanten. Führen wir nicht mehr
-     * 94 Wird zur Zeit nur ab Verlag/Lieferant geliefert – Bestellung nicht vorgemerkt
-     * 99 Titel hat Nachfolgetitel/-auflage
+     * No orders possible:
+     * - 07 Vergriffen, keine Neuauflage, Bestellung abgelegt
+     * - 17 Führen wir nicht bzw. nicht mehr
+     * - 19 Ladenpreis aufgehoben. Führen wir nicht mehr
+     * - 20 Noch nicht erschienen. Bestellung nicht vorgemerkt
+     * - 24 Erscheint nicht laut Verlag/Lieferant
+     * - 28 Titelnummer unbekannt
+     * - 29 ISBN oder EAN unbekannt
+     * - 43 Vergriffen – Neuauflage/Nachfolgeprodukt unbestimmt – Bestellung wird nicht vorgemerkt
+     * - 60 Indiziert. Führen wir nicht mehr
+     * - 62 Artikel infolge rechtlicher Auseinandersetzungen zur Zeit nicht lieferbar. Bestellung nicht vorgemerkt
+     * - 88 Konditionsänderung durch den Verlag/Lieferanten. Führen wir nicht mehr
+     * - 94 Wird zur Zeit nur ab Verlag/Lieferant geliefert – Bestellung nicht vorgemerkt
+     * - 99 Titel hat Nachfolgetitel/-auflage
      *
      * @var array
      */
@@ -93,7 +93,7 @@ trait OlaStatus
 
 
     /**
-     * All KNV 'Meldenummer' descriptions
+     * Current KNV 'Meldenummer' descriptions
      *
      * @var array
      */
@@ -130,73 +130,36 @@ trait OlaStatus
 
 
     /**
-     * Current KNV 'Meldenummer'
+     * Current KNV 'Fehlernummer' descriptions
      *
-     * @var string
+     * @var array
      */
-    protected $olaCode = null;
-
-
-    /**
-     * Current KNV 'Meldenummer' description
-     *
-     * @var string
-     */
-    protected $olaMessage = null;
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Checks if KNV 'Meldenummer' is available
-     *
-     * @return bool
-     */
-    public function hasOlaCode(): bool
-    {
-        return $this->olaCode !== null;
-    }
-
-
-    /**
-     * Exports current KNV 'Meldenummer'
-     *
-     * @return string
-     */
-    public function olaCode(): string
-    {
-        if ($this->hasOlaCode()) {
-            return $this->olaCode;
-        }
-
-        return '';
-    }
-
-
-    /**
-     * Checks if KNV 'Meldenummer' description is available
-     *
-     * @return bool
-     */
-    public function hasOlaMessage(): bool
-    {
-        return $this->olaMessage !== null;
-    }
-
-
-    /**
-     * Exports current KNV 'Meldenummer' description
-     *
-     * @return string
-     */
-    public function olaMessage(): string
-    {
-        if ($this->hasOlaMessage()) {
-            return $this->olaMessage;
-        }
-
-        return '';
-    }
+    protected array $errorMessages = [
+        '19003' => 'Benutzerfehler',
+        '19004' => 'Passwortfehler',
+        '19005' => 'Hostfehler',
+        '19006' => 'Falsche ACT',
+        '19007' => 'Verkehrsnummer fehlt',
+        '19008' => 'Bestellnummer fehlt',
+        '19009' => 'Menge fehlt',
+        '19010' => 'Kommunikationsfehler',
+        '19011' => 'Antwortfehler',
+        '19012' => 'Antwortunterbrechung',
+        '19013' => 'Timeout',
+        '19014' => 'Busy',
+        '19015' => 'No carrier',
+        '19016' => 'Beeendigungsfehler',
+        '19017' => 'Schreibfehler',
+        '19018' => 'OLA-Konfiguration fehlt',
+        '19031' => 'Bei einer OLA-Anfrage darf die Menge maximal 99 betragen',
+        '19032' => 'Fehlende Referenznummer',
+        '19033' => 'Fehlendes Bestelldatum',
+        '19034' => 'Menge darf bei einer Onlinebestellung maximal 30000 betragen',
+        '19040' => 'Fehler bei der TCPIP Initialisierung',
+        '19041' => 'Fehler beim TCPIP Connect',
+        '19050' => 'Referenznummer konnte nicht generiert werden',
+        '19060' => 'Keine Vormerkung gefunden',
+        '19061' => 'Storno nicht erlaubt',
+        # TODO: 19062 ?
+    ];
 }

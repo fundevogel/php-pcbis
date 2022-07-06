@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Products;
 
+use Fundevogel\Pcbis\Api\Ola;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Traits\OlaStatus;
+use Fundevogel\Pcbis\Traits\People;
+use Fundevogel\Pcbis\Traits\Tags;
 use Fundevogel\Pcbis\Utilities\Butler;
 
 use DOMDocument;
@@ -20,10 +25,76 @@ use DOMDocument;
 /**
  * Class Product
  *
- * Generic base class
+ * Generic base class for products
  */
-class Product extends ProductAbstract
+abstract class Product
 {
+    /**
+     * Traits
+     */
+
+    use OlaStatus;
+    use People;
+    use Tags;
+
+
+    /**
+     * Properties
+     */
+
+    /**
+     * Product EAN/ISBN
+     *
+     * @var string
+     */
+    protected $identifier;
+
+
+    /**
+     * Constructor
+     *
+     * @param array $data Source data as fetched from KNV's API
+     * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
+     * @return void
+     */
+    public function __construct(public array $data, protected ?Webservice $api = null)
+    {
+        # If not specified ..
+        if (is_null($this->api)) {
+            # .. invoke API client in offline mode
+            $this->api = new Webservice();
+        }
+
+        # Store product EAN/ISBN
+        $this->identifier = $this->data['EAN'];
+
+        # If present ..
+        if (class_exists('Nicebooks\Isbn\Isbn')) {
+            # .. attempt to ..
+            try {
+                # .. format product EAN/ISBN using third-party tools
+                $this->identifier = \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
+            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
+            }
+        }
+
+        # Add startup hook
+        $this->setup();
+    }
+
+
+    /**
+     * Setup hook
+     *
+     * @return void
+     */
+    public function setup(): void
+    {
+        $this->people = $this->setUpPeople();
+        $this->tags   = $this->setUpTags();
+    }
+
+
     /**
      * Magic methods
      */
@@ -46,6 +117,376 @@ class Product extends ProductAbstract
 
         # .. otherwise, only product title
         return $this->title();
+    }
+
+
+    /**
+     * Methods
+     */
+
+    /**
+     * Checks whether product has a predecessor
+     *
+     * @return bool
+     */
+    public function hasDowngrade(): bool
+    {
+        return $this->data['VorherigeAuflageGtin'] != '';
+    }
+
+
+    /**
+     * Checks whether product has a successor
+     *
+     * @return bool
+     */
+    public function hasUpgrade(): bool
+    {
+        return $this->data['NeueAuflageGtin'] != '';
+    }
+
+
+    /**
+     * Type detection helper
+     *
+     * @return string
+     */
+    protected function type(): string
+    {
+        # Extract class name (= product type)
+        return A::last(explode('\\', get_class($this)));
+    }
+
+
+    /**
+     * Checks whether this is a book
+     *
+     * @return bool
+     */
+    public function isBook(): bool
+    {
+        return in_array($this->type(), [
+            # Base
+            'Book',
+
+            # Subset
+            'Ebook',
+            'Hardcover',
+            'Schoolbook',
+            'Softcover',
+        ]);
+    }
+
+
+    /**
+     * Checks whether this is an eBook
+     *
+     * @return bool
+     */
+    public function isEbook(): bool
+    {
+        return $this->type() == 'Ebook';
+    }
+
+
+    /**
+     * Checks whether this is a hardcover book
+     *
+     * @return bool
+     */
+    public function isHardcover(): bool
+    {
+        return $this->type() == 'Hardcover';
+    }
+
+
+    /**
+     * Checks whether this is a schoolbook
+     *
+     * @return bool
+     */
+    public function isSchoolbook(): bool
+    {
+        return $this->type() == 'Schoolbook';
+    }
+
+
+    /**
+     * Checks whether this is a softcover book
+     *
+     * @return bool
+     */
+    public function isSoftcover(): bool
+    {
+        return $this->type() == 'Softcover';
+    }
+
+
+    /**
+     * Checks whether this is a medium
+     *
+     * @return bool
+     */
+    public function isMedia(): bool
+    {
+        return in_array($this->type(), [
+            # Base
+            'Medium',
+
+            # Subset
+            'Audiobook',
+            'Movie',
+            'Music',
+            'Sound',
+        ]);
+    }
+
+
+    /**
+     * Checks whether this is an audiobook
+     *
+     * @return bool
+     */
+    public function isAudiobook(): bool
+    {
+        return $this->type() == 'Audiobook';
+    }
+
+
+    /**
+     * Checks whether this is a movie
+     *
+     * @return bool
+     */
+    public function isMovie(): bool
+    {
+        return $this->type() == 'Movie';
+    }
+
+
+    /**
+     * Checks whether this is music
+     *
+     * @return bool
+     */
+    public function isMusic(): bool
+    {
+        return $this->type() == 'Music';
+    }
+
+
+    /**
+     * Checks whether this is a sound storage medium
+     *
+     * @return bool
+     */
+    public function isSound(): bool
+    {
+        return $this->type() == 'Sound';
+    }
+
+
+    /**
+     * Checks whether this is an item
+     *
+     * @return bool
+     */
+    public function isItem(): bool
+    {
+        return in_array($this->type(), [
+            # Base
+            'Item',
+
+            # Subset
+            'Boardgame',
+            'Calendar',
+            'Map',
+            'Nonbook',
+            'Notes',
+            'Software',
+            'Stationery',
+            'Toy',
+            'Videogame',
+        ]);
+    }
+
+
+    /**
+     * Checks whether this is a boardgame
+     *
+     * @return bool
+     */
+    public function isBoardgame(): bool
+    {
+        return $this->type() == 'Boardgame';
+    }
+
+
+    /**
+     * Checks whether this is a calendar
+     *
+     * @return bool
+     */
+    public function isCalendar(): bool
+    {
+        return $this->type() == 'Calendar';
+    }
+
+
+    /**
+     * Checks whether this is a map
+     *
+     * @return bool
+     */
+    public function isMap(): bool
+    {
+        return $this->type() == 'Map';
+    }
+
+
+    /**
+     * Checks whether this is a generic item
+     *
+     * @return bool
+     */
+    public function isNonbook(): bool
+    {
+        return $this->type() == 'Nonbook';
+    }
+
+
+    /**
+     * Checks whether these are notes
+     *
+     * @return bool
+     */
+    public function isNotes(): bool
+    {
+        return $this->type() == 'Notes';
+    }
+
+
+    /**
+     * Checks whether this is software
+     *
+     * @return bool
+     */
+    public function isSoftware(): bool
+    {
+        return $this->type() == 'Software';
+    }
+
+
+    /**
+     * Checks whether this is stationery
+     *
+     * @return bool
+     */
+    public function isStationery(): bool
+    {
+        return $this->type() == 'Stationery';
+    }
+
+
+    /**
+     * Checks whether this is a toy
+     *
+     * @return bool
+     */
+    public function isToy(): bool
+    {
+        return $this->type() == 'Toy';
+    }
+
+
+    /**
+     * Checks whether this is a videogame
+     *
+     * @return bool
+     */
+    public function isVideogame(): bool
+    {
+        return $this->type() == 'Videogame';
+    }
+
+
+    /**
+     * Exports OLA record
+     *
+     * @param string $type OLA type (either 'anfrage', 'bestellung' or 'storno')
+     * @param int $quantity Number of products to be delivered
+     * @return \Fundevogel\Pcbis\Api\Ola
+     */
+    public function ola(int $quantity = 1, string $type = 'anfrage'): Ola
+    {
+        return new Ola($this->api->ola($this->identifier, $quantity, $type));
+    }
+
+
+    /**
+     * Checks whether KNV 'Meldenummer' is present
+     *
+     * @return bool
+     */
+    public function hasOlaCode(): bool
+    {
+        return $this->data['Mnr'] != '';
+    }
+
+
+    /**
+     * Exports KNV 'Meldenummer' (if present)
+     *
+     * @return string
+     */
+    public function olaCode(): string
+    {
+        return $this->data['Mnr'];
+    }
+
+
+    /**
+     * Exports KNV 'Meldetext' (if present)
+     *
+     * @return string
+     */
+    public function olaMessage(): string
+    {
+        if (array_key_exists($this->olaCode(), $this->olaMessages)) {
+            return $this->olaMessages[$this->olaCode()];
+        }
+
+        return $this->ola()->olaMessage();
+    }
+
+
+    /**
+     * Checks whether product is available (= purchasable)
+     *
+     * @return bool
+     */
+    public function isAvailable(): bool
+    {
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode(), $this->available);
+        }
+
+        return $this->ola()->isAvailable();
+    }
+
+
+    /**
+     * Checks whether product is permanently unavailable
+     *
+     * @return bool
+     */
+    public function isUnavailable(): bool
+    {
+        if ($this->hasOlaCode()) {
+            return in_array($this->olaCode(), $this->unavailable);
+        }
+
+        return $this->ola->isUnavailable();
     }
 
 
@@ -135,43 +576,42 @@ class Product extends ProductAbstract
      */
     public function description(): array
     {
-        if (!isset($this->data['Text1'])) {
-            return [];
-        }
-
-        # Prepare text for HTML processing
-        # (1) Avoid `htmlParseStartTag: invalid element name in Entity` warnings
-        # Sometimes, KNV uses '>>' & '<<' instead of quotation marks, leading to broken texts
-        # See 978-3-8373-9003-2
-        $text = Str::replace($this->data['Text1'], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
-        # TODO: Use additional text fields?
-
-        # (2) Convert HTML elements
-        $text = html_entity_decode($text);
-
-        # (3) Avoid `htmlParseEntityRef: no name in Entity` warnings
-        # See https://stackoverflow.com/a/14832134
-        # TODO: Should be deprecated
-        $text = Str::replace($text, '&', '&amp;');
-
-        # Create DOM document & load HTML
-        $dom = new DOMDocument();
-
-        # Suppress warnings when encountering invalid HTML
-        # See https://stackoverflow.com/a/41845049
-        libxml_use_internal_errors(true);
-
-        # Load prepared HTML text
-        $dom->loadHtml($text);
-
         # Create data array
         $description = [];
 
-        # Iterate over `span` elements ..
-        foreach ($dom->getElementsByTagName('span') as $node) {
-            # (1) .. decoding them as UTF-8
-            # (2) .. removing unnecessary whitespaces
-            $description[] = trim(utf8_decode($node->nodeValue));
+        # Iterate over possible text field keys
+        foreach (['Text1', 'Text2', 'Text3', 'Text4', 'Text15'] as $key) {
+            # If key not present in data ..
+            if (!isset($this->data[$key])) {
+                # .. skip it
+                continue;
+            }
+
+            # Prepare text for HTML processing
+            # (1) Avoid `htmlParseStartTag: invalid element name in Entity` warnings
+            $text = Str::replace($this->data[$key], ['&gt;&gt;', '&lt;&lt;'], ['"', '"']);
+            # Note: Sometimes, KNV uses '>>' & '<<' instead of quotation marks, leading to broken texts
+            # See 978-3-8373-9003-2
+
+            # (2) Convert breakline tags
+            $text = Str::replace($text, '<br>', "\n");
+
+            # Create DOM document & load HTML
+            $dom = new DOMDocument();
+
+            # Suppress warnings when encountering invalid HTML
+            # See https://stackoverflow.com/a/41845049
+            libxml_use_internal_errors(true);
+
+            # Load prepared HTML text
+            $dom->loadHtml($text);
+
+            # Iterate over `span` elements ..
+            foreach ($dom->getElementsByTagName('span') as $node) {
+                # (1) .. decoding them as UTF-8
+                # (2) .. removing unnecessary whitespaces
+                $description[] = trim(utf8_decode($node->nodeValue));
+            }
         }
 
         return $description;

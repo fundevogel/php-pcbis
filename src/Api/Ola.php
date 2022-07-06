@@ -34,78 +34,11 @@ class Ola
      */
 
     /**
-     * Whether current OLA query was successful
-     *
-     * @var bool
-     */
-    private $success;
-
-
-    /**
-     * Quantity being checked
-     *
-     * @var int
-     */
-    private $quantityOrdered;
-
-
-    /**
-     * Quantity in stock
-     *
-     * @var int
-     */
-    private $quantityAvailable;
-
-
-    /**
-     * Current KNV 'Fehlernummer'
-     *
-     * @var string
-     */
-    private $errorCode = null;
-
-
-    /**
-     * Current KNV 'Fehlernummer' description
-     *
-     * @var string
-     */
-    private $errorMessage = null;
-
-
-    /**
-     * All KNV 'Fehlernummer' descriptions
+     * Source OLA data as fetched from KNV's API
      *
      * @var array
      */
-    private $errorMessages = [
-        '19003' => 'Benutzerfehler',
-        '19004' => 'Passwortfehler',
-        '19005' => 'Hostfehler',
-        '19006' => 'Falsche ACT',
-        '19007' => 'Verkehrsnummer fehlt',
-        '19008' => 'Bestellnummer fehlt',
-        '19009' => 'Menge fehlt',
-        '19010' => 'Kommunikationsfehler',
-        '19011' => 'Antwortfehler',
-        '19012' => 'Antwortunterbrechung',
-        '19013' => 'Timeout',
-        '19014' => 'Busy',
-        '19015' => 'No carrier',
-        '19016' => 'Beeendigungsfehler',
-        '19017' => 'Schreibfehler',
-        '19018' => 'OLA-Konfiguration fehlt',
-        '19031' => 'Bei einer OLA-Anfrage darf die Menge maximal 99 betragen',
-        '19032' => 'Fehlende Referenznummer',
-        '19033' => 'Fehlendes Bestelldatum',
-        '19034' => 'Menge darf bei einer Onlinebestellung maximal 30000 betragen',
-        '19040' => 'Fehler bei der TCPIP Initialisierung',
-        '19041' => 'Fehler beim TCPIP Connect',
-        '19050' => 'Referenznummer konnte nicht generiert werden',
-        '19060' => 'Keine Vormerkung gefunden',
-        '19061' => 'Storno nicht erlaubt',
-        # TODO: 19062 ?
-    ];
+    public array $data;
 
 
     /**
@@ -113,37 +46,9 @@ class Ola
      *
      * @param \stdClass $data OLA response ('Online-Lieferabfrage')
      */
-    public function __construct(public stdClass $data)
+    public function __construct(stdClass $data)
     {
-        $this->data = $data->OLAResponse->OLAResponseRecord;
-
-        # Whether OLA query for given product was successfull
-        # Note: This doesn't convern given product's availability!
-        $this->success = $this->data->StatusPosition === 'OK' ? true : false;
-
-        # Number of items ordered & available for order
-        $this->quantityOrdered = $this->data->Bestellmenge;
-        $this->quantityAvailable = $this->data->Lieferbaremenge;
-
-        # Set OLA code & message
-        if (isset($this->data->Meldenummer)) {
-            $this->olaCode = (string) $this->data->Meldenummer;
-        }
-
-        if (array_key_exists($this->olaCode, $this->olaMessages)) {
-            $this->olaMessage = $this->olaMessages[$this->olaCode];
-        }
-
-        # Set error code & error message
-        if (isset($this->data->Fehlercode)) {
-            $this->errorCode = (string) $this->data->Fehlercode;
-        }
-
-        if (array_key_exists($this->errorCode, $this->errorMessages)) {
-            $this->errorMessage = $this->errorMessages[$this->errorCode];
-        } elseif (isset($this->data->Fehlertext)) {
-            $this->errorMessage = $this->data->Fehlertext;
-        }
+        $this->data = $data->responseItems;
     }
 
 
@@ -167,84 +72,154 @@ class Ola
      */
 
     /**
-     * Checks if KNV 'Fehlernummer' is available
+     * Checks whether OLA query succeeded
+     *
+     * Note: This differs from product availability!
+     *
+     * @return bool
+     */
+    public function hasSucceeded(): bool
+    {
+        return $this->data->status == 'OK';
+    }
+
+
+    /**
+     * Checks whether OLA query failed
+     *
+     * Note: This differs from product availability!
+     *
+     * @return bool
+     */
+    public function hasFailed(): bool
+    {
+        return $this->data->status == 'FAILED';
+    }
+
+
+    /**
+     * Checks whether KNV 'Meldenummer' is present
+     *
+     * @return bool
+     */
+    public function hasOlaCode(): bool
+    {
+        return $this->data->meldeNummer != '';
+    }
+
+
+    /**
+     * Exports KNV 'Meldenummer' (if present)
+     *
+     * @return string
+     */
+    public function olaCode(): string
+    {
+        return $this->data->meldeNummer;
+    }
+
+
+    /**
+     * Exports KNV 'Meldetext' (if present)
+     *
+     * @return string
+     */
+    public function olaMessage(): string
+    {
+        if (array_key_exists($this->olaCode(), $this->olaMessages)) {
+            return $this->olaMessages[$this->olaCode()];
+        }
+
+        return $this->data->meldeText;
+    }
+
+
+    /**
+     * Checks whether KNV 'Fehlernummer' is present
      *
      * @return bool
      */
     public function hasErrorCode(): bool
     {
-        return $this->errorCode !== null;
+        return $this->data->fehlerNummer != '';
     }
 
 
     /**
-     * Prints current KNV 'Fehlernummer'
+     * Exports KNV 'Fehlermmer' (if present)
      *
      * @return string
      */
     public function errorCode(): string
     {
-        if ($this->hasErrorCode()) {
-            return $this->errorCode;
-        }
-
-        return '';
+        return $this->data->fehlerNummer;
     }
 
 
     /**
-     * Checks if KNV 'Fehlertext' is available
-     *
-     * @return bool
-     */
-    public function hasErrorMessage(): bool
-    {
-        return $this->errorMessage !== null;
-    }
-
-
-    /**
-     * Prints current KNV 'Fehlertext'
+     * Exports KNV 'Fehlertext' (if present)
      *
      * @return string
      */
     public function errorMessage(): string
     {
-        if ($this->hasErrorMessage()) {
-            return $this->errorMessage;
+        if (array_key_exists($this->errorCode(), $this->errorMessages)) {
+            return $this->errorMessages[$this->errorCode()];
         }
 
-        return '';
+        return $this->data->fehlerText;
     }
 
 
     /**
-     * Checks if product is available / may be purchased
+     * Checks if product is purchasable
      *
      * @return bool
      */
     public function isAvailable(): bool
     {
         if ($this->hasOlaCode()) {
-            return in_array($this->olaCode, $this->available);
+            return in_array($this->olaCode(), $this->available);
         }
 
-        return $this->success && $this->quantityOrdered <= $this->quantityAvailable;
+        return $this->hasSucceeded() && $this->data->numberOrdered() <= $this->numberAvailable();
     }
 
 
     /**
-     * Checks if product is permanently unavailable
+     * Checks if product is permanently unpurchasable
      *
      * @return bool
      */
     public function isUnavailable(): bool
     {
         if ($this->hasOlaCode()) {
-            return in_array($this->olaCode, $this->unavailable);
+            return in_array($this->olaCode(), $this->unavailable);
         }
 
         return !$this->isAvailable();
+    }
+
+
+    /**
+     * Checks number of ordered items
+     *
+     * @return int
+     */
+    public function numberOrdered(): int
+    {
+        return $this->data->bestellMenge;
+    }
+
+
+    /**
+     * Checks number of available items
+     *
+     * @return int
+     */
+    public function numberAvailable(): int
+    {
+        return $this->data->lieferbareMenge;
     }
 
 

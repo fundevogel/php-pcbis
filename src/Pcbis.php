@@ -12,25 +12,11 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis;
 
+use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
+use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Products\Factory;
 use Fundevogel\Pcbis\Products\Product;
-use Fundevogel\Pcbis\Products\Books\Types\Ebook;
-use Fundevogel\Pcbis\Products\Books\Types\Hardcover;
-use Fundevogel\Pcbis\Products\Books\Types\Schoolbook;
-use Fundevogel\Pcbis\Products\Books\Types\Softcover;
-use Fundevogel\Pcbis\Products\Media\Types\Audiobook;
-use Fundevogel\Pcbis\Products\Media\Types\Movie;
-use Fundevogel\Pcbis\Products\Media\Types\Music;
-use Fundevogel\Pcbis\Products\Media\Types\Sound;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Boardgame;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Calendar;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Map;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Nonbook;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Notes;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Software;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Stationery;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Toy;
-use Fundevogel\Pcbis\Products\Nonbook\Types\Videogame;
 
 /**
  * Class Pcbis
@@ -49,6 +35,14 @@ final class Pcbis
      * @var \Fundevogel\Pcbis\Api\Webservice
      */
     public Webservice $api;
+
+
+    /**
+     * Whether to update cached data
+     *
+     * @var bool
+     */
+    public bool $forceRefresh = false;
 
 
     /**
@@ -79,7 +73,7 @@ final class Pcbis
             # Create data array
             $data = [];
 
-            foreach ($result->lesenAntwort->titel[0]->einzelWerk as $item) {
+            foreach (A::first($result->lesenAntwort->titel)->einzelWerk as $item) {
                 if (count($item->werte) > 1) {
                     $data[$item->feldName] = $item->werte;
                 } else {
@@ -88,11 +82,6 @@ final class Pcbis
             }
 
             return $data;
-
-            // return $result->lesenAntwort->titel[0]->einzelWerk;
-            // return array_map(function(array $data) {
-            //     return $data->einzelWerk;
-            // }, $result->lesenAntwort->titel);
         }
 
         return [];
@@ -107,7 +96,7 @@ final class Pcbis
      * @param bool $forceRefresh Whether to update cached data
      * @return array
      */
-    private function fetch(string $identifier, bool $forceRefresh = false): array
+    public function fetch(string $identifier, bool $forceRefresh = false): array
     {
         $value = null;
 
@@ -136,93 +125,66 @@ final class Pcbis
      * Instantiates 'Product' object from single EAN/ISBN
      *
      * @param string $identifier Product EAN/ISBN
-     * @param bool $forceRefresh Whether to update cached data
-     * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
+     * @return \Fundevogel\Pcbis\Products\Product|null
+     */
+    public function load(string $identifier): Product|null
+    {
+        # If raw data is available ..
+        if ($data = $this->fetch($identifier, $this->forceRefresh)) {
+            # .. instantiate
+            return Factory::create($data, $this->api);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Performs downgrade (or returns product itself)
+     *
+     * @param \Fundevogel\Pcbis\Products\Product $object Product to be downgraded
      * @return \Fundevogel\Pcbis\Products\Product
      */
-    public function load(string $identifier, bool $forceRefresh = false): Product
+    public function downgrade(Product $object): Product
     {
-        # Define available product types
-        $types = [
-            # (1) Books
-            'AG' => 'ePublikation',
-            'HC' => 'Hardcover',
-            'SB' => 'Schulbuch',
-            'TB' => 'Taschenbuch',
-
-            # (2) Media
-            'AC' => 'Hörbuch',
-            'AD' => 'Film',
-            'AF' => 'Tonträger',
-            'AK' => 'Musik',
-
-            # (3) Nonbook
-            'AB' => 'Nonbook',
-            'AE' => 'Software',
-            'AH' => 'Games',
-            'AI' => 'Kalender',
-            'AJ' => 'Landkarte/Globus',
-            'AL' => 'Noten',
-            'AM' => 'Papeterie/PBS',
-            'AN' => 'Spiel',
-            'AO' => 'Spielzeug',
-        ];
-
-        # Fetch raw data
-        $data = $this->fetch($identifier, $forceRefresh);
-
-        # Determine type identifier
-        $code = $data['Sortimentskennzeichen'];
-
-        # If product type is unknown ..
-        if (!array_key_exists($code, $types)) {
-            # .. fail early
-            throw new UnknownTypeException(sprintf('Unknown type identifier: "%s"', $code));
+        # If available ..
+        if ($object->hasDowngrade()) {
+            # .. perform downgrade
+            return $this->load($object->data['VorherigeAuflageGtin']);
         }
 
-        # Create instance based on product type
-        $type = $types[$code];
+        return $object;
+    }
 
-        switch ($type) {
-            # Books
-            case 'ePublikation':
-                return new Ebook($data, $this->api);
-            case 'Hardcover':
-                return new Hardcover($data, $this->api);
-            case 'Schulbuch':
-                return new Schoolbook($data, $this->api);
-            case 'Taschenbuch':
-                return new Softcover($data, $this->api);
 
-            # Media
-            case 'Film':
-                return new Movie($data, $this->api);
-            case 'Hörbuch':
-                return new Audiobook($data, $this->api);
-            case 'Musik':
-                return new Music($data, $this->api);
-            case 'Tonträger':
-                return new Sound($data, $this->api);
-
-            # Nonbook
-            case 'Games':
-                return new Videogame($data, $this->api);
-            case 'Kalender':
-                return new Calendar($data, $this->api);
-            case 'Landkarte/Globus':
-                return new Map($data, $this->api);
-            case 'Nonbook':
-                return new Nonbook($data, $this->api);
-            case 'Noten':
-                return new Notes($data, $this->api);
-            case 'Papeterie/PBS':
-                return new Stationery($data, $this->api);
-            case 'Software':
-                return new Software($data, $this->api);
-            case 'Spiel':
-                return new Boardgame($data, $this->api);
-            case 'Spielzeug':
-                return new Toy($data, $this->api);
+    /**
+     * Performs upgrade (or returns product itself)
+     *
+     * @param \Fundevogel\Pcbis\Products\Product $object Product to be upgraded
+     * @return \Fundevogel\Pcbis\Products\Product
+     */
+    public function upgrade(Product $object): Product
+    {
+        # If available ..
+        if ($object->hasUpgrade()) {
+            # .. perform upgrade
+            return $this->load($object->data['NeueAuflageGtin']);
         }
+
+        return $object;
+    }
+
+
+    /**
+     * Checks product availability via OLA ('Online Lieferbarkeits-Abfrage')
+     *
+     * @param string $identifier Product EAN/ISBN
+     * @param int $quantity Number of products to be delivered
+     * @param string $type OLA type (either 'anfrage', 'bestellung' or 'storno')
+     * @return \Fundevogel\Pcbis\Api\Ola
+     */
+    public function ola(string $identifier, int $quantity = 1, string $type = 'anfrage'): Ola
+    {
+        return new Ola($this->api->ola($identifier, $quantity, $type));
     }
 }

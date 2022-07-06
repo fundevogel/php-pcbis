@@ -11,17 +11,10 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Api;
 
-use Fundevogel\Pcbis\Api\Ola;
-use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
-use Fundevogel\Pcbis\Exceptions\NoRecordFoundException;
 use Fundevogel\Pcbis\Exceptions\OfflineModeException;
-use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
-use Fundevogel\Pcbis\Helpers\A;
-use Fundevogel\Pcbis\Utilities\Butler;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * Class Webservice
@@ -148,7 +141,7 @@ final class Webservice
 
 
     /**
-     * Authenticates with KNV's API & generates session token
+     * Authenticates with KNV's API
      *
      * @param array $credentials Login credentials
      * @throws \Fundevogel\Pcbis\Exceptions\KNVException
@@ -174,7 +167,7 @@ final class Webservice
      * Fetches raw product data from KNV's API
      *
      * @param string $identifier Product EAN/ISBN
-     * @return \stdClass
+     * @return \stdClass Response body as JSON object
      */
     public function suche(string $identifier): \stdClass
     {
@@ -200,83 +193,24 @@ final class Webservice
 
 
     /**
-     *
-     * .. if product for given EAN/ISBN exists
-     *
-     * @param string $identifier Product EAN/ISBN
-     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException
-     * @return array
-     */
-    private function query(string $identifier): array
-    {
-        # For getting started with KNV's (surprisingly well documented) german API,
-        # see https://zeitfracht-medien.de/wp-content/uploads/2022/05/ZF-Webservice_3.0-1.pdf
-        $query = $this->client->WSCall([
-            # Log in using sessionID
-            'SessionID' => $this->sessionID,
-
-            # Start new database query
-            'Suchen' => [
-                # Search across all databases
-                'Datenbank' => [
-                    'KNV',
-                    'KNVBG',
-                    'BakerTaylor',
-                    'Gardners',
-                ],
-                'Suche' => [
-                    'SimpleTerm' => [
-                        # Simple search suffices for querying single ISBN
-                        'Suchfeld' => 'ISBN',
-                        'Suchwert' => $identifier,
-                        'Schwert2' => '',
-                        'Suchart'  => 'Genau',
-                    ],
-                ],
-            ],
-            # Read results of the query & return first result
-            'Lesen' => [
-                'SatzVon' => 1,
-                'SatzBis' => 1,
-                'Format'  => 'KNVXMLLangText',
-            ],
-        ]);
-
-        if ($query->Suchergebnis->TrefferGesamt > 0) {
-            $result = $query->Daten->Datensaetze->Record->ArtikelDaten;
-            $array = Butler::loadXML($result);
-
-            return A::last($array);
-        }
-
-        throw new NoRecordFoundException(sprintf('No database record found for "%s".', $identifier));
-    }
-
-
-    /**
-     * Checks if product is available for delivery via OLA query
+     * Checks product availability via OLA ('Online Lieferbarkeits-Abfrage')
      *
      * @param string $identifier Product EAN/ISBN
      * @param int $quantity Number of products to be delivered
-     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException
-     * @return \Fundevogel\Pcbis\Api\Ola
+     * @param string $type OLA type (either 'anfrage', 'bestellung' or 'storno')
+     * @return \stdClass Response body as JSON object
      */
-    public function ola(string $identifier, int $quantity = 1): Ola
+    public function ola(string $identifier, int $quantity = 1, string $type = 'anfrage'): \stdClass
     {
-        if ($this->offlineMode) {
-            throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
-        }
-
-        return new Ola($this->client->WSCall([
-            # Log in using sessionID
-            'SessionID' => $this->sessionID,
-            'OLA' => [
-                'Art' => 'Abfrage',
-                'OLAItem' => [
-                    'Bestellnummer' => ['ISBN' => $identifier],
-                    'Menge' => $quantity,
-                ],
+        # Determine OLA items
+        # TODO: Make it fully configurable
+        $query = [
+            'olaItems' => [
+                'bestellNummer' => ['ean' => $identifier],
+                'menge' => $quantity,
             ],
-        ]));
+        ];
+
+        return $this->call(sprintf('ola/%s', $type), $query);
     }
 }
