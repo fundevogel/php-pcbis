@@ -46,13 +46,13 @@ class Spreadsheets
             $lines[0] = str_replace("\xEF\xBB\xBF", '', $lines[0]);
 
             # (3) Extract CSV data
-            $csv = array_map(function ($d) use ($delimiter) {
+            $csv = array_map(function ($line) use ($delimiter) {
                 # Encode CSV data as UTF-8 (if necessary)
-                if (Str::encoding($d) != 'UTF-8') {
-                    $d = utf8_encode($d);
+                if (Str::encoding($line) != 'UTF-8') {
+                    $line = utf8_encode($line);
                 }
 
-                return str_getcsv($d, $delimiter);
+                return str_getcsv($line, $delimiter);
             }, $lines);
 
             # (4) Add header names
@@ -123,7 +123,7 @@ class Spreadsheets
 
         $bindings = json_decode(file_get_contents(__DIR__ . '/../../data/codes.json'), true);
 
-        foreach (self::csvOpen($file, $headers, $delimiter) as $array) {
+        foreach (static::csvOpen($file, $headers, $delimiter) as $array) {
             # Gathering & processing generic book information
             $string = $array['Informationen'];
 
@@ -147,13 +147,13 @@ class Spreadsheets
 
                 # Filter age
                 if (Str::contains($entry, ' J.') || Str::contains($entry, ' Mon.')) {
-                    $age = self::convertAge($entry);
+                    $age = static::convertAge($entry);
                     unset($array[array_search($entry, $array)]);
                 }
 
                 # Filter page count
                 if (Str::contains($entry, ' S.')) {
-                    $pageCount = self::convertPageCount($entry);
+                    $pageCount = static::convertPageCount($entry);
                     unset($array[array_search($entry, $array)]);
                 }
 
@@ -172,10 +172,10 @@ class Spreadsheets
 
             $array = A::update($array, [
                 # Add blanks to prevent column shifts
-                'Titel' => self::convertTitle($array['Titel']),
+                'Titel' => static::convertTitle($array['Titel']),
                 'Untertitel' => '',
                 'Mitwirkende' => '',
-                'Preis' => self::convertPrice($array['Preis']),
+                'Preis' => static::convertPrice($array['Preis']),
                 'Erscheinungsjahr' => $year,
                 'Altersempfehlung' => $age,
                 'Inhaltsbeschreibung' => '',
@@ -185,7 +185,7 @@ class Spreadsheets
                 'Abmessungen' => '',
             ]);
 
-            $data[] = self::sortArray($array);
+            $data[] = static::sortArray($array);
         }
 
         return A::sort($data, 'AutorIn', 'asc');
