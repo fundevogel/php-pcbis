@@ -14,6 +14,6 @@ namespace Fundevogel\Pcbis\Exceptions;
 /**
  * Class UnknownRoleException
  */
-class UnknownRoleException extends KNVException
+class UnknownRoleException extends \Exception
 {
 }

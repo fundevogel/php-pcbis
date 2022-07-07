@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Api;
 
+use Fundevogel\Pcbis\Api\Exceptions\Factory;
 use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 
 use GuzzleHttp\Client;
@@ -136,7 +137,7 @@ final class Webservice
         }
 
         # .. otherwise everything goes south
-        throw new \Exception((string) $response->getBody());
+        throw Factory::create(json_decode((string) $response->getBody()));
     }
 
 

@@ -14,6 +14,6 @@ namespace Fundevogel\Pcbis\Exceptions;
 /**
  * Class UnknownTypeException
  */
-class UnknownTypeException extends KNVException
+class UnknownTypeException extends \Exception
 {
 }

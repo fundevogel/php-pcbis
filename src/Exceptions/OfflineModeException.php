@@ -14,6 +14,6 @@ namespace Fundevogel\Pcbis\Exceptions;
 /**
  * Class OfflineModeException
  */
-class OfflineModeException extends KNVException
+class OfflineModeException extends \Exception
 {
 }
