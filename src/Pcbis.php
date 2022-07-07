@@ -14,7 +14,6 @@ namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
-use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Products\Factory;
 use Fundevogel\Pcbis\Products\Product;
 
@@ -59,29 +58,35 @@ final class Pcbis
 
 
     /**
-     * Formats query results (helper function)
+     * Retrieves data from API & formats it
      *
      * @param string $identifier Product EAN/ISBN
-     * @return array Matched products
+     * @return array Matched products (may be empty)
      */
-    private function _fetch(string $identifier): array
+    private function retrieve(string $identifier): array
     {
         # Query API for matching search items
         $result = $this->api->suche($identifier);
 
+        # If search was successful ..
         if ($result->suchenAntwort->gesamtTreffer > 0) {
-            # Create data array
-            $data = [];
+            # .. formatting data of each hit
+            return array_map(function (array $array): array {
+                # Create data array
+                $data = [];
 
-            foreach (A::first($result->lesenAntwort->titel)->einzelWerk as $item) {
-                if (count($item->werte) > 1) {
-                    $data[$item->feldName] = $item->werte;
-                } else {
-                    $data[$item->feldName] = $item->werte[0];
+                # Iterate over each item
+                foreach ($array->einzelWerk as $item) {
+                    # If more than one value available ..
+                    $data[$item->feldName] = count($item->werte) > 1
+                        ? $item->werte     # .. assign them all
+                        : $item->werte[0]  # .. otherwise first only
+                    ;
                 }
-            }
 
-            return $data;
+                return $data;
+            # .. while iterating over results
+            }, $result->lesenAntwort->titel);
         }
 
         return [];
@@ -96,7 +101,7 @@ final class Pcbis
      * @param bool $forceRefresh Whether to update cached data
      * @return array
      */
-    public function fetch(string $identifier, bool $forceRefresh = false): array
+    private function fetch(string $identifier, bool $forceRefresh = false): array
     {
         $value = null;
 
@@ -109,12 +114,12 @@ final class Pcbis
 
             # Retrieve from cache
             $value = $this->cache->get($identifier, function () use ($identifier) {
-                return $this->_fetch($identifier);
+                return $this->retrieve($identifier);
             });
         }
 
         if (is_null($value)) {
-            $value = $this->_fetch($identifier);
+            $value = $this->retrieve($identifier);
         }
 
         return $value;
@@ -132,7 +137,7 @@ final class Pcbis
         # If raw data is available ..
         if ($data = $this->fetch($identifier, $this->forceRefresh)) {
             # .. instantiate
-            return Factory::create($data, $this->api);
+            return Factory::create($data[0], $this->api);
         }
 
         return null;
