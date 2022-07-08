@@ -9,9 +9,9 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Pcbis\Tests\Fields;
+namespace Pcbis\Tests\Classes\Fields;
 
-use Fundevogel\Pcbis\Fields\Roles;
+use Fundevogel\Pcbis\Classes\Fields\Roles;
 
 class RolesTest extends \PHPUnit\Framework\TestCase
 {

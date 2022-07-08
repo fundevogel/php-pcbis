@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Traits;
 
+use Fundevogel\Pcbis\Classes\Fields\Role;
+use Fundevogel\Pcbis\Classes\Fields\Roles;
 use Fundevogel\Pcbis\Exceptions\UnknownRoleException;
-use Fundevogel\Pcbis\Fields\Role;
-use Fundevogel\Pcbis\Fields\Roles;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 

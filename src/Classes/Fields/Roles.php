@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Fields;
+namespace Fundevogel\Pcbis\Classes\Fields;
 
 use Fundevogel\Pcbis\Helpers\A;
 
