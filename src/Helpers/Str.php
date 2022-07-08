@@ -312,7 +312,7 @@ class Str
      * Takes a replacement array and processes the replacements
      *
      * @param  string $string       String being replaced on (haystack)
-     * @param  array  $replacements Replacement array from Butler::makeReplacements()
+     * @param  array  $replacements Replacement array from Str::makeReplacements()
      * @return string               String with replaced values
      */
     public static function replaceReplacements($string, $replacements)

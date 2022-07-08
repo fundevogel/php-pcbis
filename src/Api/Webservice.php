@@ -17,6 +17,8 @@ use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
+use stdClass;
+
 /**
  * Class Webservice
  *
@@ -108,10 +110,10 @@ final class Webservice
      * @param string $resource API resource being called
      * @param array $data Data being sent as JSON object
      * @param string $type Request type (mostly 'POST')
-     * @throws \Exception|\Fundevogel\Pcbis\Exceptions\OfflineModeException
+     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException No API calls when offline
      * @return \stdClass Response body as JSON object
      */
-    private function call(string $resource, array $data, string $type = 'POST'): \stdClass
+    private function call(string $resource, array $data, string $type = 'POST'): stdClass
     {
         if ($this->offlineMode) {
             throw new OfflineModeException('Offline mode enabled, API calls are not allowed.');
@@ -168,9 +170,9 @@ final class Webservice
      * Fetches raw product data from KNV's API
      *
      * @param string $identifier Product EAN/ISBN
-     * @return \stdClass Response body as JSON object
+     * @return mixed Response body as JSON object
      */
-    public function suche(string $identifier): \stdClass
+    public function suche(string $identifier): stdClass
     {
         # Determine search parameters
         # TODO: Make it fully configurable
@@ -201,7 +203,7 @@ final class Webservice
      * @param string $type OLA type (either 'anfrage', 'bestellung' or 'storno')
      * @return \stdClass Response body as JSON object
      */
-    public function ola(string $identifier, int $quantity = 1, string $type = 'anfrage'): \stdClass
+    public function ola(string $identifier, int $quantity = 1, string $type = 'anfrage'): stdClass
     {
         # Determine OLA items
         # TODO: Make it fully configurable

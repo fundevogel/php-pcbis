@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
+use Fundevogel\Pcbis\Interfaces\Product;
 use Fundevogel\Pcbis\Classes\Product\Books\Types\Ebook;
 use Fundevogel\Pcbis\Classes\Product\Books\Types\Hardcover;
 use Fundevogel\Pcbis\Classes\Product\Books\Types\Schoolbook;
@@ -73,7 +74,7 @@ class Factory
      *
      * @param array $data Raw product data
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownTypeException
-     * @return \Fundevogel\Pcbis\Classes\Product\ProductBase
+     * @return \Fundevogel\Pcbis\Interfaces\Product
      */
     public static function create(array $data): Product
     {
