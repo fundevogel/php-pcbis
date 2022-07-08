@@ -14,8 +14,9 @@ namespace Fundevogel\Pcbis;
 
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
-use Fundevogel\Pcbis\Products\Factory;
-use Fundevogel\Pcbis\Products\Product;
+use Fundevogel\Pcbis\Classes\Product\Factory;
+use Fundevogel\Pcbis\Classes\Products\Collection;
+use Fundevogel\Pcbis\Interfaces\Product;
 
 /**
  * Class Pcbis
@@ -70,23 +71,27 @@ final class Pcbis
 
         # If search was successful ..
         if ($result->suchenAntwort->gesamtTreffer > 0) {
-            # .. formatting data of each hit
-            return array_map(function (array $array): array {
+            # .. iterate over its hits
+            foreach ($result->lesenAntwort->titel as $item) {
                 # Create data array
                 $data = [];
 
-                # Iterate over each item
-                foreach ($array->einzelWerk as $item) {
+                # Iterate over data triples
+                foreach ($item->einzelWerk as $triple) {
                     # If more than one value available ..
-                    $data[$item->feldName] = count($item->werte) > 1
-                        ? $item->werte     # .. assign them all
-                        : $item->werte[0]  # .. otherwise first only
+                    $data[$triple->feldName] = count($triple->werte) > 1
+                        ? $triple->werte     # .. assign them all
+                        : $triple->werte[0]  # .. otherwise first only
                     ;
                 }
 
+                # Skip mismatches
+                if ($data['EAN'] != str_replace('-', '', $identifier)) {
+                    continue;
+                }
+
                 return $data;
-            # .. while iterating over results
-            }, $result->lesenAntwort->titel);
+            }
         }
 
         return [];
@@ -130,14 +135,19 @@ final class Pcbis
      * Instantiates 'Product' object from single EAN/ISBN
      *
      * @param string $identifier Product EAN/ISBN
-     * @return \Fundevogel\Pcbis\Products\Product|null
+     * @return \Fundevogel\Pcbis\Interfaces\Product
      */
-    public function load(string $identifier): Product|null
+    public function load(string $identifier): ?Product
     {
         # If raw data is available ..
         if ($data = $this->fetch($identifier, $this->forceRefresh)) {
-            # .. instantiate
-            return Factory::create($data[0], $this->api);
+            # .. instantiate product
+            $object = Factory::create($data);
+
+            # .. pass API object
+            $object->api = $this->api;
+
+            return $object;
         }
 
         return null;
@@ -145,12 +155,32 @@ final class Pcbis
 
 
     /**
+     * Instantiates 'Products' object from multiple EANs/ISBNs
+     *
+     * @param string $identifier Product EANs/ISBNs
+     * @return \Fundevogel\Pcbis\Classes\Products\Collection
+     */
+    public function loadAll(array $identifiers): ?Collection
+    {
+        $collection = new Collection();
+
+        foreach ($identifiers as $identifier) {
+            if ($object = $this->load($identifier)) {
+                $collection->add($object);
+            }
+        }
+
+        return $collection;
+    }
+
+
+    /**
      * Performs downgrade (or returns product itself)
      *
-     * @param \Fundevogel\Pcbis\Products\Product $object Product to be downgraded
-     * @return \Fundevogel\Pcbis\Products\Product
+     * @param \Fundevogel\Pcbis\Interfaces\Product $object Product to be downgraded
+     * @return \Fundevogel\Pcbis\Interfaces\Product|self
      */
-    public function downgrade(Product $object): Product
+    public function downgrade(Product $object): Product|self
     {
         # If available ..
         if ($object->hasDowngrade()) {
@@ -165,10 +195,10 @@ final class Pcbis
     /**
      * Performs upgrade (or returns product itself)
      *
-     * @param \Fundevogel\Pcbis\Products\Product $object Product to be upgraded
-     * @return \Fundevogel\Pcbis\Products\Product
+     * @param \Fundevogel\Pcbis\Interfaces\Product $object Product to be upgraded
+     * @return \Fundevogel\Pcbis\Interfaces\Product|self
      */
-    public function upgrade(Product $object): Product
+    public function upgrade(Product $object): Product|self
     {
         # If available ..
         if ($object->hasUpgrade()) {
