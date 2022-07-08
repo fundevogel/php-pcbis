@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Api\Exceptions;
 
-use Fundevogel\Pcbis\Api\Exceptions\KNVException;
-
 /**
  * Class InternalServerErrorException
  *
