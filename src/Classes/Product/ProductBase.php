@@ -41,7 +41,7 @@ abstract class ProductBase implements Product
      * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
      * @return void
      */
-    public function __construct(public array $data, protected ?Webservice $api = null)
+    public function __construct(public array $data, public ?Webservice $api = null)
     {
         # If not specified ..
         if (is_null($this->api)) {

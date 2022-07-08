@@ -38,27 +38,6 @@ class Product extends ProductBase
 
 
     /**
-     * Constructor
-     *
-     * @param array $data Source data as fetched from KNV's API
-     * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
-     * @return void
-     */
-    public function __construct(public array $data, protected ?Webservice $api = null)
-    {
-        # If not specified ..
-        if (is_null($this->api)) {
-            # .. invoke API client in offline mode
-            $this->api = new Webservice();
-        }
-
-
-        # Add startup hook
-        $this->setup();
-    }
-
-
-    /**
      * Setup hook
      *
      * @return void

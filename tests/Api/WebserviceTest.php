@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Tests\Api;
 
 use Fundevogel\Pcbis\Api\Webservice;
-use Fundevogel\Pcbis\Exceptions\InvalidLoginException;
 
 class WebserviceTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,22 +19,52 @@ class WebserviceTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function testLoginInvalid(): void
+    public function testAvailableMethods(): void
     {
-        // # Setup
-        // # (1) Invalid login credentials
-        // $array = [
-        //     'VKN'      => '123',
-        //     'Benutzer' => '123',
-        //     'Passwort' => '123',
-        // ];
+        # Setup
+        $methods = [
+            'login',
+            'suche',
+            'ola',
+        ];
 
-        // # Assert exception
-        // $this->expectException(InvalidLoginException::class);
+        # Run function
+        $obj = new Pcbis();
 
-        // # Run function
-        // $result = new Webservice($array);
+        foreach ($methods as $method) {
+            # Assert result
+            $this->assertTrue(method_exists($obj, $method));
+        }
+    }
 
-        $this->assertTrue(true);
+
+    public function testAvailableProperties(): void
+    {
+        # Setup
+        $properties = [
+            'headers',
+            'url',
+            'token',
+        ];
+
+        # Run function
+        $obj = new Webservice();
+
+        foreach ($properties as $property) {
+            # Assert result
+            $this->assertTrue(property_exists($obj, $property));
+        }
+    }
+
+
+    public function testInit(): void
+    {
+        # Run function
+        $obj = new Webservice();
+
+        # Assert result
+        $this->assertEquals($obj->headers, []);
+        $this->assertIsString($obj->url);
+        $this->assertNull($obj->token);
     }
 }
