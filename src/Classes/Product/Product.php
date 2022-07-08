@@ -18,7 +18,6 @@ use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Traits\OlaStatus;
 use Fundevogel\Pcbis\Traits\People;
 use Fundevogel\Pcbis\Traits\Tags;
-use Fundevogel\Pcbis\Utilities\Butler;
 
 use DOMDocument;
 
@@ -467,7 +466,7 @@ class Product extends ProductBase
             return '';
         }
 
-        return Butler::convertMM($this->data['Breite']);
+        return $this->convertMM($this->data['Breite']);
     }
 
 
@@ -482,7 +481,7 @@ class Product extends ProductBase
             return '';
         }
 
-        return Butler::convertMM($this->data['Höhe']);
+        return $this->convertMM($this->data['Höhe']);
     }
 
 
@@ -497,7 +496,7 @@ class Product extends ProductBase
             return '';
         }
 
-        return Butler::convertMM($this->data['Tiefe']);
+        return $this->convertMM($this->data['Tiefe']);
     }
 
 
@@ -647,5 +646,28 @@ class Product extends ProductBase
             'Kategorien'          => $this->categories(),
             'Themen'              => $this->topics(),
         ];
+    }
+
+
+    /**
+     * Helpers
+     */
+
+    /**
+     * Converts millimeters to centimeters
+     *
+     * @param string $string Millimeter information
+     * @return string
+     */
+    protected function convertMM(string $string): string
+    {
+        # TODO: Messing up some other values, needs fixing
+        # Edge case: string already contains width/height in centimeters
+        # See 978-3-7891-2946-9
+        if (Str::contains($string, ',')) {
+            return $string;
+        }
+
+        return Str::replace($string / 10, '.', ',');
     }
 }

@@ -41,24 +41,6 @@ class Butler
 
 
     /**
-     * Converts millimeters to centimeters
-     *
-     * @param string $string Millimeter information
-     */
-    public static function convertMM(string $string): array|string
-    {
-        # TODO: Messing up some other values, needs fixing
-        # Edge case: string already contains width/height in centimeters
-        # See 978-3-7891-2946-9
-        if (Str::contains($string, ',')) {
-            return $string;
-        }
-
-        return Str::replace($string / 10, '.', ',');
-    }
-
-
-    /**
      * Downloads cover images from the German National Library (DNB)
      *
      * @param string $isbn A given product's EAN/ISBN
@@ -96,23 +78,5 @@ class Butler
 
         # .. report failure
         return false;
-    }
-
-
-    /**
-     *
-     */
-    public static function pluck(array $array): array
-    {
-        $output = [];
-
-        foreach ($array as $item) {
-            $output[$item['feldName']] = count($item['werte']) > 1
-                ? $item['werte']
-                : $item['werte'][0]
-            ;
-        }
-
-        return $output;
     }
 }
