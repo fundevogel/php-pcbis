@@ -47,7 +47,7 @@ class KNVException extends \Exception
 
 
     /**
-     * Retrieves HTTP status
+     * Exports HTTP status
      *
      * @return string
      */
@@ -58,5 +58,16 @@ class KNVException extends \Exception
         }
 
         return $this->data['status'];
+    }
+
+
+    /**
+     * Exports detailed exception description
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
     }
 }
