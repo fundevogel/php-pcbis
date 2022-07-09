@@ -169,26 +169,28 @@ final class Webservice
     /**
      * Fetches raw product data from KNV's API
      *
-     * @param string $identifier Product EAN/ISBN
+     * @param array|string $query Query data
      * @return mixed Response body as JSON object
      */
-    public function suche(string $identifier): stdClass
+    public function suche(array|string $query): stdClass
     {
-        # Determine search parameters
-        # TODO: Make it fully configurable
-        $query = [
-            'suche' => [
-                # Search across all databases
-                'datenbanken' => ['ZF', 'ZFBG'],
-                'zfSuche' => $identifier,
-            ],
-            # Read results of the query & return first result
-            'lesen' => [
-                'satzVon' => 1,
-                'satzBis' => 1,
-                'satzFormat' => 'LANGTEXT',
-            ],
-        ];
+        # If it resembles product EAN/ISBN ..
+        if (is_string($query)) {
+            # .. build simple query data from it
+            $query = [
+                'suche' => [
+                    # Search across all databases
+                    'datenbanken' => ['ZF', 'ZFBG'],
+                    'zfSuche' => $query,
+                ],
+                # Read results of the query & return first result
+                'lesen' => [
+                    'satzVon' => 1,
+                    'satzBis' => 1,
+                    'satzFormat' => 'LANGTEXT',
+                ],
+            ];
+        }
 
         # Send query & report back
         return $this->call('suche', $query);
@@ -196,24 +198,104 @@ final class Webservice
 
 
     /**
+     * Provides predefined filters
+     *
+     * @param array $query Query data
+     * @param string $groupID Filter group identifier
+     * @return \stdClass Response body as JSON object
+     */
+    public function filter(array $query, ?string $groupID = null): stdClass
+    {
+        $type = is_null($groupID)
+            ? 'filter'
+            : sprintf('filter/%s', $groupID)
+        ;
+
+        return $this->call($type, $query, 'GET');
+    }
+
+
+    /**
+     * Provides matching search terms for specific field entry
+     *
+     * @param array $query Query data
+     * @return \stdClass Response body as JSON object
+     */
+    public function register(array $query): stdClass
+    {
+        return $this->call('register', $query);
+    }
+
+
+    /**
      * Checks product availability via OLA ('Online Lieferbarkeits-Abfrage')
      *
-     * @param string $identifier Product EAN/ISBN
+     * @param array|string $query Query data
      * @param int $quantity Number of products to be delivered
      * @param string $type OLA type (either 'anfrage', 'bestellung' or 'storno')
      * @return \stdClass Response body as JSON object
      */
-    public function ola(string $identifier, int $quantity = 1, string $type = 'anfrage'): stdClass
+    public function ola(array|string $query, int $quantity = 1, string $type = 'anfrage'): stdClass
     {
-        # Determine OLA items
-        # TODO: Make it fully configurable
-        $query = [
-            'olaItems' => [
-                'bestellNummer' => ['ean' => $identifier],
-                'menge' => $quantity,
-            ],
-        ];
+        # If it resembles product EAN/ISBN ..
+        if (is_string($query)) {
+            # .. build simple query data from it
+            $query = [
+                'olaItems' => [
+                    'bestellNummer' => ['ean' => $query],
+                    'menge' => $quantity,
+                ],
+            ];
+        }
 
         return $this->call(sprintf('ola/%s', $type), $query);
+    }
+
+
+    /**
+     * Retrieves download link for eBooks
+     *
+     * @param array|string $query Query data
+     * @return \stdClass Response body as JSON object
+     */
+    public function ebook(array|string $query): stdClass
+    {
+        # If it resembles product EAN/ISBN ..
+        if (is_string($query)) {
+            # .. build simple query data from it
+            $query = ['ebookItems' => ['ean' => $query]];
+        }
+
+        return $this->call('ebook', $query);
+    }
+
+
+    /**
+     * Provides matching search terms for any field entry
+     *
+     * @param array|string $query Query data
+     * @return \stdClass Response body as JSON object
+     */
+    public function suchvorschlaege(array|string $query): stdClass
+    {
+        # If it resembles product EAN/ISBN ..
+        if (is_string($query)) {
+            # .. build simple query data from it
+            $query = ['teilSuchwert' => $query];
+        }
+
+        return $this->call('suchvorschlaege', $query);
+    }
+
+
+    /**
+     * Retrieves information about CMP ('Category Management Pakete')
+     *
+     * @param array $query Query data
+     * @return \stdClass Response body as JSON object
+     */
+    public function cmpaket(array $query): stdClass
+    {
+        return $this->call('cmpaket', $query, 'GET');
     }
 }
