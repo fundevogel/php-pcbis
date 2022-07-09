@@ -23,18 +23,6 @@ use Fundevogel\Pcbis\Interfaces\Product;
 abstract class ProductBase implements Product
 {
     /**
-     * Properties
-     */
-
-    /**
-     * Product EAN/ISBN
-     *
-     * @var string
-     */
-    protected $identifier;
-
-
-    /**
      * Constructor
      *
      * @param array $data Source data as fetched from KNV's API
@@ -48,34 +36,12 @@ abstract class ProductBase implements Product
             # .. invoke API client in offline mode
             $this->api = new Webservice();
         }
-
-        # Add startup hook
-        $this->setup();
     }
-
-
-    /**
-     * Setup hook
-     *
-     * @return void
-     */
-    abstract public function setup(): void;
 
 
     /**
      * Dataset methods
      */
-
-    /**
-     * Exports European Article Number (EAN)
-     *
-     * @return string
-     */
-    public function ean(): string
-    {
-        return $this->identifier;
-    }
-
 
     /**
      * Exports title

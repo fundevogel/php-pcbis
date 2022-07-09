@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Api\Ola;
+use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Traits\OlaStatus;
@@ -37,15 +38,44 @@ class Product extends ProductBase
 
 
     /**
+     * Properties
+     */
+
+    /**
+     * Product EAN/ISBN
+     *
+     * @var string
+     */
+    protected string $identifier;
+
+
+    /**
+     * Constructor
+     *
+     * @param array $data Source data as fetched from KNV's API
+     * @param \Fundevogel\Pcbis\Api\Webservice $api Object granting access to KNV's API
+     * @return void
+     */
+    public function __construct(array $data, ?Webservice $api = null)
+    {
+        # Execute default constructor
+        parent::__construct($data, $api);
+
+        # Store product EAN/ISBN
+        $this->identifier = $this->data['EAN'];
+
+        # Add startup hook
+        $this->setup();
+    }
+
+
+    /**
      * Setup hook
      *
      * @return void
      */
     public function setup(): void
     {
-        # Store product EAN/ISBN
-        $this->identifier = $this->data['EAN'];
-
         # Process data
         # (1) Involved people
         $this->people = $this->setUpPeople();
@@ -197,6 +227,27 @@ class Product extends ProductBase
      */
     public function ean(): string
     {
+        return $this->identifier;
+    }
+
+
+    /**
+     * Exports International Standard Book Number (ISBN)
+     *
+     * @return string
+     */
+    public function isbn(): string
+    {
+        # If present ..
+        if (class_exists('Nicebooks\Isbn\Isbn')) {
+            # .. attempt to ..
+            try {
+                # .. format product EAN/ISBN using third-party tools
+                return \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
+            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
+            }
+        }
+
         return $this->identifier;
     }
 

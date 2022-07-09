@@ -56,27 +56,6 @@ class Book extends Product
      */
 
     /**
-     * Exports International Standard Book Number (ISBN)
-     *
-     * @return string
-     */
-    public function isbn(): string
-    {
-        # If present ..
-        if (class_exists('Nicebooks\Isbn\Isbn')) {
-            # .. attempt to ..
-            try {
-                # .. format product EAN/ISBN using third-party tools
-                return \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
-            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
-            }
-        }
-
-        return $this->identifier;
-    }
-
-
-    /**
      * Exports binding
      *
      * @return string
