@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Pcbis\Tests\Classes\Fields;
 
-use Fundevogel\Pcbis\Classes\Fields\Role;
+use Fundevogel\Pcbis\Classes\Fields\Types\Role;
 
 class RoleTest extends \PHPUnit\Framework\TestCase
 {

@@ -9,8 +9,9 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Classes\Fields;
+namespace Fundevogel\Pcbis\Classes\Fields\Types;
 
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Helpers\A;
 
 /**
@@ -18,40 +19,14 @@ use Fundevogel\Pcbis\Helpers\A;
  *
  * Holds involved people of the same role
  */
-class Role
+class Role extends Value
 {
-    /**
-     * Constructor
-     *
-     * @param string $role Role of involved people
-     * @param array $people People of same role
-     */
-    public function __construct(public array $people)
-    {
-    }
-
-
-    /**
-     * Magic methods
-     */
-
-    /**
-     * Prints involved people when casting to string
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
-
-
     /**
      * Methods
      */
 
     /**
-     * Formats string of involved people
+     * Converts data to string
      *
      * @param string $delimiter Delimiter between people
      * @return string
@@ -64,18 +39,7 @@ class Role
         # (3) Separate each person using delimiter
         return A::join(array_map(function (array $person): string {
             return A::join($person, ' ');
-        }, array_values($this->people)), $delimiter);
-    }
-
-
-    /**
-     * Provides involved people of same role
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->people;
+        }, array_values($this->data)), $delimiter);
     }
 
 
@@ -86,6 +50,6 @@ class Role
      */
     public function exists(): bool
     {
-        return !empty($this->people);
+        return !empty($this->data);
     }
 }

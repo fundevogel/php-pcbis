@@ -9,8 +9,9 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Classes\Fields;
+namespace Fundevogel\Pcbis\Classes\Fields\Types;
 
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Helpers\A;
 
 /**
@@ -18,7 +19,7 @@ use Fundevogel\Pcbis\Helpers\A;
  *
  * Holds involved people of all roles
  */
-class Roles
+class Roles extends Value
 {
     /**
      * Properties
@@ -46,37 +47,11 @@ class Roles
 
 
     /**
-     * Constructor
-     *
-     * @param array $people Roles, each holding involved people thereof
-     * @return void
-     */
-    public function __construct(public array $people)
-    {
-    }
-
-
-    /**
-     * Magic methods
-     */
-
-    /**
-     * Prints roles & involved people when casting to string
-     *
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
-
-
-    /**
      * Methods
      */
 
     /**
-     * Formats string of roles & people
+     * Converts data to string
      *
      * @param string $peopleDelimiter Delimiter between people of same role
      * @param string $groupDelimiter Delimiter between role groups
@@ -87,7 +62,7 @@ class Roles
         # Create data array
         $result = [];
 
-        foreach ($this->people as $role => $people) {
+        foreach ($this->data as $role => $people) {
             # Skip unused roles
             if (empty($people)) {
                 continue;
@@ -106,16 +81,5 @@ class Roles
         }
 
         return A::join($result, $groupDelimiter);
-    }
-
-
-    /**
-     * Provides involved people of all roles
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->people;
     }
 }

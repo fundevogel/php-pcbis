@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Traits;
 
-use Fundevogel\Pcbis\Classes\Fields\Role;
-use Fundevogel\Pcbis\Classes\Fields\Roles;
+use Fundevogel\Pcbis\Classes\Fields\Types\Role;
+use Fundevogel\Pcbis\Classes\Fields\Types\Roles;
 use Fundevogel\Pcbis\Exceptions\UnknownRoleException;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
@@ -239,7 +239,7 @@ trait People
      *
      * @param string $role Role (= involvement)
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownRoleException
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function getRole(string $role): Role
     {
@@ -425,7 +425,7 @@ trait People
     /**
      * Exports author(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function author(): Role
     {
@@ -436,7 +436,7 @@ trait People
     /**
      * Exports original author(s
      *
-     * @return \Fundevogel\Pcbis\Fields\Role)
+     * @return \Fundevogel\Pcbis\Fields\Types\Role)
      */
     public function original(): Role
     {
@@ -447,7 +447,7 @@ trait People
     /**
      * Exports illustrator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function illustrator(): Role
     {
@@ -458,7 +458,7 @@ trait People
     /**
      * Exports drawer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function drawer(): Role
     {
@@ -469,7 +469,7 @@ trait People
     /**
      * Exports photographer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function photographer(): Role
     {
@@ -480,7 +480,7 @@ trait People
     /**
      * Exports translator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function translator(): Role
     {
@@ -491,7 +491,7 @@ trait People
     /**
      * Exports editor(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function editor(): Role
     {
@@ -502,7 +502,7 @@ trait People
     /**
      * Exports narrator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function narrator(): Role
     {
@@ -513,7 +513,7 @@ trait People
     /**
      * Export composer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function composer(): Role
     {
@@ -524,7 +524,7 @@ trait People
     /**
      * Exports director(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function director(): Role
     {
@@ -535,7 +535,7 @@ trait People
     /**
      * Exports producer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function producer(): Role
     {
@@ -546,7 +546,7 @@ trait People
     /**
      * Exports actor(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function actor(): Role
     {
@@ -557,7 +557,7 @@ trait People
     /**
      * Exports participant(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Role
+     * @return \Fundevogel\Pcbis\Fields\Types\Role
      */
     public function participant(): Role
     {
@@ -568,7 +568,7 @@ trait People
     /**
      * Exports (just) involved people
      *
-     * @return \Fundevogel\Pcbis\Fields\Roles
+     * @return \Fundevogel\Pcbis\Fields\Types\Roles
      */
     public function people(): Roles
     {
