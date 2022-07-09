@@ -13,6 +13,8 @@ namespace Fundevogel\Pcbis\Tests\Classes\Product;
 
 use Fundevogel\Pcbis\Classes\Product\Product;
 
+use org\bovigo\vfs\vfsStream;
+
 class ProductTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -268,6 +270,34 @@ class ProductTest extends \PHPUnit\Framework\TestCase
 
             # Assert result #2
             $this->assertEquals($obj->vat(), $expected);
+        }
+    }
+
+
+    public function testDownloadCover(): void
+    {
+        # Setup
+        # (1) Virtual directory
+        $root = vfsStream::setup('home');
+
+        # (2) Fixture file path
+        $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
+        $fixture = sprintf('%s/fixtures/%s.jpg', __DIR__ . '/../..', $isbn);
+
+        # (3) Output file path
+        $path = $root->url() . '/example.jpg';
+
+        try {
+            # Run function
+            $obj = new Product(['EAN' => $isbn]);
+            $result = $obj->downloadCover($path);
+
+            # Assert result
+            $this->assertTrue($result);
+            $this->assertFileEquals($fixture, $path);
+        } catch (\Throwable $th) {
+            var_dump($th->getMessage());
+            $this->markTestIncomplete();
         }
     }
 }

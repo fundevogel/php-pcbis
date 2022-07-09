@@ -18,6 +18,7 @@ use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Traits\OlaStatus;
 use Fundevogel\Pcbis\Traits\People;
 use Fundevogel\Pcbis\Traits\Tags;
+use Fundevogel\Pcbis\Utilities\Butler;
 
 use DOMDocument;
 
@@ -698,5 +699,18 @@ class Product extends ProductBase
         }
 
         return Str::replace($string / 10, '.', ',');
+    }
+
+
+    /**
+     * Downloads cover images from the German National Library (DNB)
+     *
+     * @param mixed $file Path to download file OR file-like object
+     * @param string $ua User-Agent used when downloading cover images
+     * @return bool Download status
+     */
+    public function downloadCover(mixed $file = null, ?string $ua = null): bool
+    {
+        return Butler::downloadCover($this->ean(), $file, $ua);
     }
 }

@@ -14,7 +14,6 @@ namespace Fundevogel\Pcbis\Classes\Product\Books;
 use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Classes\Product\Product;
 use Fundevogel\Pcbis\Helpers\Str;
-use Fundevogel\Pcbis\Utilities\Butler;
 
 /**
  * Class Book
@@ -146,22 +145,5 @@ class Book extends Product
             'HerausgeberIn' => $this->getRole('editor'),
             'MitarbeiterIn' => $this->getRole('participant'),
         ]);
-    }
-
-
-    /**
-     * Methods
-     */
-
-    /**
-     * Downloads cover images from the German National Library (DNB)
-     *
-     * @param mixed $file Path to download file OR file-like object
-     * @param string $ua User-Agent used when downloading cover images
-     * @return bool Download status
-     */
-    public function downloadCover(mixed $file = null, ?string $ua = null): bool
-    {
-        return Butler::downloadCover($this->isbn(), $file, $ua);
     }
 }
