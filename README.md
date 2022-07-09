@@ -32,32 +32,35 @@ require_once('vendor/autoload.php');
 
 use Fundevogel\Pcbis\Pcbis;
 
-# Create API object, passing credentials as first parameter (for caching, see below)
+# Create object, passing credentials as first parameter (for caching, see below)
 $object = new Pcbis([/* ... */]);
 
 try {
     # After loading a book, you might want to ..
     $book = $object->load('978-3-522-20255-8');
+
     # (1) .. export its bibliographic data
     $data = $book->export();
 
     # (2) .. access specific information
-     echo $book->title();
+    echo $book->title();
 
     # (3) .. download its cover
-    $book->downloadCover();
-    # Note: For this to work, you have to install 'Guzzle':
-    # composer require guzzlehttp/guzzle
+    if ($book->downloadCover()) {
+        echo 'Cover downloaded!';
+    }
 
     # (4) .. query its OLA status
-    $book->ola()->isAvailable();
+    $book->isAvailable();
 
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
 }
 ```
 
-**Note**: Starting with v3, ISBN validation is no longer enabled by default. If you want formatted (= hyphenated) ISBNs, `php-pcbis` takes care of this for you if [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn) is installed via `composer require nicebooks/isbn`.
+If you want to load several EANs/ISBNs, use `loadAll(array $identifiers)` which returns a `Collection` object.
+
+**Note**: Starting with v3, ISBN validation is no longer enabled by default. If you want formatted (= hyphenated) ISBNs when calling `isbn()` (books only), `php-pcbis` takes care of this automatically if [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn) is installed via `composer require nicebooks/isbn`.
 
 
 ### Caching

@@ -63,7 +63,17 @@ class Ebook extends Book
 
         $string = A::last(Str::split($this->data['Utitel'], 'Unterstützte Lesegerätegruppen:'));
 
-        return Str::split(Str::replace($string, ['MAC', 'Tabl'], ['Mac', 'Tablet']), '/');
+        return array_map(function (string $string): string {
+            if ($string == 'MAC') {
+                return 'Mac';
+            }
+
+            if ($string == 'Tabl') {
+                return 'Tablet';
+            }
+
+            return $string;
+        }, Str::split($string, '/'));
     }
 
 

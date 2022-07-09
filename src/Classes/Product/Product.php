@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Api\Ola;
-use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Traits\OlaStatus;

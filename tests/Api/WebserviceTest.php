@@ -29,7 +29,7 @@ class WebserviceTest extends \PHPUnit\Framework\TestCase
         ];
 
         # Run function
-        $obj = new Pcbis();
+        $obj = new Webservice();
 
         foreach ($methods as $method) {
             # Assert result

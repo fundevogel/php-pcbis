@@ -46,7 +46,6 @@ class PcbisTest extends \PHPUnit\Framework\TestCase
         $properties = [
             'api',
             'forceRefresh',
-            'data',
         ];
 
         # Run function
@@ -67,6 +66,5 @@ class PcbisTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertInstanceOf(Webservice::class, $obj->api);
         $this->assertFalse($obj->forceRefresh);
-        $this->assertNull($obj->data);
     }
 }
