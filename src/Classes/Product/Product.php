@@ -119,6 +119,38 @@ class Product extends ProductBase
      */
 
     /**
+     * Exports European Article Number (EAN)
+     *
+     * @return string
+     */
+    public function ean(): string
+    {
+        return $this->identifier;
+    }
+
+
+    /**
+     * Exports International Standard Book Number (ISBN)
+     *
+     * @return string
+     */
+    public function isbn(): string
+    {
+        # If present ..
+        if (class_exists('Nicebooks\Isbn\Isbn')) {
+            # .. attempt to ..
+            try {
+                # .. format product EAN/ISBN using third-party tools
+                return \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
+            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
+            }
+        }
+
+        return $this->identifier;
+    }
+
+
+    /**
      * Checks whether product has a predecessor
      *
      * @return bool
@@ -223,38 +255,6 @@ class Product extends ProductBase
     /**
      * Dataset methods
      */
-
-    /**
-     * Exports European Article Number (EAN)
-     *
-     * @return string
-     */
-    public function ean(): string
-    {
-        return $this->identifier;
-    }
-
-
-    /**
-     * Exports International Standard Book Number (ISBN)
-     *
-     * @return string
-     */
-    public function isbn(): string
-    {
-        # If present ..
-        if (class_exists('Nicebooks\Isbn\Isbn')) {
-            # .. attempt to ..
-            try {
-                # .. format product EAN/ISBN using third-party tools
-                return \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
-            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
-            }
-        }
-
-        return $this->identifier;
-    }
-
 
     /**
      * Exports title
