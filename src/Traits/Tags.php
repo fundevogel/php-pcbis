@@ -29,7 +29,7 @@ trait Tags
      *
      * @var array
      */
-    protected $public;
+    protected array $tags;
 
 
     /**
@@ -148,7 +148,7 @@ trait Tags
             'Kinder/Jugendlit.',
         ];
 
-        $topics = array_map(function ($topic) use ($blockList) {
+        $topics = array_map(function (string $topic) use ($blockList) {
             # Skip blocklisted topics
             if (in_array($topic, $blockList)) {
                 return '';

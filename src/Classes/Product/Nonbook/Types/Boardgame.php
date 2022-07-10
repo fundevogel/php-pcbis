@@ -72,7 +72,7 @@ class Boardgame extends Item
                     # Match each tag for term 'playing time' ..
                     if (Str::contains(Str::lower($tag), 'spieldauer')) {
                         # .. which means the next entry contains playing time ..
-                        $playingTime = $this->data['IndexStichw'][$index + 1];
+                        $playingTime = $this->data['IndexStichw'][(int) $index + 1];
 
                         # .. so stop looping
                         break;

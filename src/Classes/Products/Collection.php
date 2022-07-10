@@ -111,10 +111,10 @@ class Collection extends Iterator implements Countable, Products
     /**
      * Adds product(s)
      *
-     * @param \Fundevogel\Pcbis\Interfaces\Product|\Fundevogel\Pcbis\Interfaces\Products
+     * @param \Fundevogel\Pcbis\Classes\Product\Product|\Fundevogel\Pcbis\Classes\Products\Collection $object
      * @return self
      */
-    public function add(Product|ProductsInterface $object): self
+    public function add(Product|Collection $object): self
     {
         if (is_a($object, self::class)) {
             foreach ($object->data as $item) {

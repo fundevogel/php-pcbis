@@ -36,9 +36,9 @@ class Ola
     /**
      * Source OLA data as fetched from KNV's API
      *
-     * @var array
+     * @var \stdClass
      */
-    public array $data;
+    public stdClass $data;
 
 
     /**
@@ -182,7 +182,7 @@ class Ola
             return in_array($this->olaCode(), $this->available);
         }
 
-        return $this->hasSucceeded() && $this->data->numberOrdered() <= $this->numberAvailable();
+        return $this->hasSucceeded() && $this->data->numberOrdered <= $this->numberAvailable();
     }
 
 

@@ -106,11 +106,11 @@ class Product extends ProductBase
         # If present ..
         if ($author->exists()) {
             # .. print author(s) & product title
-            return sprintf('%s: %s', $author->toString(', '), $this->title());
+            return sprintf('%s: %s', $author->toString(', '), $this->title()->toString());
         }
 
         # .. otherwise, only product title
-        return $this->title();
+        return $this->title()->toString();
     }
 
 
@@ -142,7 +142,7 @@ class Product extends ProductBase
             try {
                 # .. format product EAN/ISBN using third-party tools
                 return \Nicebooks\Isbn\Isbn::of($this->identifier)->format();
-            } catch (\Nicebooks\Isbn\Exception\InvalidIsbnException $e) {
+            } catch (\Exception $e) {
             }
         }
 
@@ -345,8 +345,14 @@ class Product extends ProductBase
             # Load prepared HTML text
             $dom->loadHtml($text);
 
-            # Iterate over `span` elements ..
+            # Iterate over `span` elements
             foreach ($dom->getElementsByTagName('span') as $node) {
+                # Skip empty nodes
+                if (is_null($node->nodeValue)) {
+                    continue;
+                }
+
+                # Format their text by ..
                 # (1) .. decoding them as UTF-8
                 # (2) .. removing unnecessary whitespaces
                 $description[] = trim(utf8_decode($node->nodeValue));
@@ -681,7 +687,10 @@ class Product extends ProductBase
             return $string;
         }
 
-        return Str::replace($string / 10, '.', ',');
+        # Convert value
+        $string = (float) $string / 10;
+
+        return Str::replace((string) $string, '.', ',');
     }
 
 

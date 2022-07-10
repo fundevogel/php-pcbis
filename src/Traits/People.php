@@ -33,7 +33,7 @@ trait People
      *
      * @var array
      */
-    public $people;
+    public array $people;
 
 
     /**
@@ -151,6 +151,9 @@ trait People
         ];
 
         foreach (Str::split($data, '.') as $string) {
+            # Define fallback to check against later
+            $group = null;
+
             # If dots were replaced, change them back
             $string = Str::replace($string, '#', '.');
 
@@ -175,6 +178,11 @@ trait People
                 }
 
                 $group = $array[1];
+            }
+
+            # Skip undefined group
+            if (is_null($group)) {
+                continue;
             }
 
             $people[$role] = $this->organizePeople($group);
@@ -239,7 +247,7 @@ trait People
      *
      * @param string $role Role (= involvement)
      * @throws \Fundevogel\Pcbis\Exceptions\UnknownRoleException
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function getRole(string $role): Role
     {
@@ -425,7 +433,7 @@ trait People
     /**
      * Exports author(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function author(): Role
     {
@@ -436,7 +444,7 @@ trait People
     /**
      * Exports original author(s
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role)
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function original(): Role
     {
@@ -447,7 +455,7 @@ trait People
     /**
      * Exports illustrator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function illustrator(): Role
     {
@@ -458,7 +466,7 @@ trait People
     /**
      * Exports drawer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function drawer(): Role
     {
@@ -469,7 +477,7 @@ trait People
     /**
      * Exports photographer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function photographer(): Role
     {
@@ -480,7 +488,7 @@ trait People
     /**
      * Exports translator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function translator(): Role
     {
@@ -491,7 +499,7 @@ trait People
     /**
      * Exports editor(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function editor(): Role
     {
@@ -502,7 +510,7 @@ trait People
     /**
      * Exports narrator(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function narrator(): Role
     {
@@ -513,7 +521,7 @@ trait People
     /**
      * Export composer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function composer(): Role
     {
@@ -524,7 +532,7 @@ trait People
     /**
      * Exports director(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function director(): Role
     {
@@ -535,7 +543,7 @@ trait People
     /**
      * Exports producer(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function producer(): Role
     {
@@ -546,7 +554,7 @@ trait People
     /**
      * Exports actor(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function actor(): Role
     {
@@ -557,7 +565,7 @@ trait People
     /**
      * Exports participant(s)
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Role
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Role
      */
     public function participant(): Role
     {
@@ -568,7 +576,7 @@ trait People
     /**
      * Exports (just) involved people
      *
-     * @return \Fundevogel\Pcbis\Fields\Types\Roles
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Roles
      */
     public function people(): Roles
     {

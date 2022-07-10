@@ -53,11 +53,11 @@ class Roles extends Value
     /**
      * Converts data to string
      *
-     * @param string $peopleDelimiter Delimiter between people of same role
+     * @param string $delimiter Delimiter between people of same role
      * @param string $groupDelimiter Delimiter between role groups
      * @return string
      */
-    public function toString(string $peopleDelimiter = '; ', string $groupDelimiter = '. '): string
+    public function toString(string $delimiter = '; ', string $groupDelimiter = '. '): string
     {
         # Create data array
         $result = [];
@@ -77,7 +77,7 @@ class Roles extends Value
             $obj = new Role($people);
 
             # Format string, using role & people thereof
-            $result[] = sprintf('%s: %s', $this->roles[$role], $obj->toString($peopleDelimiter));
+            $result[] = sprintf('%s: %s', $this->roles[$role], $obj->toString($delimiter));
         }
 
         return A::join($result, $groupDelimiter);

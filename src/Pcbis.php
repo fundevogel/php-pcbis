@@ -15,8 +15,8 @@ namespace Fundevogel\Pcbis;
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
 use Fundevogel\Pcbis\Classes\Product\Factory;
+use Fundevogel\Pcbis\Classes\Product\Product;
 use Fundevogel\Pcbis\Classes\Products\Collection;
-use Fundevogel\Pcbis\Interfaces\Product;
 
 /**
  * Class Pcbis
@@ -49,7 +49,7 @@ final class Pcbis
      * Constructor
      *
      * @param array $credentials Login credentials
-     * @param string $cache Cache object
+     * @param mixed $cache Cache object
      * @return void
      */
     public function __construct(?array $credentials = null, public mixed $cache = null)
@@ -135,7 +135,7 @@ final class Pcbis
      * Instantiates 'Product' object from single EAN/ISBN
      *
      * @param string $identifier Product EAN/ISBN
-     * @return \Fundevogel\Pcbis\Interfaces\Product
+     * @return \Fundevogel\Pcbis\Classes\Product\Product
      */
     public function load(string $identifier): ?Product
     {
@@ -157,7 +157,7 @@ final class Pcbis
     /**
      * Instantiates 'Products' object from multiple EANs/ISBNs
      *
-     * @param string $identifier Product EANs/ISBNs
+     * @param array $identifiers Product EANs/ISBNs
      * @return \Fundevogel\Pcbis\Classes\Products\Collection
      */
     public function loadAll(array $identifiers): ?Collection
@@ -177,15 +177,18 @@ final class Pcbis
     /**
      * Performs downgrade (or returns product itself)
      *
-     * @param \Fundevogel\Pcbis\Interfaces\Product $object Product to be downgraded
-     * @return \Fundevogel\Pcbis\Interfaces\Product|self
+     * @param \Fundevogel\Pcbis\Classes\Product\Product $object Product to be downgraded
+     * @return \Fundevogel\Pcbis\Classes\Product\Product|self
      */
     public function downgrade(Product $object): Product|self
     {
         # If available ..
         if ($object->hasDowngrade()) {
-            # .. perform downgrade
-            return $this->load($object->data['VorherigeAuflageGtin']);
+            # .. attempt to ..
+            if ($downgrade = $this->load($object->data['VorherigeAuflageGtin'])) {
+                # .. perform downgrade
+                return $downgrade;
+            }
         }
 
         return $object;
@@ -195,15 +198,18 @@ final class Pcbis
     /**
      * Performs upgrade (or returns product itself)
      *
-     * @param \Fundevogel\Pcbis\Interfaces\Product $object Product to be upgraded
-     * @return \Fundevogel\Pcbis\Interfaces\Product|self
+     * @param \Fundevogel\Pcbis\Classes\Product\Product $object Product to be upgraded
+     * @return \Fundevogel\Pcbis\Classes\Product\Product|self|null
      */
-    public function upgrade(Product $object): Product|self
+    public function upgrade(Product $object): Product|self|null
     {
         # If available ..
         if ($object->hasUpgrade()) {
-            # .. perform upgrade
-            return $this->load($object->data['NeueAuflageGtin']);
+            # .. attempt to ..
+            if ($upgrade = $this->load($object->data['NeueAuflageGtin'])) {
+                # .. perform upgrade
+                return $upgrade;
+            }
         }
 
         return $object;

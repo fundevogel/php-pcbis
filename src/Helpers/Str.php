@@ -317,50 +317,6 @@ class Str
     }
 
     /**
-     * Convert timestamp to date string
-     * according to locale settings
-     *
-     * @param int|null $time
-     * @param string|\IntlDateFormatter|null $format
-     * @param string $handler date, intl or strftime
-     * @return string|int
-     */
-    public static function date(?int $time = null, $format = null, string $handler = 'date')
-    {
-        if (is_null($format) === true) {
-            return $time;
-        }
-
-        // $format is an IntlDateFormatter instance
-        if (is_a($format, 'IntlDateFormatter') === true) {
-            return $format->format($time ?? time());
-        }
-
-        // `intl` handler
-        if ($handler === 'intl') {
-            $datetime = new DateTime();
-
-            if ($time !== null) {
-                $datetime->setTimestamp($time);
-            }
-
-            return IntlDateFormatter::formatObject($datetime, $format);
-        }
-
-        // handle `strftime` to be able
-        // to suppress deprecation warning
-        // TODO: remove strftime support for PHP 9.0
-        if ($handler === 'strftime') {
-            // make sure timezone is set correctly
-            date_default_timezone_get();
-
-            return @strftime($format, $time);
-        }
-
-        return $handler($format, $time);
-    }
-
-    /**
      * Converts a string to a different encoding
      *
      * @param string $string
@@ -435,23 +391,6 @@ class Str
         }
 
         return $needle === $probe;
-    }
-
-    /**
-     * Escape string for context specific output
-     * @since 3.7.0
-     *
-     * @param string $string Untrusted data
-     * @param string $context Location of output (`html`, `attr`, `js`, `css`, `url` or `xml`)
-     * @return string Escaped data
-     */
-    public static function esc(string $string, string $context = 'html'): string
-    {
-        if (method_exists('Kirby\Toolkit\Escape', $context) === true) {
-            return Escape::$context($string);
-        }
-
-        return $string;
     }
 
     /**
@@ -869,53 +808,6 @@ class Str
     }
 
     /**
-     * Replaces placeholders in string with values from the data array
-     * and escapes HTML in the results in `{{ }}` placeholders
-     * while leaving HTML special characters untouched in `{< >}` placeholders
-     *
-     * @since 3.6.0
-     *
-     * @param string|null $string The string with placeholders
-     * @param array $data Associative array with placeholders as
-     *                    keys and replacements as values.
-     *                    Supports query syntax.
-     * @param array $options An options array that contains:
-     *                       - fallback: if a token does not have any matches
-     *                       - callback: to be able to handle each matching result (escaping is applied after the callback)
-     *
-     * @return string The filled-in and partially escaped string
-     */
-    public static function safeTemplate(string $string = null, array $data = [], array $options = []): string
-    {
-        $callback = is_a(($options['callback'] ?? null), 'Closure') === true ? $options['callback'] : null;
-        $fallback = $options['fallback'] ?? '';
-
-        // replace and escape
-        $string = static::template($string, $data, [
-            'start'    => '{{',
-            'end'      => '}}',
-            'callback' => function ($result, $query, $data) use ($callback) {
-                if ($callback !== null) {
-                    $result = $callback($result, $query, $data);
-                }
-
-                return Escape::html($result);
-            },
-            'fallback' => $fallback
-        ]);
-
-        // replace unescaped (specifically marked placeholders)
-        $string = static::template($string, $data, [
-            'start'    => '{<',
-            'end'      => '>}',
-            'callback' => $callback,
-            'fallback' => $fallback
-        ]);
-
-        return $string;
-    }
-
-    /**
      * Shortens a string and adds an ellipsis if the string is too long
      *
      * <code>
@@ -1303,24 +1195,6 @@ class Str
     public static function ucwords(string $string = null): string
     {
         return mb_convert_case($string ?? '', MB_CASE_TITLE, 'UTF-8');
-    }
-
-    /**
-     * Removes all html tags and encoded chars from a string
-     *
-     * <code>
-     *
-     * echo str::unhtml('some <em>crazy</em> stuff');
-     * // output: some uber crazy stuff
-     *
-     * </code>
-     *
-     * @param string $string
-     * @return string The html string
-     */
-    public static function unhtml(string $string = null): string
-    {
-        return Html::decode($string);
     }
 
     /**

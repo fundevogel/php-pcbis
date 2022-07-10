@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Api;
 
 use Fundevogel\Pcbis\Api\Exceptions\Factory;
+use Fundevogel\Pcbis\Api\Exceptions\Exception;
 use Fundevogel\Pcbis\Exceptions\OfflineModeException;
 
 use GuzzleHttp\Client;
@@ -110,7 +111,7 @@ final class Webservice
      * @param string $resource API resource being called
      * @param array $data Data being sent as JSON object
      * @param string $type Request type (mostly 'POST')
-     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException No API calls when offline
+     * @throws \Fundevogel\Pcbis\Exceptions\OfflineModeException|\Fundevogel\Pcbis\Api\Exceptions\Exception No API calls when offline
      * @return \stdClass Response body as JSON object
      */
     private function call(string $resource, array $data, string $type = 'POST'): stdClass
@@ -138,8 +139,13 @@ final class Webservice
             return json_decode((string) $response->getBody());
         }
 
+        /**
+         * @var \Fundevogel\Pcbis\Api\Exceptions\Exception
+         */
+        $exception = Factory::create(json_decode((string) $response->getBody()));
+
         # .. otherwise everything goes south
-        throw Factory::create(json_decode((string) $response->getBody()));
+        throw $exception;
     }
 
 
@@ -147,7 +153,6 @@ final class Webservice
      * Authenticates with KNV's API
      *
      * @param array $credentials Login credentials
-     * @throws \Fundevogel\Pcbis\Exceptions\KNVException
      * @return bool
      */
     public function login(array $credentials): bool

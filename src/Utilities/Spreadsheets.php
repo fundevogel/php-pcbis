@@ -225,13 +225,13 @@ class Spreadsheets
 
 
     /**
-     * Utilities
+     * Helpers
      */
 
     /**
      * Builds 'Titel' attribute as exported with pcbis.de
      *
-     * @param string $string Title string
+     * @param string $string 'Title' string
      * @return string
      */
     protected static function convertTitle(string $string): string
@@ -245,7 +245,7 @@ class Spreadsheets
     /**
      * Builds 'Altersangabe' attribute as exported with pcbis.de
      *
-     * @param string $string Altersangabe string
+     * @param string $string 'Altersangabe' string
      * @return string
      */
     protected static function convertAge(string $string): string
@@ -262,7 +262,7 @@ class Spreadsheets
     /**
      * Builds 'Seitenzahl' attribute as exported with pcbis.de
      *
-     * @param string $string Seitenzahl string
+     * @param string $string 'Seitenzahl' string
      * @return int
      */
     protected static function convertPageCount(string $string): int
@@ -274,10 +274,10 @@ class Spreadsheets
     /**
      * Builds 'Preis' attribute as exported with pcbis.de
      *
-     * @param string $string Preis string
+     * @param string $string 'Preis' string
      * @return string
      */
-    protected static function convertPrice($string): string
+    protected static function convertPrice(string $string): string
     {
         # Input: XX.YY EUR
         # Output: XX,YY €
@@ -291,9 +291,10 @@ class Spreadsheets
     /**
      * Sorts a given array holding book information by certain sort order
      *
+     * TODO: https://www.php.net/manual/en/function.usort.php#25360
+     *
      * @param array $array Input that should be sorted
      * @return array
-     * TODO: https://www.php.net/manual/en/function.usort.php#25360
      */
     protected static function sortArray(array $array): array
     {

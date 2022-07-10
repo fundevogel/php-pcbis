@@ -47,7 +47,7 @@ class Series extends Value
      */
     public function series(): array
     {
-        return array_keys($this->data);
+        return is_null($this->data) ? array_keys($this->data) : [];
     }
 
 
@@ -58,7 +58,7 @@ class Series extends Value
      */
     public function volumes(): array
     {
-        return array_values($this->data);
+        return is_null($this->data) ? array_values($this->data) : [];
     }
 
 
@@ -73,7 +73,7 @@ class Series extends Value
      */
     public function toArray(): array
     {
-        return $this->data;
+        return is_null($this->data) ? $this->data : [];
     }
 
 
@@ -96,6 +96,6 @@ class Series extends Value
      */
     public function toString(string $delimiter = '<br \>'): string
     {
-        return A::join(array_keys($this->data), $delimiter);
+        return is_null($this->data) ? A::join(array_keys($this->data), $delimiter) : '';
     }
 }

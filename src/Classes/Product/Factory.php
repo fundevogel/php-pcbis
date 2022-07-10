@@ -81,12 +81,6 @@ class Factory
         # Determine Product type identifier
         $type = $data['Sortimentskennzeichen'];
 
-        # If product type is unknown ..
-        if (!array_key_exists($type, static::$types)) {
-            # .. fail early
-            throw new UnknownTypeException(sprintf('Unknown type identifier: "%s"', $type));
-        }
-
         # Create instance based on product type
         switch (static::$types[$type]) {
             # Books
@@ -129,5 +123,7 @@ class Factory
             case 'Spielzeug':
                 return new Toy($data);
         }
+
+        throw new UnknownTypeException(sprintf('Unknown type identifier: "%s"', $type));
     }
 }
