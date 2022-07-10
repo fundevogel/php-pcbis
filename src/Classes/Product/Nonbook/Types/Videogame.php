@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product\Nonbook\Types;
 
 use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Nonbook\Item;
 
 /**
@@ -28,12 +29,12 @@ class Videogame extends Item
     /**
      * Exports recommended minimum age (in years)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function age(): string
+    public function age(): Value
     {
         if (isset($this->data['SonstTxt']) && preg_match('/USK\s(.*)\sfreigegeben/', $this->data['SonstTxt'], $matches)) {
-            return $matches[1] . ' Jahren';
+            return new Value($matches[1] . ' Jahren');
         }
 
         return parent::age();

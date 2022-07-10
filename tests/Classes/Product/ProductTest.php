@@ -57,10 +57,16 @@ class ProductTest extends \PHPUnit\Framework\TestCase
 
     public function testSubtitle(): void
     {
-        # Run function
+        # Run function #1
+        $obj = new Product(['EAN' => 'xxx']);
+
+        # Assert result #1
+        $this->assertEquals($obj->subtitle(), '');
+
+        # Run function #2
         $obj = new Product(['EAN' => 'xxx', 'Utitel' => 'Subtitle']);
 
-        # Assert result
+        # Assert result #2
         $this->assertEquals($obj->subtitle(), 'Subtitle');
     }
 
@@ -77,7 +83,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $obj = new Product(['EAN' => 'xxx', 'IndexVerlag' => ['Verlag  ', '  Verlagsgruppe']]);
 
         # Assert result #2
-        $this->assertEquals($obj->publisher(), ['Verlag', 'Verlagsgruppe']);
+        $this->assertEquals($obj->publisher()->value(), ['Verlag', 'Verlagsgruppe']);
     }
 
 
@@ -87,7 +93,14 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $obj = new Product(['EAN' => 'xxx', 'Text1' => '06<span class="TextSchwarz">Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen. </span>15<span class="TextSchwarz">Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen. </span>01<span class="TextSchwarz">Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.</span>']);
 
         # Assert result
-        $this->assertEquals($obj->description(), [
+        $this->assertEquals(
+            $obj->description(),
+            ''
+            . 'Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen.' . '<br \>'
+            . 'Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen.' . '<br \>'
+            . 'Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.'
+        );
+        $this->assertEquals($obj->description()->value(), [
             'Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen.',
             'Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen.',
             'Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.',
@@ -139,13 +152,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter']);
 
         # Assert result #1
-        $this->assertEquals($obj->series(), ['Harry Potter' => '']);
+        $this->assertEquals($obj->series()->value(), ['Harry Potter' => null]);
 
         # Run function #2
         $obj = new Product(['EAN' => 'xxx', 'VerwieseneReihe1' => 'Harry Potter', 'BandnrVerwieseneReihe1' => '3: Der Gefangene von Askaban']);
 
         # Assert result #2
-        $this->assertEquals($obj->series(), ['Harry Potter' => '3: Der Gefangene von Askaban']);
+        $this->assertEquals($obj->series()->value(), ['Harry Potter' => '3: Der Gefangene von Askaban']);
     }
 
 
@@ -245,7 +258,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $obj = new Product(['EAN' => 'xxx', 'Sprachschl' => ['01', '02']]);
 
         # Assert result #2
-        $this->assertEquals($obj->languages(), ['Deutsch', 'Englisch']);
+        $this->assertEquals($obj->languages()->value(), ['Deutsch', 'Englisch']);
     }
 
 

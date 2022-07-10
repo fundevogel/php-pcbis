@@ -12,21 +12,22 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Fields;
 
 use Fundevogel\Pcbis\Helpers\A;
+use Fundevogel\Pcbis\Interfaces\Field;
 
 /**
  * Class Value
  *
- * Template for all field values
+ * Base class for all field values
  */
-abstract class Value
+class Value implements Field
 {
     /**
      * Constructor
      *
-     * @param array $data Roles, each holding involved people thereof
+     * @param mixed $data Field value
      * @return void
      */
-    public function __construct(public array $data = [])
+    public function __construct(public mixed $data = null)
     {
     }
 
@@ -36,7 +37,7 @@ abstract class Value
      */
 
     /**
-     * Prints roles & involved people when casting to string
+     * Casts data to string
      *
      * @return string
      */
@@ -51,21 +52,21 @@ abstract class Value
      */
 
     /**
-     * Converts data to string
-     *
-     * @return string
-     */
-    abstract public function toString(): string;
-
-
-    /**
      * Converts data to array
      *
      * @return array
      */
     public function toArray(): array
     {
-        return $this->data;
+        if (is_null($this->data)) {
+            return [];
+        }
+
+        if (is_array($this->data)) {
+            return $this->data;
+        }
+
+        return (array) $this->data;
     }
 
 
@@ -76,6 +77,41 @@ abstract class Value
      */
     public function toJson(): string
     {
-        return json_encode($this->toArray());
+        if (is_null($this->data)) {
+            return json_encode('');
+        }
+
+        return json_encode($this->data);
+    }
+
+
+    /**
+     * Converts data to string
+     *
+     * @param string $delimiter Separator
+     * @return string
+     */
+    public function toString(string $delimiter = '<br \>'): string
+    {
+        if (is_null($this->data)) {
+            return '';
+        }
+
+        if (is_string($this->data)) {
+            return $this->data;
+        }
+
+        return A::join($this->data, $delimiter);
+    }
+
+
+    /**
+     * Exports default value
+     *
+     * @return mixed
+     */
+    public function value(): mixed
+    {
+        return $this->data;
     }
 }

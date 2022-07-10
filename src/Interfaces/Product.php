@@ -19,51 +19,15 @@ namespace Fundevogel\Pcbis\Interfaces;
 interface Product
 {
     /**
+     * Methods
+     */
+
+    /**
      * Exports European Article Number (EAN)
      *
      * @return string
      */
     public function ean(): string;
-
-
-    /**
-     * Exports title
-     *
-     * @return string
-     */
-    public function title(): string;
-
-
-    /**
-     * Exports subtitle
-     *
-     * @return string
-     */
-    public function subtitle(): string;
-
-
-    /**
-     * Exports retail price (in €)
-     *
-     * @return string
-     */
-    public function retailPrice(): string;
-
-
-    /**
-     * Exports release year
-     *
-     * @return string
-     */
-    public function releaseYear(): string;
-
-
-    /**
-     * Exports type of value added tax (VAT)
-     *
-     * @return string
-     */
-    public function vat(): string;
 
 
     /**

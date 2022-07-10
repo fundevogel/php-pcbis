@@ -86,6 +86,6 @@ class RolesTest extends \PHPUnit\Framework\TestCase
         $result = new Roles(self::$people);
 
         # Assert result
-        $this->assertEquals($result->toArray(), self::$people);
+        $this->assertEquals($result->value(), self::$people);
     }
 }

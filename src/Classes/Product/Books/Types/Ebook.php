@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product\Books\Types;
 
 use Fundevogel\Pcbis\Classes\Product\Books\Book;
-
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 
@@ -30,19 +30,19 @@ class Ebook extends Book
     /**
      * Exports subtitle
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function subtitle(): string
+    public function subtitle(): Value
     {
         if (!isset($this->data['Utitel'])) {
-            return '';
+            return new Value();
         }
 
         if (Str::contains($this->data['Utitel'], 'Lesegerätegruppen')) {
-            return '';
+            return new Value();
         }
 
-        return A::first(Str::split($this->data['Utitel'], '.'));
+        return new Value(A::first(Str::split($this->data['Utitel'], '.')));
     }
 
 
@@ -53,17 +53,17 @@ class Ebook extends Book
     /**
      * Exports supported devices
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function devices(): array
+    public function devices(): Value
     {
         if (!isset($this->data['Utitel'])) {
-            return [];
+            return new Value();
         }
 
         $string = A::last(Str::split($this->data['Utitel'], 'Unterstützte Lesegerätegruppen:'));
 
-        return array_map(function (string $string): string {
+        return new Value(array_map(function (string $string): string {
             if ($string == 'MAC') {
                 return 'Mac';
             }
@@ -73,67 +73,63 @@ class Ebook extends Book
             }
 
             return $string;
-        }, Str::split($string, '/'));
+        }, Str::split($string, '/')));
     }
 
 
     /**
      * Exports print edition ISBN
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function printEdition(): string
+    public function printEdition(): Value
     {
-        if (!isset($this->data['PrintISBN'])) {
-            return '';
-        }
-
-        return $this->data['PrintISBN'];
+        return new Value($this->data['PrintISBN'] ?? '');
     }
 
 
     /**
      * Exports file size (in megabytes)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function fileSize(): string
+    public function fileSize(): Value
     {
         if (!isset($this->data['DateiGroesse'])) {
-            return '';
+            return new Value();
         }
 
         $kilobytes = (int) Str::replace($this->data['DateiGroesse'], ' KB', '');
 
-        return number_format($kilobytes / 1024, 2) . ' MB';
+        return new Value(number_format($kilobytes / 1024, 2) . ' MB');
     }
 
 
     /**
      * Exports file format
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function fileFormat(): string
+    public function fileFormat(): Value
     {
         if (!isset($this->data['DateiFormat'])) {
-            return '';
+            return new Value();
         }
 
         # Be safe, trim strings
-        return Str::lower(trim($this->data['DateiFormat']));
+        return new Value(Str::lower(trim($this->data['DateiFormat'])));
     }
 
 
     /**
      * Exports DRM descriptor
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function drm(): string
+    public function drm(): Value
     {
         if (!isset($this->data['DRMFlags'])) {
-            return '';
+            return new Value();
         }
 
         $flags = [
@@ -144,7 +140,7 @@ class Ebook extends Book
         ];
 
         # Be safe, trim strings
-        return $flags[trim($this->data['DRMFlags'])];
+        return new Value($flags[trim($this->data['DRMFlags'])]);
     }
 
 

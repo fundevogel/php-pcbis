@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product\Media\Types;
 
 use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Media\Medium;
 
 /**
@@ -57,12 +58,12 @@ class Movie extends Medium
     /**
      * Exports recommended minimum age (in years)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function age(): string
+    public function age(): Value
     {
         if (!isset($this->data['SonstTxt'])) {
-            return '';
+            return new Value();
         }
 
         $age = '';
@@ -71,7 +72,7 @@ class Movie extends Medium
             $age = $matches[1] . ' Jahren';
         }
 
-        return $age;
+        return new Value($age);
     }
 
 

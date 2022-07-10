@@ -19,6 +19,10 @@ namespace Fundevogel\Pcbis\Interfaces;
 interface Products
 {
     /**
+     * Methods
+     */
+
+    /**
      * Counts products
      *
      * @return int

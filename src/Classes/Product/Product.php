@@ -13,8 +13,11 @@ namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
+use Fundevogel\Pcbis\Classes\Fields\Value;
+use Fundevogel\Pcbis\Classes\Fields\Types\Series;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Interfaces\Field;
 use Fundevogel\Pcbis\Traits\OlaStatus;
 use Fundevogel\Pcbis\Traits\People;
 use Fundevogel\Pcbis\Traits\Tags;
@@ -256,73 +259,61 @@ class Product extends ProductBase
     /**
      * Exports title
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function title(): string
+    public function title(): Value
     {
-        if (!isset($this->data['Titel'])) {
-            if (isset($this->data['AutorSachtitel'])) {
-                return $this->data['AutorSachtitel'];
-            }
-
-            return '';
-        }
-
-        return $this->data['Titel'];
+        return new Value($this->data['Titel'] ?? $this->data['AutorSachtitel'] ?? '');
     }
 
 
     /**
      * Exports subtitle
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function subtitle(): string
+    public function subtitle(): Value
     {
-        if (!isset($this->data['Utitel'])) {
-            return '';
-        }
-
-        return $this->data['Utitel'];
+        return new Value($this->data['Utitel'] ?? '');
     }
 
 
     /**
      * Exports publisher(s)
      *
-     * @return array|string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function publisher(): array|string
+    public function publisher(): Value
     {
         if (!isset($this->data['IndexVerlag'])) {
-            return [];
+            return new Value();
         }
 
-        if (is_array($this->data['IndexVerlag'])) {
-            $publisher = [];
+        if (is_string($this->data['IndexVerlag'])) {
+            return new Value(trim($this->data['IndexVerlag']));
+        }
 
-            foreach ($this->data['IndexVerlag'] as $string) {
-                # Skip variations
-                if (Str::contains($string, ' # ')) {
-                    continue;
-                }
+        $publisher = [];
 
-                $publisher[] = trim($string);
+        foreach ($this->data['IndexVerlag'] as $string) {
+            # Skip variations
+            if (Str::contains($string, ' # ')) {
+                continue;
             }
 
-            return $publisher;
+            $publisher[] = trim($string);
         }
 
-        return trim($this->data['IndexVerlag']);
+        return new Value($publisher);
     }
 
 
     /**
      * Exports description(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function description(): array
+    public function description(): Value
     {
         # Create data array
         $description = [];
@@ -362,7 +353,7 @@ class Product extends ProductBase
             }
         }
 
-        return $description;
+        return new Value($description);
     }
 
 
@@ -373,42 +364,38 @@ class Product extends ProductBase
      * - XX    => XX,00
      * - XX.YY => XX,YY
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function retailPrice(): string
+    public function retailPrice(): Value
     {
         if (!isset($this->data['PreisEurD'])) {
-            return '';
+            return new Value();
         }
 
-        return number_format((float)$this->data['PreisEurD'], 2, ',', '');
+        return new Value(number_format((float) $this->data['PreisEurD'], 2, ',', ''));
     }
 
 
     /**
      * Exports release year
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function releaseYear(): string
+    public function releaseYear(): Value
     {
-        if (!isset($this->data['Erschjahr'])) {
-            return '';
-        }
-
-        return $this->data['Erschjahr'];
+        return new Value($this->data['Erschjahr'] ?? '');
     }
 
 
     /**
      * Exports recommended minimum age (in years)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function age(): string
+    public function age(): Value
     {
         if (!isset($this->data['Alter'])) {
-            return '';
+            return new Value();
         }
 
         $age = Str::substr($this->data['Alter'], 0, 2);
@@ -418,16 +405,16 @@ class Product extends ProductBase
         }
 
         # TODO: Add support for months
-        return 'ab ' . $age . ' Jahren';
+        return new Value('ab ' . $age . ' Jahren');
     }
 
 
     /**
      * Exports series & volume(s)
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Series
      */
-    public function series(): array
+    public function series(): Series
     {
         $data = [
             'VerwieseneReihe1' => 'BandnrVerwieseneReihe1',
@@ -444,7 +431,7 @@ class Product extends ProductBase
             # If series is present ..
             if (isset($this->data[$series])) {
                 # .. store it, along with empty volume
-                $array[trim($this->data[$series])] = '';
+                $array[trim($this->data[$series])] = null;
 
                 # If volume is also present ..
                 if (isset($this->data[$volume])) {
@@ -454,79 +441,75 @@ class Product extends ProductBase
             }
         }
 
-        return $array;
+        return new Series($array);
     }
 
 
     /**
-     * Checks whether product is part of one (or more) series
+     * Checks whether product is part of (at least one) series
      *
      * @return bool
      */
     public function isSeries(): bool
     {
-        return !empty($this->series());
+        return isset($this->data['VerwieseneReihe1']);
     }
 
 
     /**
-     * Exports weight  (in g)
+     * Exports weight (in g)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function weight(): string
+    public function weight(): Value
     {
-        if (!isset($this->data['Gewicht'])) {
-            return '';
-        }
-
         # TODO: Always grams?
-        return $this->data['Gewicht'];
+        return new Value($this->data['Gewicht'] ?? '');
     }
 
 
     /**
      * Exports width (in cm)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function width(): string
+    public function width(): Value
     {
         if (!isset($this->data['Breite'])) {
-            return '';
+            return new Value();
         }
 
-        return $this->convertMM($this->data['Breite']);
+        return new Value($this->convertMM($this->data['Breite']));
     }
 
 
     /**
      * Exports height (in cm)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function height(): string
+    public function height(): Value
     {
         if (!isset($this->data['Höhe'])) {
-            return '';
+            return new Value();
         }
 
-        return $this->convertMM($this->data['Höhe']);
+        return new Value($this->convertMM($this->data['Höhe']));
     }
 
 
     /**
      * Exports depth (in cm)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function depth(): string
+    public function depth(): Value
     {
         if (!isset($this->data['Tiefe'])) {
-            return '';
+            return new Value();
         }
 
-        return $this->convertMM($this->data['Tiefe']);
+        return new Value($this->convertMM($this->data['Tiefe']));
     }
 
 
@@ -539,27 +522,27 @@ class Product extends ProductBase
      * - 'width x height'
      * - 'width x height x depth'
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function dimensions(): string
+    public function dimensions(): Value
     {
-        return A::join(array_filter([
-            $this->width(),
-            $this->height(),
-            $this->depth(),
-        ]), 'x');
+        return new Value(A::join(array_filter([
+            $this->width()->toString(),
+            $this->height()->toString(),
+            $this->depth()->toString(),
+        ]), 'x'));
     }
 
 
     /**
      * Exports language(s)
      *
-     * @return array|string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function languages(): array|string
+    public function languages(): Value
     {
         if (!isset($this->data['Sprachschl'])) {
-            return [];
+            return new Value();
         }
 
         $languageCodes = [
@@ -611,14 +594,14 @@ class Product extends ProductBase
         ];
 
         if (is_array($this->data['Sprachschl'])) {
-            return array_map(function (string $languageCode) use ($languageCodes) {
+            return new Value(array_map(function (string $languageCode) use ($languageCodes) {
                 # Be safe, trim strings
                 return $languageCodes[trim($languageCode)];
-            }, $this->data['Sprachschl']);
+            }, $this->data['Sprachschl']));
         }
 
         # Be safe, trim strings
-        return $languageCodes[trim($this->data['Sprachschl'])];
+        return new Value($languageCodes[trim($this->data['Sprachschl'])]);
     }
 
 
@@ -630,12 +613,12 @@ class Product extends ProductBase
      * - '1' = half
      * - '2' = full
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function vat(): string
+    public function vat(): Value
     {
         if (!isset($this->data['Mwstknz'])) {
-            return '';
+            return new Value();
         }
 
         $vatCodes = [
@@ -644,7 +627,7 @@ class Product extends ProductBase
             '2' => 'voll',
         ];
 
-        return $vatCodes[$this->data['Mwstknz']];
+        return new Value($vatCodes[$this->data['Mwstknz']]);
     }
 
 

@@ -46,7 +46,7 @@ class EbookTest extends \PHPUnit\Framework\TestCase
         $obj = new Ebook(['EAN' => 'xxx', 'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet']);
 
         # Assert result
-        $this->assertEquals($obj->devices(), ['PC', 'Mac', 'eReader', 'Tablet']);
+        $this->assertEquals($obj->devices()->value(), ['PC', 'Mac', 'eReader', 'Tablet']);
     }
 
 

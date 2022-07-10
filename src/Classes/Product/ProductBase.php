@@ -40,58 +40,6 @@ abstract class ProductBase implements Product
 
 
     /**
-     * Dataset methods
-     */
-
-    /**
-     * Exports title
-     *
-     * @return string
-     */
-    abstract public function title(): string;
-
-
-    /**
-     * Exports subtitle
-     *
-     * @return string
-     */
-    abstract public function subtitle(): string;
-
-
-    /**
-     * Exports retail price (in €)
-     *
-     * @return string
-     */
-    abstract public function retailPrice(): string;
-
-
-    /**
-     * Exports release year
-     *
-     * @return string
-     */
-    abstract public function releaseYear(): string;
-
-
-    /**
-     * Exports type of value added tax (VAT)
-     *
-     * @return string
-     */
-    abstract public function vat(): string;
-
-
-    /**
-     * Exports all data
-     *
-     * @return array
-     */
-    abstract public function export(): array;
-
-
-    /**
      * Helpers
      */
 
