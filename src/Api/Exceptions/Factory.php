@@ -11,10 +11,17 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Api\Exceptions;
 
+use Fundevogel\Pcbis\Interfaces\KnvException;
+use Fundevogel\Pcbis\Api\Exceptions\Types\BadRequestException;
+use Fundevogel\Pcbis\Api\Exceptions\Types\ForbiddenException;
+use Fundevogel\Pcbis\Api\Exceptions\Types\InternalServerErrorException;
+use Fundevogel\Pcbis\Api\Exceptions\Types\OKException;
+use Fundevogel\Pcbis\Api\Exceptions\Types\UnauthorizedException;
+
 /**
  * Class Factory
  *
- * Creates 'KNVException' subclasses, factory-style
+ * Creates 'KnvException' subclasses, factory-style
  */
 class Factory
 {
@@ -81,12 +88,12 @@ class Factory
 
 
     /**
-     * Creates 'KNVException' instance matching given HTTP status
+     * Creates 'KnvException' instance matching given HTTP status
      *
      * @param \stdClass $data Response body as JSON object
-     * @return \Fundevogel\Pcbis\Api\KNVException
+     * @return \Fundevogel\Pcbis\Interfaces\KnvException
      */
-    public static function create(\stdClass $data): KNVException
+    public static function create(\stdClass $data): KnvException
     {
         # Define fallback values
         $message = '';
@@ -117,29 +124,29 @@ class Factory
         }
 
         # Create exception based on error code
-        # (1) 'Unauthorized'
-        if (in_array($data->httpStatus, 'UNAUTHORIZED')) {
-            return new UnauthorizedException($message, $code, $description, $data);
+        switch ($data->httpStatus) {
+            # 'Unauthorized'
+            case 'UNAUTHORIZED':
+                return new UnauthorizedException($message, $code, $description, $data);
+
+            # 'Forbidden'
+            case 'FORBIDDEN':
+                return new ForbiddenException($message, $code, $description, $data);
+
+            # 'Bad Request'
+            case 'BAD_REQUEST':
+                return new BadRequestException($message, $code, $description, $data);
+
+            # 'OK'
+            case 'OK':
+                return new OKException($message, $code, $description, $data);
+
+            # 'Internal Server Error'
+            case 'INTERNAL_SERVER_ERROR':
+                return new InternalServerErrorException($message, $code, $description, $data);
         }
 
-        # (2) 'Forbidden'
-        if ($data->httpStatus == 'FORBIDDEN') {
-            return new ForbiddenException($message, $code, $description, $data);
-        }
-
-        # (3) 'Bad Request'
-        if (in_array($data->httpStatus, 'BAD_REQUEST')) {
-            return new BadRequestException($message, $code, $description, $data);
-        }
-
-        # (4) 'OK'
-        if (in_array($data->httpStatus, 'OK')) {
-            return new OKException($message, $code, $description, $data);
-        }
-
-        # (5) 'Internal Server Error'
-        if ($data->httpStatus == 'INTERNAL_SERVER_ERROR') {
-            return new InternalServerErrorException($message, $code, $description, $data);
-        }
+        # Provide fallback exception
+        return new Exception($message, $code, $description, $data);
     }
 }

@@ -9,13 +9,15 @@ declare(strict_types=1);
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL v3
  */
 
-namespace Fundevogel\Pcbis\Api\Exceptions;
+namespace Fundevogel\Pcbis\Api\Exceptions\Types;
+
+use Fundevogel\Pcbis\Api\Exceptions\Exception;
 
 /**
  * Class BadRequestException
  *
  * Indicates 'Bad Request' response
  */
-class BadRequestException extends KNVException
+class BadRequestException extends Exception
 {
 }

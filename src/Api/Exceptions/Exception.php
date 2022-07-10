@@ -11,19 +11,21 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Api\Exceptions;
 
+use Fundevogel\Pcbis\Interfaces\KnvException;
+
 /**
- * Class KNVException
+ * Class Exception
  *
  * Custom base exception
  */
-class KNVException extends \Exception
+class Exception extends \Exception implements KnvException
 {
     /**
      * Constructor
      *
      * @param string $message Exception message
      * @param int $code Exception code
-     * @param int $description Detailed exception description
+     * @param string $description Detailed exception description
      * @param \stdClass $data Response body as JSON object
      * @param \Throwable $previous Previous exception (if nested)
      * @return void
@@ -53,11 +55,7 @@ class KNVException extends \Exception
      */
     public function getStatus(): string
     {
-        if (array_key_exists('httpStatus', $this->data)) {
-            return $this->data['httpStatus'];
-        }
-
-        return $this->data['status'];
+        return $this->data->httpStatus ?? $this->data->status;
     }
 
 
