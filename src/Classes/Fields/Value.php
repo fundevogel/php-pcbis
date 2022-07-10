@@ -58,15 +58,15 @@ class Value implements Field
      */
     public function toArray(): array
     {
-        if (is_null($this->data)) {
-            return [];
-        }
-
         if (is_array($this->data)) {
             return $this->data;
         }
 
-        return (array) $this->data;
+        if (is_string($this->data)) {
+            return (array) $this->data;
+        }
+
+        return [];
     }
 
 
@@ -93,15 +93,15 @@ class Value implements Field
      */
     public function toString(string $delimiter = '<br \>'): string
     {
-        if (is_null($this->data)) {
-            return '';
-        }
-
         if (is_string($this->data)) {
             return $this->data;
         }
 
-        return A::join($this->data, $delimiter);
+        if (is_array($this->data)) {
+            return A::join($this->data, $delimiter);
+        }
+
+        return '';
     }
 
 
