@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Fundevogel\Pcbis\Classes\Product\Books;
 
 use Fundevogel\Pcbis\Api\Webservice;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Product;
 use Fundevogel\Pcbis\Helpers\Str;
 
@@ -57,66 +58,62 @@ class Book extends Product
     /**
      * Exports binding
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function binding(): string
+    public function binding(): Value
     {
         if (!isset($this->data['Einband'])) {
-            return '';
+            return new Value();
         }
 
         # Be safe, trim strings
         $binding = trim($this->data['Einband']);
 
         if (!array_key_exists($binding, $this->bindings)) {
-            return $binding;
+            return new Value($binding);
         }
 
-        return $this->bindings[$binding];
+        return new Value($this->bindings[$binding]);
     }
 
 
     /**
      * Exports page count
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function pageCount(): string
+    public function pageCount(): Value
     {
         if (!isset($this->data['Abb'])) {
-            return '';
+            return new Value();
         }
 
         $lines = Str::split($this->data['Abb'], '.');
 
         foreach ($lines as $line) {
             if (Str::substr($line, -1) === 'S') {
-                return Str::split($line, ' ')[0];
+                return new Value(Str::split($line, ' ')[0]);
             }
         }
 
-        return '';
+        return new Value();
     }
 
 
     /**
      * Exports Antolin rating
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function antolin(): string
+    public function antolin(): Value
     {
-        if (empty($this->tags)) {
-            return '';
-        }
-
         foreach ($this->tags as $tag) {
             if (Str::startsWith($tag, 'Antolin')) {
-                return Str::replace($tag, ['Antolin (', ')'], '');
+                return new Value(Str::replace($tag, ['Antolin (', ')'], ''));
             }
         }
 
-        return '';
+        return new Value();
     }
 
 

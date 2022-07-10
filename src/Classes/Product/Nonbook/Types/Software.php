@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Classes\Product\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Nonbook\Item;
+use Fundevogel\Pcbis\Helpers\Str;
 
 /**
  * Class Software
@@ -28,12 +29,12 @@ class Software extends Item
     /**
      * Exports version schema
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function version(): string
+    public function version(): Value
     {
         if (!isset($this->data['Abb'])) {
-            return '';
+            return new Value();
         }
 
         $version = '';
@@ -62,7 +63,7 @@ class Software extends Item
             }
         }
 
-        return $version;
+        return new Value($version);
     }
 
 

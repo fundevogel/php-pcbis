@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Classes\Product\Books\Types;
 
-use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Books\Book;
+use Fundevogel\Pcbis\Helpers\Str;
 
 /**
  * Class Schoolbook
@@ -28,9 +29,9 @@ class Schoolbook extends Book
     /**
      * Exports school subject
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function subject(): string
+    public function subject(): Value
     {
         # Maps (partial) strings to subjects
         # TODO: Multiple subjects possible?
@@ -109,18 +110,21 @@ class Schoolbook extends Book
             }
         }
 
+        # Create data array
+        $data = [];
+
         # Iterate over collected sources ..
         foreach ($array as $string) {
             # .. as well as known subjects ..
             foreach ($subjects as $key => $value) {
                 # .. and see what sticks
                 if (Str::contains(Str::lower($string), $key)) {
-                    return $value;
+                    return new Value($value);
                 }
             }
         }
 
-        return '';
+        return new Value();
     }
 
 

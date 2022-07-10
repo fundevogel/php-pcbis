@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Classes\Product\Media;
 
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Product;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
@@ -29,18 +30,18 @@ class Medium extends Product
     /**
      * Exports duration
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function duration(): string
+    public function duration(): Value
     {
         # TODO: Prevent subtitle containing duration
         if (!isset($this->data['Utitel'])) {
-            return '';
+            return new Value();
         }
 
         $array = Str::split($this->data['Utitel'], '.');
 
-        return Str::replace(A::last($array), ' Min', '');
+        return new Value(Str::replace(A::last($array), ' Min', ''));
     }
 
 

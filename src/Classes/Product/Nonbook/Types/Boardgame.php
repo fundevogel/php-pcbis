@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Classes\Product\Nonbook\Types;
 
-use Fundevogel\Pcbis\Helpers\Str;
+use Fundevogel\Pcbis\Classes\Fields\Value;
 use Fundevogel\Pcbis\Classes\Product\Nonbook\Item;
+use Fundevogel\Pcbis\Helpers\Str;
 
 /**
  * Class Boardgame
@@ -28,13 +29,13 @@ class Boardgame extends Item
     /**
      * Exports number of players
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function playerCount(): string
+    public function playerCount(): Value
     {
         # TODO: Prevent subtitle containing player count!
         if (!isset($this->data['Utitel'])) {
-            return '';
+            return new Value();
         }
 
         $playerCount = '';
@@ -43,19 +44,19 @@ class Boardgame extends Item
             $playerCount = $matches[1];
         }
 
-        return $playerCount;
+        return new Value($playerCount);
     }
 
 
     /**
      * Exports estimated playing time (in minutes)
      *
-     * @return string
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function playingTime(): string
+    public function playingTime(): Value
     {
         if (!isset($this->data['Utitel'])) {
-            return '';
+            return new Value();
         }
 
         $playingTime = '';
@@ -82,7 +83,7 @@ class Boardgame extends Item
         }
 
         # Be safe, trim strings
-        return trim($playingTime);
+        return new Value(trim($playingTime));
     }
 
 

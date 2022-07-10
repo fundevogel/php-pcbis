@@ -46,6 +46,6 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
         $obj = new Videogame(['EAN' => 'xxx', 'AutorSachtitel' => 'The Legend of Zelda, Breath of the Wild, 1 Nintendo Switch-Spiel']);
 
         # Assert result
-        $this->assertEquals($obj->platforms(), ['Nintendo Switch']);
+        $this->assertEquals($obj->platforms()->value(), ['Nintendo Switch']);
     }
 }

@@ -48,9 +48,9 @@ class Videogame extends Item
     /**
      * Exports supported platforms
      *
-     * @return array
+     * @return \Fundevogel\Pcbis\Classes\Fields\Value
      */
-    public function platforms(): array
+    public function platforms(): Value
     {
         if (!isset($this->data['AutorSachtitel'])) {
             return [];
@@ -94,7 +94,7 @@ class Videogame extends Item
             # - '4260252082049'
         }
 
-        return $platforms;
+        return new Value($platforms);
     }
 
 
