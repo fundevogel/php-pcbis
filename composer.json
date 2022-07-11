@@ -5,7 +5,7 @@
     "keywords": ["pcbis", "knv", "api", "rest", "client"],
     "homepage": "https://codeberg.org/Fundevogel/php-pcbis",
     "license": "GPL-3.0",
-    "version": "4.0.0-rc.3",
+    "version": "4.0.0-rc.4",
     "scripts": {
         "lint": "pint --verbose",
         "test": "phpunit"
