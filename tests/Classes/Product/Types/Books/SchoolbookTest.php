@@ -63,4 +63,36 @@ class SchoolbookTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->subject(), 'Altgriechisch');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Schoolbook([
+            'EAN' => 'xxx',
+            'Utitel' => 'Griechische Lerngrammatik ab 8./9. Klasse bis incl. Universität',
+            'AutorSachtitel' => 'Grammateion',
+            'Abb' => '1. Auflage 2018. 88 S. 26 cm',
+            'Kurztitel' => 'Grammateion',
+            'IndexStichw' => [
+                'Grammateion                             ',
+                'Griechische                             ',
+                'Lerngrammatik                           ',
+                'ab                                      ',
+                '8                                       ',
+                '9                                       ',
+                'Klasse                                  ',
+                'bis                                     ',
+                'incl                                    ',
+                'Universität                             '
+            ],
+            'IndexSchlagw' => [
+                'Altgriechisch; Grammatik',
+                'Altgriechisch; Schulbuch (Gymnasium)',
+            ],
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

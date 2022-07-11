@@ -28,4 +28,14 @@ class SoundTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isMedia());
         $this->assertTrue($obj->isSound());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Sound(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

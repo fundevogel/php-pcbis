@@ -44,4 +44,18 @@ class SoftwareTest extends \PHPUnit\Framework\TestCase
         # Assert result #2
         $this->assertEquals($obj->version(), '28.00');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Software([
+            'EAN' => 'xxx',
+            'Titel' => 'Fritz & Fertig, Sonderedition 2 in 1, 2 CD-ROMs',
+            'Abb' => 'Version 28.00 2020. 19,5 cm',
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

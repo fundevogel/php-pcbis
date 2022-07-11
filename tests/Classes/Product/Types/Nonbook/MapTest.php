@@ -28,4 +28,14 @@ class MapTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isMap());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Map(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

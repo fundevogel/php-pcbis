@@ -28,4 +28,14 @@ class ToyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isToy());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Toy(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

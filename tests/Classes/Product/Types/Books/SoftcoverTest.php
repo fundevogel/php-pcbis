@@ -28,4 +28,14 @@ class SoftcoverTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isBook());
         $this->assertTrue($obj->isSoftcover());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Softcover(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

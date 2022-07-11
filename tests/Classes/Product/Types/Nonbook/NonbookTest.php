@@ -28,4 +28,14 @@ class NonbookTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isNonbook());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Nonbook(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

@@ -28,4 +28,14 @@ class StationeryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isStationery());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Stationery(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

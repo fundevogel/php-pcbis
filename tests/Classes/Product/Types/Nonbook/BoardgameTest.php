@@ -48,4 +48,14 @@ class BoardgameTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->playingTime(), '60-90');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Boardgame(['EAN' => 'xxx', 'Utitel' => 'Für 1-4 Spieler. Spieldauer: 60-90 Min.']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

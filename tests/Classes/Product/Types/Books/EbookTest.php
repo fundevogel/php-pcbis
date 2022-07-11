@@ -88,4 +88,21 @@ class EbookTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->drm(), 'Digitales Wasserzeichen');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Ebook([
+            'EAN' => 'xxx',
+            'Utitel' => 'Unterstützte Lesegerätegruppen: PC/MAC/eReader/Tablet',
+            'PrintISBN' => '9783522202107',
+            'DateiGroesse' => '10229 KB',
+            'DateiFormat' => 'EPUB',
+            'DRMFlags' => '02',
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

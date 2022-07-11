@@ -313,4 +313,29 @@ class ProductTest extends \PHPUnit\Framework\TestCase
             $this->markTestIncomplete();
         }
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Product([
+            'EAN' => 'xxx',
+            'AutorSachtitel' => 'Doe, John',
+            'Titel' => 'Title',
+            'Utitel' => 'Subtitle',
+            'IndexVerlag' => 'Verlag',
+            'Text1' => '06<span class="TextSchwarz">Mama kann viele Dinge sein. Manchmal ist sie laut, manchmal ist sie leise. Meistens ist sie ziemlich normal. Nur am Abend steht sie auf der Opernbühne und stirbt tausend dramatische Tode. Und das Publikum ist hingerissen. </span>15<span class="TextSchwarz">Im Laufe eines einzigen Tages macht Mama so manche Verwandlung durch: Mal ist sie ganz still, mal laut und aufbrausend. Am Tag spielt sie mit den Kindern. Am Abend aber verwandelt sich Mama in eine glamouröse Opernsängerin. In einer ihrer vielen Rollen steht sie auf der Bühne und be geistert das Publikum. Besonderen Eindruck hinterlassen ihre unzähligen tragischen, aber auch ulkigen Sterbeszenen. Von Langeweile keine Spur! Zu ihrem Bilderbuch-Debüt wurde Carla Haslbauer von der Welt der Oper inspiriert. Ihr leichter und farbenfroher Stil zeugt von ihrer Liebe zum Comic. Mit viel Humor teilt sie eine universelle Erkenntnis: dass die Eltern nicht nur Eltern sind, sondern in viele verschiedene Rollen schlüpfen. </span>01<span class="TextSchwarz">Carla Haslbauer wurde in Frankfurt am Main geboren und wuchs in der Kleinstadt Bad Nauheim auf. Seit dem Abschluss in Illustration Fiction an der Hoch schule Luzern Design & Kunst arbeitet sie als freischaffende Illustratorin. Als Mitglied des Comic-Kollektivs Corner Collective realisiert sie regel mäßig auch Comic-Projekte. Ihre Inspiration findet sie in der Natur und dem Alltagsgeschehen um sie herum. Gerne gräbt sie auch in ihren Kindheitserinnerungen und findet so manche erzählenswerte Geschichte. »Die Tode meiner Mutter« ist ihr erstes Bilderbuch.</span>',
+            'PreisEurD' => '15.00',
+            'Erschjahr' => '2018',
+            'Alter' => '06',
+            'VerwieseneReihe1' => 'Harry Potter', 'BandnrVerwieseneReihe1' => '3: Der Gefangene von Askaban',
+            'Gewicht' => '80',
+            'Breite' => '80',
+            'Höhe' => '80',
+            'Sprachschl' => '02',
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

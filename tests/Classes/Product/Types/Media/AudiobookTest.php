@@ -28,4 +28,14 @@ class AudiobookTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isMedia());
         $this->assertTrue($obj->isAudiobook());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Audiobook(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

@@ -70,4 +70,19 @@ class BookTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->antolin(), '3. Klasse');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Book([
+            'EAN' => 'xxx',
+            'Einband' => 'GEB',
+            'Abb' => '1. Auflage 2021. 48 S. durchgehend farbig illustriert 28 cm',
+            'IndexSchlagw' => ['Antolin (3. Klasse)'],
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

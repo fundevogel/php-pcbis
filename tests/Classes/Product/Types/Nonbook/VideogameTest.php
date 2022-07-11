@@ -48,4 +48,18 @@ class VideogameTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->platforms()->value(), ['Nintendo Switch']);
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Videogame([
+            'EAN' => 'xxx',
+            'AutorSachtitel' => 'The Legend of Zelda, Breath of the Wild, 1 Nintendo Switch-Spiel',
+            'SonstTxt' => 'USK ab 12 freigegeben. 2520040'
+        ]);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

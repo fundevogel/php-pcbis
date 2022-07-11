@@ -28,4 +28,14 @@ class NotesTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isItem());
         $this->assertTrue($obj->isNotes());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Notes(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

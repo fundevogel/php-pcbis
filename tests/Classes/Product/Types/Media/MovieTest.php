@@ -38,4 +38,14 @@ class MovieTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->age(), 'ab 16 Jahren');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Movie(['EAN' => 'xxx', 'SonstTxt' => 'FSK ab 16 freigegeben']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

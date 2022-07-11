@@ -37,4 +37,14 @@ class MediumTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertEquals($obj->duration(), '104');
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Medium(['EAN' => 'xxx', 'Utitel' => '104 Min.']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

@@ -27,4 +27,14 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         # Assert result
         $this->assertTrue($obj->isItem());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Item(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

@@ -28,4 +28,14 @@ class MusicTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isMedia());
         $this->assertTrue($obj->isMusic());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Music(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }

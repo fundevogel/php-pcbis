@@ -28,4 +28,14 @@ class HardcoverTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($obj->isBook());
         $this->assertTrue($obj->isHardcover());
     }
+
+
+    public function testExport(): void
+    {
+        # Run function
+        $obj = new Hardcover(['EAN' => 'xxx']);
+
+        # Assert result
+        $this->assertIsArray($obj->export());
+    }
 }
