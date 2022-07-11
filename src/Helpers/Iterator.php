@@ -9,12 +9,6 @@ use IteratorAggregate;
  * Extended version of PHP's iterator
  * class that builds the foundation of our
  * Collection class.
- *
- * @package   Kirby Toolkit
- * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      https://getkirby.com
- * @copyright Bastian Allgeier
- * @license   https://opensource.org/licenses/MIT
  */
 class Iterator implements IteratorAggregate
 {

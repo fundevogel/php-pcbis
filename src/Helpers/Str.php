@@ -4,19 +4,11 @@ namespace Fundevogel\Pcbis\Helpers;
 
 use Exception;
 
-if(!defined('MB')) define('MB', (int)function_exists('mb_get_info'));
-
 
 /**
  * The String class provides a set
  * of handy methods for string
  * handling and manipulation.
- *
- * @package   Kirby Toolkit
- * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      https://getkirby.com
- * @copyright Bastian Allgeier
- * @license   https://opensource.org/licenses/MIT
  */
 class Str
 {
