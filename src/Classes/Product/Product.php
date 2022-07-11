@@ -13,8 +13,8 @@ namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Api\Ola;
 use Fundevogel\Pcbis\Api\Webservice;
-use Fundevogel\Pcbis\Classes\Fields\Value;
-use Fundevogel\Pcbis\Classes\Fields\Types\Series;
+use Fundevogel\Pcbis\Classes\Product\Fields\Value;
+use Fundevogel\Pcbis\Classes\Product\Fields\Types\Series;
 use Fundevogel\Pcbis\Helpers\A;
 use Fundevogel\Pcbis\Helpers\Str;
 use Fundevogel\Pcbis\Interfaces\Field;
@@ -259,7 +259,7 @@ class Product extends ProductBase
     /**
      * Exports title
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function title(): Value
     {
@@ -270,7 +270,7 @@ class Product extends ProductBase
     /**
      * Exports subtitle
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function subtitle(): Value
     {
@@ -281,7 +281,7 @@ class Product extends ProductBase
     /**
      * Exports publisher(s)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function publisher(): Value
     {
@@ -311,7 +311,7 @@ class Product extends ProductBase
     /**
      * Exports description(s)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function description(): Value
     {
@@ -370,7 +370,7 @@ class Product extends ProductBase
      * - XX    => XX,00
      * - XX.YY => XX,YY
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function retailPrice(): Value
     {
@@ -385,7 +385,7 @@ class Product extends ProductBase
     /**
      * Exports release year
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function releaseYear(): Value
     {
@@ -396,7 +396,7 @@ class Product extends ProductBase
     /**
      * Exports recommended minimum age (in years)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function age(): Value
     {
@@ -418,7 +418,7 @@ class Product extends ProductBase
     /**
      * Exports series & volume(s)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Types\Series
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Types\Series
      */
     public function series(): Series
     {
@@ -465,7 +465,7 @@ class Product extends ProductBase
     /**
      * Exports weight (in g)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function weight(): Value
     {
@@ -477,7 +477,7 @@ class Product extends ProductBase
     /**
      * Exports width (in cm)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function width(): Value
     {
@@ -492,7 +492,7 @@ class Product extends ProductBase
     /**
      * Exports height (in cm)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function height(): Value
     {
@@ -507,7 +507,7 @@ class Product extends ProductBase
     /**
      * Exports depth (in cm)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function depth(): Value
     {
@@ -528,7 +528,7 @@ class Product extends ProductBase
      * - 'width x height'
      * - 'width x height x depth'
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function dimensions(): Value
     {
@@ -543,7 +543,7 @@ class Product extends ProductBase
     /**
      * Exports language(s)
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function languages(): Value
     {
@@ -619,7 +619,7 @@ class Product extends ProductBase
      * - '1' = half
      * - '2' = full
      *
-     * @return \Fundevogel\Pcbis\Classes\Fields\Value
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
      */
     public function vat(): Value
     {

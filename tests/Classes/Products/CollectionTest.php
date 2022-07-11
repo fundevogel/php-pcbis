@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Fundevogel\Pcbis\Tests\Classes\Products;
 
-use Fundevogel\Pcbis\Classes\Product\Books\Book;
-use Fundevogel\Pcbis\Classes\Product\Media\Medium;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Item;
+use Fundevogel\Pcbis\Classes\Product\Types\Book;
+use Fundevogel\Pcbis\Classes\Product\Types\Medium;
+use Fundevogel\Pcbis\Classes\Product\Types\Item;
 use Fundevogel\Pcbis\Classes\Products\Collection;
 
 class CollectionTest extends \PHPUnit\Framework\TestCase
