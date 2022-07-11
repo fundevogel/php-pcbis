@@ -97,8 +97,8 @@ class Boardgame extends Item
         # Build dataset
         return array_merge(parent::export(), [
             # 'Boardgame' specific data
-            'Spieleranzahl' => $this->playerCount(),
-            'Spieldauer'    => $this->playingTime(),
+            'Spieleranzahl' => $this->playerCount()->value(),
+            'Spieldauer'    => $this->playingTime()->value(),
         ]);
     }
 }

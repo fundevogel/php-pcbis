@@ -128,19 +128,19 @@ class Book extends Product
         return array_merge(parent::export(), [
             # (1) 'Book' specific data
             'ISBN'          => $this->isbn(),
-            'Einband'       => $this->binding(),
-            'Seitenzahl'    => $this->pageCount(),
-            'Antolin'       => $this->antolin(),
+            'Einband'       => $this->binding()->value(),
+            'Seitenzahl'    => $this->pageCount()->value(),
+            'Antolin'       => $this->antolin()->value(),
 
             # (2) Extension 'People'
-            'AutorIn'       => $this->getRole('author'),
-            'Vorlage'       => $this->getRole('original'),
-            'IllustratorIn' => $this->getRole('illustrator'),
-            'ZeichnerIn'    => $this->getRole('drawer'),
-            'PhotographIn'  => $this->getRole('photographer'),
-            'ÜbersetzerIn'  => $this->getRole('translator'),
-            'HerausgeberIn' => $this->getRole('editor'),
-            'MitarbeiterIn' => $this->getRole('participant'),
+            'AutorIn'       => $this->getRole('author')->value(),
+            'Vorlage'       => $this->getRole('original')->value(),
+            'IllustratorIn' => $this->getRole('illustrator')->value(),
+            'ZeichnerIn'    => $this->getRole('drawer')->value(),
+            'PhotographIn'  => $this->getRole('photographer')->value(),
+            'ÜbersetzerIn'  => $this->getRole('translator')->value(),
+            'HerausgeberIn' => $this->getRole('editor')->value(),
+            'MitarbeiterIn' => $this->getRole('participant')->value(),
         ]);
     }
 }

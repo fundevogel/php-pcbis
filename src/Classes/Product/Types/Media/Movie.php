@@ -90,7 +90,7 @@ class Movie extends Medium
         # Build dataset
         return array_merge(parent::export(), [
             # 'Movie' specific data
-            'SchauspielerIn' => $this->getRole('actor'),
+            'SchauspielerIn' => $this->getRole('actor')->value(),
         ]);
     }
 }

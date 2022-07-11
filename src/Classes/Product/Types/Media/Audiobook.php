@@ -25,7 +25,7 @@ class Audiobook extends Medium
         # Build dataset
         return array_merge(parent::export(), [
             # 'Audiobook' specific data
-            'ErzählerIn' => $this->getRole('narrator'),
+            'ErzählerIn' => $this->getRole('narrator')->value(),
         ]);
     }
 }

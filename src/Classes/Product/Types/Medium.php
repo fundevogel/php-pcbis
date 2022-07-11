@@ -55,20 +55,20 @@ class Medium extends Product
         # Build dataset
         return array_merge(parent::export(), [
             # (1) 'Media' specific data
-            'Dauer'         => $this->duration(),
-            'KomponistIn'   => $this->getRole('composer'),
-            'RegisseurIn'   => $this->getRole('director'),
-            'ProduzentIn'   => $this->getRole('producer'),
+            'Dauer'         => $this->duration()->value(),
+            'KomponistIn'   => $this->getRole('composer')->value(),
+            'RegisseurIn'   => $this->getRole('director')->value(),
+            'ProduzentIn'   => $this->getRole('producer')->value(),
 
             # (2) Extension 'People'
-            'AutorIn'       => $this->getRole('author'),
-            'Vorlage'       => $this->getRole('original'),
-            'IllustratorIn' => $this->getRole('illustrator'),
-            'ZeichnerIn'    => $this->getRole('drawer'),
-            'PhotographIn'  => $this->getRole('photographer'),
-            'ÜbersetzerIn'  => $this->getRole('translator'),
-            'HerausgeberIn' => $this->getRole('editor'),
-            'MitarbeiterIn' => $this->getRole('participant'),
+            'AutorIn'       => $this->getRole('author')->value(),
+            'Vorlage'       => $this->getRole('original')->value(),
+            'IllustratorIn' => $this->getRole('illustrator')->value(),
+            'ZeichnerIn'    => $this->getRole('drawer')->value(),
+            'PhotographIn'  => $this->getRole('photographer')->value(),
+            'ÜbersetzerIn'  => $this->getRole('translator')->value(),
+            'HerausgeberIn' => $this->getRole('editor')->value(),
+            'MitarbeiterIn' => $this->getRole('participant')->value(),
         ]);
     }
 }

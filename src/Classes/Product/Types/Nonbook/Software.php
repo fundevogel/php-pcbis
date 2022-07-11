@@ -92,7 +92,7 @@ class Software extends Item
         # Build dataset
         return array_merge(parent::export(), [
             # 'Software' specific data
-            'Version' => $this->version(),
+            'Version' => $this->version()->value(),
         ]);
     }
 }

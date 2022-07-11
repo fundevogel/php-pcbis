@@ -108,7 +108,7 @@ class Videogame extends Item
         # Build dataset
         return array_merge(parent::export(), [
             # 'Videogame' specific data
-            'Plattformen' => $this->platforms(),
+            'Plattformen' => $this->platforms()->value(),
         ]);
     }
 }

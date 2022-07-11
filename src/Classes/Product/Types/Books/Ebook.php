@@ -154,11 +154,11 @@ class Ebook extends Book
         # Build dataset
         return array_merge(parent::export(), [
             # 'Ebook' specific data
-            'Lesegeräte'   => $this->devices(),
-            'Printausgabe' => $this->printEdition(),
-            'Dateigröße'   => $this->fileSize(),
-            'Dateiformat'  => $this->fileFormat(),
-            'DRM'          => $this->drm(),
+            'Lesegeräte'   => $this->devices()->value(),
+            'Printausgabe' => $this->printEdition()->value(),
+            'Dateigröße'   => $this->fileSize()->value(),
+            'Dateiformat'  => $this->fileFormat()->value(),
+            'DRM'          => $this->drm()->value(),
         ]);
     }
 }

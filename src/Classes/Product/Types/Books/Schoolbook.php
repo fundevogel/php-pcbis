@@ -138,7 +138,7 @@ class Schoolbook extends Book
         # Build dataset
         return array_merge(parent::export(), [
             # 'Schoolbook' specific data
-            'Schulfach' => $this->subject(),
+            'Schulfach' => $this->subject()->value(),
         ]);
     }
 }
