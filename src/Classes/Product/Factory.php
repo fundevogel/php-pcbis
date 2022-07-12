@@ -13,23 +13,23 @@ namespace Fundevogel\Pcbis\Classes\Product;
 
 use Fundevogel\Pcbis\Exceptions\UnknownTypeException;
 use Fundevogel\Pcbis\Interfaces\Product;
-use Fundevogel\Pcbis\Classes\Product\Books\Types\Ebook;
-use Fundevogel\Pcbis\Classes\Product\Books\Types\Hardcover;
-use Fundevogel\Pcbis\Classes\Product\Books\Types\Schoolbook;
-use Fundevogel\Pcbis\Classes\Product\Books\Types\Softcover;
-use Fundevogel\Pcbis\Classes\Product\Media\Types\Audiobook;
-use Fundevogel\Pcbis\Classes\Product\Media\Types\Movie;
-use Fundevogel\Pcbis\Classes\Product\Media\Types\Music;
-use Fundevogel\Pcbis\Classes\Product\Media\Types\Sound;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Boardgame;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Calendar;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Map;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Nonbook;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Notes;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Software;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Stationery;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Toy;
-use Fundevogel\Pcbis\Classes\Product\Nonbook\Types\Videogame;
+use Fundevogel\Pcbis\Classes\Product\Types\Books\Ebook;
+use Fundevogel\Pcbis\Classes\Product\Types\Books\Hardcover;
+use Fundevogel\Pcbis\Classes\Product\Types\Books\Schoolbook;
+use Fundevogel\Pcbis\Classes\Product\Types\Books\Softcover;
+use Fundevogel\Pcbis\Classes\Product\Types\Media\Audiobook;
+use Fundevogel\Pcbis\Classes\Product\Types\Media\Movie;
+use Fundevogel\Pcbis\Classes\Product\Types\Media\Music;
+use Fundevogel\Pcbis\Classes\Product\Types\Media\Sound;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Boardgame;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Calendar;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Map;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Nonbook;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Notes;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Software;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Stationery;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Toy;
+use Fundevogel\Pcbis\Classes\Product\Types\Nonbook\Videogame;
 
 /**
  * Class Factory
