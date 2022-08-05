@@ -107,7 +107,7 @@ class Book extends Product
      */
     public function antolin(): Value
     {
-        foreach ($this->tags as $tag) {
+        foreach ($this->getTags() as $tag) {
             if (Str::startsWith($tag, 'Antolin')) {
                 return new Value(Str::replace($tag, ['Antolin (', ')'], ''));
             }

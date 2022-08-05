@@ -38,7 +38,6 @@ class Product extends ProductBase
 
     use OlaStatus;
     use People;
-    use Tags;
 
 
     /**
@@ -68,24 +67,8 @@ class Product extends ProductBase
         # Store product EAN/ISBN
         $this->identifier = $this->data['EAN'];
 
-        # Add startup hook
-        $this->setup();
-    }
-
-
-    /**
-     * Setup hook
-     *
-     * @return void
-     */
-    public function setup(): void
-    {
-        # Process data
-        # (1) Involved people
+        # Process & add involved people
         $this->people = $this->setUpPeople();
-
-        # (2) Topics & categories
-        $this->tags = $this->setUpTags();
     }
 
 
@@ -638,6 +621,157 @@ class Product extends ProductBase
 
 
     /**
+     * Extracts tags from raw data
+     *
+     * @return array
+     */
+    protected function getTags(): array
+    {
+        if (!isset($this->data['IndexSchlagw'])) {
+            return [];
+        }
+
+        if (is_string($this->data['IndexSchlagw'])) {
+            return (array) trim($this->data['IndexSchlagw']);
+        }
+
+        return $this->data['IndexSchlagw'];
+    }
+
+
+    /**
+     * Exports categories
+     *
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
+     */
+    public function categories(): Value
+    {
+        # Create data array
+        $categories = [];
+
+        # Fail early for empty values
+        if (empty($tags = $this->getTags())) {
+            return new Value($categories);
+        }
+
+        # Low-hanging fruit
+        # (1) Audiobooks
+        if ($this->isAudiobook()) {
+            $categories[] = 'Hörbuch';
+        }
+
+        # (2) Schoolbooks
+        if ($this->isSchoolbook()) {
+            $categories[] = 'Schulbuch';
+        }
+
+        foreach ($tags as $tag) {
+            # Be safe, trim whitespaces
+            $tag = trim($tag);
+
+            # Define exact example values
+            $higher = [
+                'Bilderbuch',
+                'Kinderbuch',
+                'Jugendbuch',
+                'Sachbuch',
+            ];
+
+            # High(er) accuracy
+            foreach ($higher as $example) {
+                # If strings match (case-insensitive) ..
+                if (Str::contains($tag, $example, true)) {
+                    # .. add them
+                    $categories[] = $example;
+                }
+            }
+
+            # Define vague example values
+            $lower = [
+                'erstlese'    => 'Erstlesebuch',
+                'sachbilder'  => 'Sachbuch',
+                'sach-bilder' => 'Sachbuch',
+                'vorlese'     => 'Vorlesebuch',
+            ];
+
+            # Low(er) accuracy
+            foreach ($lower as $key => $value) {
+                # If strings match (case-insensitive) ..
+                if (Str::contains($tag, $key, true)) {
+                    # .. add them
+                    $categories[] = $value;
+                }
+            }
+        }
+
+        return new Value(array_unique($categories));
+    }
+
+
+    /**
+     * Exports topics
+     *
+     * @return \Fundevogel\Pcbis\Classes\Product\Fields\Value
+     */
+    public function topics(): Value
+    {
+        # Create data array
+        $topics = [];
+
+        # Fail early for empty values
+        if (empty($tags = $this->getTags())) {
+            return new Value($topics);
+        }
+
+        foreach ($tags as $tag) {
+            # Extract relevant string
+            $string = A::last(Str::split($tag, ';'));
+
+            # Filter out ..
+            # (1) .. categories
+            $categories = [
+                'bilderbuch',
+                'hörbuch',
+                'jugendbuch',
+                'kinderbuch',
+                'sachbuch',
+                'schulbuch',
+            ];
+
+            $skip = false;
+
+            foreach ($categories as $category) {
+                # Upon first hit ..
+                if (Str::contains($string, $category, true)) {
+                    $skip = true;
+
+                    # .. abort execution
+                    break;
+                }
+            }
+
+            # (2) .. 'Antolin' rating
+            if (Str::startsWith($string, 'Antolin')) {
+                $skip = true;
+            }
+
+            # (3) Skip them
+            if ($skip) {
+                continue;
+            }
+
+            $topics[] = trim($string);
+        }
+
+        if ($this->data['EAN'] == 'harhar') {
+            var_dump($topics);
+        }
+
+        return new Value(array_unique($topics));
+    }
+
+
+    /**
      * Exports all data
      *
      * @return array
@@ -660,10 +794,8 @@ class Product extends ProductBase
             'Abmessungen'         => $this->dimensions()->value(),
             'Sprachen'            => $this->languages()->value(),
             'Mehrwehrtsteuersatz' => $this->vat()->value(),
-
-            # (2) Extension 'Tags'
-            'Kategorien'          => $this->categories(),
-            'Themen'              => $this->topics(),
+            'Kategorien'          => $this->categories()->value(),
+            'Themen'              => $this->topics()->value(),
         ];
     }
 
