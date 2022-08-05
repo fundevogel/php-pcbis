@@ -1,11 +1,11 @@
 {
     "name": "fundevogel/php-pcbis",
     "type": "library",
-    "description": "Simple PHP wrapper for pcbis.de API, written in PHP",
-    "keywords": ["pcbis", "knv", "api", "rest", "client"],
+    "description": "Simple PHP wrapper for Zeitfracht's webservice API, written in PHP",
+    "keywords": ["pcbis", "zeitfracht", "knv", "api", "webservice"],
     "homepage": "https://codeberg.org/Fundevogel/php-pcbis",
     "license": "GPL-3.0",
-    "version": "4.0.0-rc.4",
+    "version": "4.0.0",
     "scripts": {
         "lint": "pint --verbose",
         "test": "phpunit"
@@ -40,7 +40,7 @@
         "laravel/pint": "^0.2",
         "mikey179/vfsstream": "^1.6",
         "phpunit/phpunit": "^9.0",
-        "vimeo/psalm": "^4.23"
+        "vimeo/psalm": "^4.26"
     },
     "suggest": {
         "nicebooks/isbn": "Provides ISBN functionality such as validation & formatting"
