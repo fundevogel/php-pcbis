@@ -13,8 +13,6 @@ namespace Fundevogel\Pcbis\Tests\Utilities;
 
 use Fundevogel\Pcbis\Utilities\Butler;
 
-use org\bovigo\vfs\vfsStream;
-
 class ButlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -34,31 +32,5 @@ class ButlerTest extends \PHPUnit\Framework\TestCase
 
         # Assert result #2
         $this->assertEquals($result2, 'John Doe');
-    }
-
-
-    public function testDownloadCover(): void
-    {
-        # Setup
-        # (1) Virtual directory
-        $root = vfsStream::setup('home');
-
-        # (2) Fixture file path
-        $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
-        $fixture = sprintf('%s/../fixtures/%s.jpg', __DIR__, $isbn);
-
-        # (3) Output file path
-        $path = $root->url() . '/example.jpg';
-
-        try {
-            # Run function
-            $result = Butler::downloadCover($isbn, $path);
-
-            # Assert result
-            $this->assertTrue($result);
-            $this->assertFileEquals($fixture, $path);
-        } catch (\Throwable $th) {
-            $this->markTestIncomplete();
-        }
     }
 }
