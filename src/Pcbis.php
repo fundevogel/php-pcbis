@@ -78,6 +78,24 @@ final class Pcbis
 
                 # Iterate over data triples
                 foreach ($item->einzelWerk as $triple) {
+                    # Some EANs contain two numbers
+                    # See '978-3-7891-2946-9'
+                    if ($triple->feldName == 'EAN') {
+                        # Determine EAN
+                        $ean = $triple->werte[0];
+
+                        # Skip mismatches
+                        if ($ean != str_replace('-', '', $identifier)) {
+                            break;
+                        }
+
+                        # Apply it
+                        $data['EAN'] = $ean;
+
+                        # Move on to next item
+                        continue;
+                    }
+
                     # If more than one value available ..
                     $data[$triple->feldName] = count($triple->werte) > 1
                         ? $triple->werte     # .. assign them all
@@ -86,7 +104,7 @@ final class Pcbis
                 }
 
                 # Skip mismatches
-                if ($data['EAN'] != str_replace('-', '', $identifier)) {
+                if (!array_key_exists('EAN', $data)) {
                     continue;
                 }
 
