@@ -21,27 +21,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function setUp(): void
-    {
-        # Start output buffer
-        ob_start();
-    }
-
-
     public function testCast2String(): void
     {
         # Run function
-        echo new Product(['EAN' => 'xxx', 'AutorSachtitel' => 'Doe, John', 'Titel' => 'Title']);
+        $result = new Product(['EAN' => 'xxx', 'AutorSachtitel' => 'Doe, John', 'Titel' => 'Title']);
 
         # Assert result
-        $this->assertEquals(ob_get_contents(), 'John Doe: Title');
-    }
-
-
-    public function tearDown(): void
-    {
-        # Clear output buffer
-        ob_end_clean();
+        $this->assertEquals($result->__toString(), 'John Doe: Title');
     }
 
 
@@ -287,31 +273,35 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testDownloadCover(): void
+    public function testCategories(): void
     {
-        # Setup
-        # (1) Virtual directory
-        $root = vfsStream::setup('home');
+        # Run function #1
+        $obj = new Product(['EAN' => 'xxx', 'IndexSchlagw' => 'Antolin 3. KLASSE']);
 
-        # (2) Fixture file path
-        $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
-        $fixture = sprintf('%s/fixtures/%s.jpg', __DIR__ . '/../..', $isbn);
+        # Assert result #1
+        $this->assertEquals($obj->categories(), '');
 
-        # (3) Output file path
-        $path = $root->url() . '/example.jpg';
+        # Run function #2
+        $obj = new Product(['EAN' => 'xxx', 'IndexSchlagw' => ['Papp-Bilderbuch', 'Vulkane']]);
 
-        try {
-            # Run function
-            $obj = new Product(['EAN' => $isbn]);
-            $result = $obj->downloadCover($path);
+        # Assert result #2
+        $this->assertEquals($obj->categories()->value(), ['Bilderbuch']);
+    }
 
-            # Assert result
-            $this->assertTrue($result);
-            $this->assertFileEquals($fixture, $path);
-        } catch (\Throwable $th) {
-            var_dump($th->getMessage());
-            $this->markTestIncomplete();
-        }
+
+    public function testTopics(): void
+    {
+        # Run function #1
+        $obj = new Product(['EAN' => 'xxx', 'IndexSchlagw' => 'Antolin 3. KLASSE']);
+
+        # Assert result #1
+        $this->assertEquals($obj->topics(), '');
+
+        # Run function #2
+        $obj = new Product(['EAN' => 'xxx', 'IndexSchlagw' => ['Papp-Bilderbuch', 'Vulkane']]);
+
+        // # Assert result #2
+        $this->assertEquals($obj->topics()->value(), ['Vulkane']);
     }
 
 
@@ -337,5 +327,32 @@ class ProductTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertIsArray($obj->export());
+    }
+
+
+    public function testDownloadCover(): void
+    {
+        # Setup
+        # (1) Virtual directory
+        $root = vfsStream::setup('home');
+
+        # (2) Fixture file path
+        $isbn = '978-3-314-10561-6';  # Die Tode meiner Mutter
+        $fixture = sprintf('%s/fixtures/%s.jpg', __DIR__ . '/../..', $isbn);
+
+        # (3) Output file path
+        $path = $root->url() . '/example.jpg';
+
+        try {
+            # Run function
+            $obj = new Product(['EAN' => $isbn]);
+            $result = $obj->downloadCover($path);
+
+            # Assert result
+            $this->assertTrue($result);
+            $this->assertFileEquals($fixture, $path);
+        } catch (\Throwable $th) {
+            $this->markTestIncomplete();
+        }
     }
 }

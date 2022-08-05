@@ -38,28 +38,19 @@ class ValueTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function setUp(): void
-    {
-        # Start output buffer
-        ob_start();
-    }
-
-
     public function testCast2String(): void
     {
         # Run function #1
-        echo new Value(self::$string);
-        echo new Value(self::$array);
+        $result1 = new Value(self::$string);
 
         # Assert result #1
-        $this->assertEquals(ob_get_contents(), 'stringvalue1<br \>value2');
-    }
+        $this->assertEquals($result1->__toString(), 'string');
 
+        # Run function #2
+        $result2 = new Value(self::$array);
 
-    public function tearDown(): void
-    {
-        # Clear output buffer
-        ob_end_clean();
+        # Assert result #2
+        $this->assertEquals($result2->__toString(), 'value1<br \>value2');
     }
 
 

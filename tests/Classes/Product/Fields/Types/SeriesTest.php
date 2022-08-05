@@ -32,27 +32,13 @@ class SeriesTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function setUp(): void
-    {
-        # Start output buffer
-        ob_start();
-    }
-
-
     public function testCast2String(): void
     {
         # Run function
-        echo new Series(self::$data);
+        $result = new Series(self::$data);
 
         # Assert result
-        $this->assertEquals(ob_get_contents(), 'Harry Potter<br \>Best of Rowling');
-    }
-
-
-    public function tearDown(): void
-    {
-        # Clear output buffer
-        ob_end_clean();
+        $this->assertEquals($result->__toString(), 'Harry Potter<br \>Best of Rowling');
     }
 
 

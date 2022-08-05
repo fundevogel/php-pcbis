@@ -46,27 +46,13 @@ class RolesTest extends \PHPUnit\Framework\TestCase
      * Tests
      */
 
-    public function setUp(): void
-    {
-        # Start output buffer
-        ob_start();
-    }
-
-
     public function testCast2String(): void
     {
         # Run function
-        echo new Roles(self::$people);
+        $result = new Roles(self::$people);
 
         # Assert result
-        $this->assertEquals(ob_get_contents(), 'Illustration: John Doe. Mitarbeit: John Doe; Jane Done');
-    }
-
-
-    public function tearDown(): void
-    {
-        # Clear output buffer
-        ob_end_clean();
+        $this->assertEquals($result->__toString(), 'Illustration: John Doe. Mitarbeit: John Doe; Jane Done');
     }
 
 
