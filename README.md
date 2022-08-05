@@ -4,7 +4,7 @@
 
 ## What
 
-This small library is a PHP wrapper for [pcbis.de](https://pcbis.de), gathering information about books through wholesale book distributor [KNV](http://knv.de)'s API. For the documentation on their [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language) interface, see [here](docs/Webservice_2.0.19.pdf).
+This small library may be used to gather information about books by utilizing the JSON API powering [pcbis.de](https://pcbis.de), developed by [Zeitfracht](https://zeitfracht.de/en), a german wholesale book distributor. The official API documentation can be found [here](docs/Webservice_3.0.0.pdf).
 
 
 ## Why
@@ -51,16 +51,18 @@ try {
     }
 
     # (4) .. query its OLA status
-    $book->isAvailable();
+    if ($book->isAvailable()) {
+        # ...
+    }
 
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage(), "\n";
 }
 ```
 
-If you want to load several EANs/ISBNs, use `loadAll(array $identifiers)` which returns a `Collection` object.
+If you want to load several EANs/ISBNs, use `loadAll(array $identifiers)` which returns a `Products` object.
 
-**Note**: Starting with v3, ISBN validation is no longer enabled by default. If you want formatted (= hyphenated) ISBNs when calling `isbn()` (books only), `php-pcbis` takes care of this automatically if [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn) is installed via `composer require nicebooks/isbn`.
+**Note**: Starting with v3, ISBN validation is no longer enabled by default. If you want formatted (= hyphenated) ISBNs when calling `isbn()` (if available), `php-pcbis` takes care of this for you if [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn) is installed.
 
 
 ### Caching
