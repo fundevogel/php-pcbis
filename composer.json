@@ -43,8 +43,7 @@
         "vimeo/psalm": "^4.23"
     },
     "suggest": {
-        "nicebooks/isbn": "Provides ISBN functionality such as validation & formatting",
-        "symfony/cache": "When passed to 'Webservice', this provides caching functionality"
+        "nicebooks/isbn": "Provides ISBN functionality such as validation & formatting"
     },
     "autoload": {
         "psr-4": {

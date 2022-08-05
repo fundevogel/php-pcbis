@@ -67,36 +67,25 @@ If you want to load several EANs/ISBNs, use `loadAll(array $identifiers)` which 
 
 ### Caching
 
-For caching data fetched from KNV's API, you may use any [`symfony/cache`](https://symfony.com/doc/current/components/cache) object:
-
-```text
-composer require symfony/cache
-```
-
-For a standard file cache, your setup might then look something like this:
+By default, `php-pcbis` doesn't implement any caching mechanism. If you want to store data - and you probably should - this could be achieved something like this:
 
 ```php
+require_once('vendor/autoload.php');
+
 use Fundevogel\Pcbis\Pcbis;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
-# Initialize cache object
-$cache = new FilesystemAdapter();
+$obj = new Pcbis([/* ... */]);
+$ean = 'identifier';
 
-# Create API object, passing credentials & cache object as parameters
-$object = new Pcbis([/* ... */], $cache);
-```
+if ($myCache->has($ean)) {
+    $data = $myCache->get($ean);
+    $product = $obj->load($data);
+}
 
-**Note**: Since we use [KirbyCMS](https://getkirby.com/docs/guide/cache) on our website, we included a cache driver to make it work nicely with `php-pcbis`:
-
-```php
-use Fundevogel\Pcbis\Pcbis;
-use Fundevogel\Pcbis\Cache\KirbyCache;
-
-# Initialize cache object
-$cache = new KirbyCache(kirby()->cache('my-cache'));
-
-# Create API object, passing credentials & cache object as parameters
-$object = new Pcbis([/* ... */], $cache);
+else {
+    $product = $obj->load($ean);
+    $myCache->set($ean, $product->data);
+}
 ```
 
 

@@ -38,33 +38,24 @@ final class Pcbis
 
 
     /**
-     * Whether to update cached data
-     *
-     * @var bool
-     */
-    public bool $forceRefresh = false;
-
-
-    /**
      * Constructor
      *
      * @param array $credentials Login credentials
-     * @param mixed $cache Cache object
      * @return void
      */
-    public function __construct(?array $credentials = null, public mixed $cache = null)
+    public function __construct(?array $credentials = null)
     {
         $this->api = new Webservice($credentials);
     }
 
 
     /**
-     * Retrieves data from API & formats it
+     * Fetches data from API & formats it
      *
      * @param string $identifier Product EAN/ISBN
      * @return array Matched products (may be empty)
      */
-    private function retrieve(string $identifier): array
+    public function fetch(string $identifier): ?array
     {
         # Query API for matching search items
         $result = $this->api->suche($identifier);
@@ -112,63 +103,38 @@ final class Pcbis
             }
         }
 
-        return [];
+        return null;
     }
 
 
     /**
-     * Fetches information from cache if they exist,
-     * otherwise loads them & saves to cache
+     * Instantiates 'Product' object from data OR single EAN/ISBN
      *
-     * @param string $identifier Product EAN/ISBN
-     * @param bool $forceRefresh Whether to update cached data
-     * @return array
-     */
-    private function fetch(string $identifier, bool $forceRefresh = false): array
-    {
-        $value = null;
-
-        if (!is_null($this->cache)) {
-            # If specified ..
-            if ($forceRefresh) {
-                # .. clear cache beforehand
-                $this->cache->delete($identifier);
-            }
-
-            # Retrieve from cache
-            $value = $this->cache->get($identifier, function () use ($identifier) {
-                return $this->retrieve($identifier);
-            });
-        }
-
-        if (is_null($value)) {
-            $value = $this->retrieve($identifier);
-        }
-
-        return $value;
-    }
-
-
-    /**
-     * Instantiates 'Product' object from single EAN/ISBN
-     *
-     * @param string $identifier Product EAN/ISBN
+     * @param string $value Product EAN/ISBN OR its data
      * @return \Fundevogel\Pcbis\Classes\Product\Product
      */
-    public function load(string $identifier): ?Product
+    public function load(array|string $value): ?Product
     {
-        # If raw data is available ..
-        if ($data = $this->fetch($identifier, $this->forceRefresh)) {
-            # .. instantiate product
-            $object = Factory::create($data);
-
-            # .. pass API object
-            $object->api = $this->api;
-
-            return $object;
+        # If value represents an identifier ..
+        if (is_string($value)) {
+            # .. fetch its product data
+            $value = $this->fetch($value);
         }
 
-        return null;
+        # If data is invalid ..
+        if (is_null($value)) {
+            # .. fail early
+            return $value;
+        }
+
+        # Load product object
+        # (1) Instantiate it
+        $object = Factory::create($value);
+
+        # (2) Pass API object
+        $object->api = $this->api;
+
+        return $object;
     }
 
 

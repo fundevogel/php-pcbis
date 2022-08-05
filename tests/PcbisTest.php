@@ -13,6 +13,7 @@ namespace Fundevogel\Pcbis\Tests;
 
 use Fundevogel\Pcbis\Pcbis;
 use Fundevogel\Pcbis\Api\Webservice;
+use Fundevogel\Pcbis\Interfaces\Product;
 
 class PcbisTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,19 +43,11 @@ class PcbisTest extends \PHPUnit\Framework\TestCase
 
     public function testAvailableProperties(): void
     {
-        # Setup
-        $properties = [
-            'api',
-            'forceRefresh',
-        ];
-
         # Run function
         $obj = new Pcbis();
 
-        foreach ($properties as $property) {
-            # Assert result
-            $this->assertTrue(property_exists($obj, $property));
-        }
+        # Assert result
+        $this->assertTrue(property_exists($obj, 'api'));
     }
 
 
@@ -65,6 +58,25 @@ class PcbisTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertInstanceOf(Webservice::class, $obj->api);
-        $this->assertFalse($obj->forceRefresh);
+    }
+
+
+    public function testLoad(): void
+    {
+        # Setup
+        $data = [
+            'EAN' => 'xxx',
+            'Sortimentskennzeichen' => 'HC',
+            'AutorSachtitel' => 'Doe, John',
+            'Titel' => 'Title',
+            'Utitel' => 'Subtitle',
+            'IndexVerlag' => 'Verlag',
+        ];
+
+        # Run function
+        $obj = (new Pcbis())->load($data);
+
+        # Assert result
+        $this->assertInstanceOf(Product::class, $obj);
     }
 }
