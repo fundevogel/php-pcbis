@@ -4,7 +4,7 @@
 
 ## What
 
-This small library may be used to gather information about books by utilizing the JSON API powering [pcbis.de](https://pcbis.de), developed by [Zeitfracht](https://zeitfracht.de/en), a german wholesale book distributor. The official API documentation can be found [here](docs/Webservice_3.0.0.pdf).
+This small library may be used to gather information about books by utilizing the JSON API powering [pcbis.de](https://pcbis.de), developed by [Zeitfracht](https://zeitfracht.de/en), a german wholesale book distributor. The official API documentation can be found [here](docs/2022-03-17_webservice_v3.0.0.pdf).
 
 
 ## Why
