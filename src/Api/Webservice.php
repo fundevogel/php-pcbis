@@ -52,7 +52,7 @@ final class Webservice
      *
      * @var string
      */
-    public $url = 'https://wstest.pcbis.de/ws30';
+    public $url = 'https://ws.pcbis.de/ws30';
 
 
     /**

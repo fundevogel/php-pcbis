@@ -60,6 +60,16 @@ try {
 }
 ```
 
+**Note**: While using this library during development, please consider using the API testing endpoint like so:
+
+```php
+# Initialize API wrapper
+$api = new Webservice($credentials);
+
+# Use 'testing' URL 
+$api->url = 'https://wstest.pcbis.de/ws30';
+```
+
 If you want to load several EANs/ISBNs, use `loadAll(array $identifiers)` which returns a `Products` object.
 
 **Note**: Starting with v3, ISBN validation is no longer enabled by default. If you want formatted (= hyphenated) ISBNs when calling `isbn()` (if available), `php-pcbis` takes care of this for you if [`nicebooks/isbn`](https://github.com/nicebooks-com/isbn) is installed.
