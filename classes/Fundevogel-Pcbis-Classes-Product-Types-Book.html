@@ -93,14 +93,15 @@
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis.html">Pcbis</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes.html">Classes</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes-product.html">Product</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes-product-types.html">Types</a></li>
     </ul>
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    Product
+    Book
 
         <span class="phpdocumentor-element__extends">
-        extends <a href="classes/Fundevogel-Pcbis-Classes-Product-ProductBase.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\ProductBase">ProductBase</abbr></a>
+        extends <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Product">Product</abbr></a>
     </span>
     
             <div class="phpdocumentor-element__package">
@@ -111,21 +112,18 @@
         </div>
     
     
-            <span class="phpdocumentor-element__extends">
-            Uses
-                            <a href="classes/Fundevogel-Pcbis-Traits-OlaStatus.html"><abbr title="\Fundevogel\Pcbis\Traits\OlaStatus">OlaStatus</abbr></a>,                             <a href="classes/Fundevogel-Pcbis-Traits-People.html"><abbr title="\Fundevogel\Pcbis\Traits\People">People</abbr></a>                    </span>
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">33</span>
+    <span class="phpdocumentor-element-found-in__line">24</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Class Product</p>
+            <p class="phpdocumentor-summary">Class Book</p>
 
-    <section class="phpdocumentor-description"><p>Base class of all product types</p>
+    <section class="phpdocumentor-description"><p>Base class for books</p>
 </section>
 
 
@@ -170,6 +168,13 @@
 <dd>Status codes of available products</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -property -protected">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#property_bindings">$bindings</a>
+    <span>
+                        &nbsp;: array&lt;string|int, mixed&gt;            </span>
+</dt>
+<dd>Binding codes</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -property -protected">
     <a href="classes/Fundevogel-Pcbis-Traits-OlaStatus.html#property_errorMessages">$errorMessages</a>
     <span>
                         &nbsp;: array&lt;string|int, mixed&gt;            </span>
@@ -198,7 +203,7 @@
 <dd>Status codes of unavailable products</dd>
 
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method___construct">__construct()</a>
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method___construct">__construct()</a>
     <span>
                                 &nbsp;: void    </span>
 </dt>
@@ -226,11 +231,25 @@
 <dd>Exports recommended minimum age (in years)</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_antolin">antolin()</a>
+    <span>
+                                &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a>    </span>
+</dt>
+<dd>Exports Antolin rating</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Fundevogel-Pcbis-Traits-People.html#method_author">author()</a>
     <span>
                                 &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Types-Role.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Types\Role">Role</abbr></a>    </span>
 </dt>
 <dd>Exports author(s)</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_binding">binding()</a>
+    <span>
+                                &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a>    </span>
+</dt>
+<dd>Exports binding</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_categories">categories()</a>
@@ -303,7 +322,7 @@
 <dd>Exports editor(s)</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_export">export()</a>
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_export">export()</a>
     <span>
                                 &nbsp;: array&lt;string|int, mixed&gt;    </span>
 </dt>
@@ -562,6 +581,13 @@
 <dd>Exports original author(s</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_pageCount">pageCount()</a>
+    <span>
+                                &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a>    </span>
+</dt>
+<dd>Exports page count</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Fundevogel-Pcbis-Traits-People.html#method_participant">participant()</a>
     <span>
                                 &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Types-Role.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Types\Role">Role</abbr></a>    </span>
@@ -802,7 +828,7 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="
@@ -962,6 +988,39 @@
             -protected
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="property_bindings">
+        $bindings
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#property_bindings" class="headerlink"><i class="fas fa-link"></i></a>
+        <span class="phpdocumentor-element__modifiers">
+                                </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">35</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Binding codes</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">protected</span>
+        <span class="phpdocumentor-signature__type">array&lt;string|int, mixed&gt;</span>
+    <span class="phpdocumentor-signature__name">$bindings</span>
+    </code>
+
+    
+    
+    
+
+</article>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -protected
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="property_errorMessages">
         $errorMessages
         <a href="classes/Fundevogel-Pcbis-Traits-OlaStatus.html#property_errorMessages" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1109,7 +1168,7 @@
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -1119,12 +1178,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method___construct">
         __construct()
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">62</span>
+    <span class="phpdocumentor-element-found-in__line">44</span>
 
     </aside>
 
@@ -1142,7 +1201,7 @@
                 : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Source data as fetched from KNV's API</p>
+                    <section class="phpdocumentor-description"><p>Source data fetched from KNV's API</p>
 </section>
 
             </dd>
@@ -1270,6 +1329,39 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_antolin">
+        antolin()
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_antolin" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">108</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Exports Antolin rating</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">antolin</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_author">
         author()
         <a href="classes/Fundevogel-Pcbis-Traits-People.html#method_author" class="headerlink"><i class="fas fa-link"></i></a>
@@ -1293,6 +1385,39 @@
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Types-Role.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Types\Role">Role</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_binding">
+        binding()
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_binding" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">63</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Exports binding</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">binding</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span>
             &mdash;
         
     
@@ -1666,12 +1791,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_export">
         export()
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_export" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_export" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">779</span>
+    <span class="phpdocumentor-element-found-in__line">125</span>
 
     </aside>
 
@@ -2922,6 +3047,39 @@
 
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
     <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Types-Role.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Types\Role">Role</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_pageCount">
+        pageCount()
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#method_pageCount" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Book.php"><a href="files/src-classes-product-types-book.html"><abbr title="src/Classes/Product/Types/Book.php">Book.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">85</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Exports page count</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">pageCount</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span>
             &mdash;
         
     
@@ -4202,7 +4360,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Book.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

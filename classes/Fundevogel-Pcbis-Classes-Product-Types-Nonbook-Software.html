@@ -93,14 +93,16 @@
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis.html">Pcbis</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes.html">Classes</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes-product.html">Product</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes-product-types.html">Types</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/fundevogel-pcbis-classes-product-types-nonbook.html">Nonbook</a></li>
     </ul>
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    Product
+    Software
 
         <span class="phpdocumentor-element__extends">
-        extends <a href="classes/Fundevogel-Pcbis-Classes-Product-ProductBase.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\ProductBase">ProductBase</abbr></a>
+        extends <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Item.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Types\Item">Item</abbr></a>
     </span>
     
             <div class="phpdocumentor-element__package">
@@ -111,21 +113,18 @@
         </div>
     
     
-            <span class="phpdocumentor-element__extends">
-            Uses
-                            <a href="classes/Fundevogel-Pcbis-Traits-OlaStatus.html"><abbr title="\Fundevogel\Pcbis\Traits\OlaStatus">OlaStatus</abbr></a>,                             <a href="classes/Fundevogel-Pcbis-Traits-People.html"><abbr title="\Fundevogel\Pcbis\Traits\People">People</abbr></a>                    </span>
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Nonbook/Software.php"><a href="files/src-classes-product-types-nonbook-software.html"><abbr title="src/Classes/Product/Types/Nonbook/Software.php">Software.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">33</span>
+    <span class="phpdocumentor-element-found-in__line">23</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Class Product</p>
+            <p class="phpdocumentor-summary">Class Software</p>
 
-    <section class="phpdocumentor-description"><p>Base class of all product types</p>
+    <section class="phpdocumentor-description"><p>KNV product category 'Software'</p>
 </section>
 
 
@@ -198,7 +197,7 @@
 <dd>Status codes of unavailable products</dd>
 
                 <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method___construct">__construct()</a>
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-ProductBase.html#method___construct">__construct()</a>
     <span>
                                 &nbsp;: void    </span>
 </dt>
@@ -303,7 +302,7 @@
 <dd>Exports editor(s)</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_export">export()</a>
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_export">export()</a>
     <span>
                                 &nbsp;: array&lt;string|int, mixed&gt;    </span>
 </dt>
@@ -399,6 +398,13 @@
                                 &nbsp;: bool    </span>
 </dt>
 <dd>Checks whether this is an eBook</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_isEducational">isEducational()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Checks whether software is educational</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Fundevogel-Pcbis-Classes-Product-ProductBase.html#method_isHardcover">isHardcover()</a>
@@ -660,6 +666,13 @@
 <dd>Exports type of value added tax (VAT)</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_version">version()</a>
+    <span>
+                                &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a>    </span>
+</dt>
+<dd>Exports version schema</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_weight">weight()</a>
     <span>
                                 &nbsp;: <a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a>    </span>
@@ -802,7 +815,7 @@
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="
@@ -1109,7 +1122,7 @@
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
         </h3>
                     <article
         class="phpdocumentor-element
@@ -1119,12 +1132,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method___construct">
         __construct()
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-ProductBase.html#method___construct" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/ProductBase.php"><a href="files/src-classes-product-productbase.html"><abbr title="src/Classes/Product/ProductBase.php">ProductBase.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">62</span>
+    <span class="phpdocumentor-element-found-in__line">32</span>
 
     </aside>
 
@@ -1666,12 +1679,12 @@
 >
     <h4 class="phpdocumentor-element__name" id="method_export">
         export()
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_export" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_export" class="headerlink"><i class="fas fa-link"></i></a>
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Product.php"><a href="files/src-classes-product-product.html"><abbr title="src/Classes/Product/Product.php">Product.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Nonbook/Software.php"><a href="files/src-classes-product-types-nonbook-software.html"><abbr title="src/Classes/Product/Types/Nonbook/Software.php">Software.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">779</span>
+    <span class="phpdocumentor-element-found-in__line">90</span>
 
     </aside>
 
@@ -2135,6 +2148,39 @@
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
                     <span class="phpdocumentor-signature__name">isEbook</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type">bool</span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_isEducational">
+        isEducational()
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_isEducational" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Nonbook/Software.php"><a href="files/src-classes-product-types-nonbook-software.html"><abbr title="src/Classes/Product/Types/Nonbook/Software.php">Software.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">75</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Checks whether software is educational</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">isEducational</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
 
     
     
@@ -3407,6 +3453,39 @@
             -public
                                                         "
 >
+    <h4 class="phpdocumentor-element__name" id="method_version">
+        version()
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#method_version" class="headerlink"><i class="fas fa-link"></i></a>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/Classes/Product/Types/Nonbook/Software.php"><a href="files/src-classes-product-types-nonbook-software.html"><abbr title="src/Classes/Product/Types/Nonbook/Software.php">Software.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">34</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Exports version schema</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">version</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span></code>
+
+    
+    
+    
+
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+    <span class="phpdocumentor-signature__response_type"><a href="classes/Fundevogel-Pcbis-Classes-Product-Fields-Value.html"><abbr title="\Fundevogel\Pcbis\Classes\Product\Fields\Value">Value</abbr></a></span>
+            &mdash;
+        
+    
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
     <h4 class="phpdocumentor-element__name" id="method_weight">
         weight()
         <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#method_weight" class="headerlink"><i class="fas fa-link"></i></a>
@@ -4202,7 +4281,7 @@
 </section>
             </div>
         </div>
-        <a href="classes/Fundevogel-Pcbis-Classes-Product-Product.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/Fundevogel-Pcbis-Classes-Product-Types-Nonbook-Software.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 
