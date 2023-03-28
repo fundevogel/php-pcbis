@@ -270,18 +270,23 @@ trait People
             return [];
         }
 
-        $string = $this->data['AutorSachtitel'];
+        $data = $this->data['AutorSachtitel'];
+
+        # Edge case: Multiple authors (see 978-3-9858505-0-1)
+        if (is_array($data)) {
+            return $this->organizePeople($data[0]);
+        }
 
         $groupDelimiter = ';';
         $personDelimiter = ',';
 
         # Edge case: `AutorSachtitel` contains something other than a person
-        if (!Str::contains($string, $groupDelimiter) && !Str::contains($string, $personDelimiter)) {
+        if (!Str::contains($data, $groupDelimiter) && !Str::contains($data, $personDelimiter)) {
             if (isset($this->data['IndexAutor'])) {
                 if (is_array($this->data['IndexAutor'])) {
-                    $string = A::join(array_map('trim', $this->data['IndexAutor']), ';');
+                    $data = A::join(array_map('trim', $this->data['IndexAutor']), ';');
                 } elseif (is_string($this->data['IndexAutor'])) {
-                    $string = trim($this->data['IndexAutor']);
+                    $data = trim($this->data['IndexAutor']);
                 } else {
                     return [];
                 }
@@ -290,7 +295,7 @@ trait People
             }
         }
 
-        return $this->organizePeople($string);
+        return $this->organizePeople($data);
     }
 
 
